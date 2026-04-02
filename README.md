@@ -25,8 +25,8 @@ Repository ufficiale dedicato al corso di Media and Interaction dell’anno acca
 ## 03_Progetti
 ### Progetto 1 — NASA70
 **Obiettivo:** Creare una pagina web divulgativa che permetta di esplorare in modo innovativo e interattivo i dati, le immagini e i materiali prodotti dalla NASA sulle attività spaziali.<br>
-**Concept**: [Descrittivo delle intenzioni e della struttura del progetto](https://lucamazzolaa.github.io/NASA70/progetti/progetto1/concept) <br>
-**Preview:** [Rapporti natuarali](#) <br>
+**Concept**: [Descrittivo delle intenzioni e della struttura del progetto](https://lucamazzolaa.github.io/NASA70/progetti/progetto1/docs/concept) <br>
+**Preview:** [Rapporti natuarali](https://lucamazzolaa.github.io/NASA70/progetti/progetto1/) <br>
 
 ## 04_Credits
 Progetto di Luca Mazzola
