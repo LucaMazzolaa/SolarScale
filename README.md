@@ -1,12 +1,12 @@
-¨SUPSI 2026  
+SUPSI 2026  
 Corso d’interaction design, CV429.01  
 Docenti: A. Gysin, G. Profeta  
 
 Progetto 1: La conquista dello spazio
 
 # Titolo progetto
-Autore: Nome Cognome \
-[Titolo progetto](https://github.com/ixd-supsi/2026/tree/main/esempi/es06_array_7)
+Autore: Luca Mazzola \
+[NASA IN SCALA](https://github.com/ixd-supsi/2026/tree/main/esempi/es06_array_7)
 
 
 ## Introduzione e tema
