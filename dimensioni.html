@@ -41,7 +41,7 @@
             /* ======================================================
                CALCOLI MATEMATICI PER MACBOOK PRO 13" (Base 1440px)
                ====================================================== */
-            --font-62: clamp(32px, 2.5vw + 26px, 90px);   /* Fallback per H1 */
+            --font-62: clamp(32px, 2.5vw + 26px, 90px);   /* Esattamente 62px a 1440px */
             --font-16: clamp(14px, 0.3vw + 11.68px, 22px);/* Esattamente 16px a 1440px */
             --font-14: clamp(12px, 0.25vw + 10.4px, 18px);/* Esattamente 14px a 1440px */
         }
@@ -503,6 +503,11 @@
 </nav>
 
 <script>
+// ==========================================
+// ABILITAZIONE CACHE GLOBALE THREE.JS PER VELOCIZZARE IL CARICAMENTO
+// ==========================================
+THREE.Cache.enabled = true;
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── 1. GESTIONE CURSORE VISIVO E ANIMAZIONI ─── */
@@ -765,7 +770,8 @@ document.addEventListener('DOMContentLoaded', () => {
     camera.position.set(headerCamX, headerCamY, headerCamZ);
     let lookAtTarget = new THREE.Vector3(headerCamX, headerCamY, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    /* OTTIMIZZAZIONE: Antialias disattivato per performance */
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     canvasContainer.appendChild(renderer.domElement);
@@ -826,6 +832,9 @@ document.addEventListener('DOMContentLoaded', () => {
             model.traverse((child) => {
                 if (child.isMesh && child.material) {
                     child.material.side = THREE.DoubleSide;
+                    /* OTTIMIZZAZIONE: Disattivo ombre non necessarie */
+                    child.castShadow = false; 
+                    child.receiveShadow = false;
                     
                     if (targetPlanets.includes(data.id)) {
                         if (child.material.color) {
@@ -840,6 +849,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         child.material.emissive = new THREE.Color(0xffffff); 
                         child.material.emissiveIntensity = 1.0; 
                     }
+
+                    // Assicura che i materiali vengano applicati senza errori o texture invisibili
+                    child.material.needsUpdate = true;
                 }
             });
 
