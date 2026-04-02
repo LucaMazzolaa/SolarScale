@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA IN SCALA - Introduzione</title>
+    <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
+    
+    <style>
+        /* =========================================
+           IMPORTAZIONE FONT E VARIABILI ROOT
+           ========================================= */
+        @font-face {
+            font-family: 'Nasa';
+            src: url('assets/nasa.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-book.otf') format('opentype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-medium.otf') format('opentype');
+            font-weight: 500;
+        }
+
+        :root {
+            /* Dimensione fluida per il menu importata da dimensioni.html */
+            --font-16: clamp(14px, 0.3vw + 11.68px, 22px); 
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; 
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 400;
+            background: black;
+            color: white;
+            overflow: hidden; 
+            cursor: none; 
+        }
+
+        /* =========================================
+           CURSORE PERSONALIZZATO
+           ========================================= */
+        .cursor-dot, .cursor-outline {
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%; 
+            z-index: 9999999; 
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 5px; height: 5px;
+            background: white; 
+            mix-blend-mode: difference;
+            transition: width .3s, height .3s;
+        }
+        .cursor-outline {
+            width: 15px; height: 15px;
+            border: 2px solid white; 
+            mix-blend-mode: difference;
+            transition: width .3s, height .3s;
+        }
+        .mouse-down { width: 20px !important; height: 20px !important; }
+        .hover      { width: 30px !important; height: 30px !important; }
+
+        /* =========================================
+           SCHERMATA DI CARICAMENTO (PRELOADER)
+           ========================================= */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            z-index: 99999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-sun {
+            width: clamp(60px, 8vw, 110px);
+            height: auto;
+            margin-bottom: 3vh;
+            filter: brightness(0) invert(1);
+        }
+
+        .preloader-title {
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 700;
+            font-size: clamp(22px, 2vw, 32px);
+            color: white;
+            line-height: 1;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .loading-percentage {
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 500;
+            font-size: clamp(14px, 1.1vw, 18px); 
+            color: #888;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           TOP MENU
+           ========================================= */
+        .menu {
+            position: fixed;
+            left: 4vh; 
+            top: 4vh; 
+            width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); 
+            font-weight: 500;
+            z-index: 999999;
+            display: flex;
+            flex-direction: row; 
+            align-items: center; 
+            gap: 3vw; 
+        }
+        
+        .nasa-title {
+            font-weight: 700;
+            font-size: clamp(22px, 2vw, 32px); 
+            color: white;
+            line-height: 1; 
+            pointer-events: all;
+            cursor: none;
+            margin-right: 1.5vw;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            text-decoration: none;
+        }
+
+        .nasa-title img {
+            height: 1em;
+            width: auto;
+            display: block;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-link {
+            font-family: 'Neue Montreal', sans-serif;
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            cursor: none;
+            opacity: 0.4; 
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 4px 6px;
+        }
+
+        .text-label, .nasa-text-label {
+            display: inline-block;
+            line-height: 1;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            pointer-events: none; 
+        }
+
+        .nav-link::before { content: "["; opacity: 1; transition: opacity 0.2s; }
+        .nav-link::after { content: "]"; opacity: 1; transition: opacity 0.2s; }
+        .nav-link:hover, .nav-link.active { opacity: 1; }
+
+        .nav-link:hover::before, .nav-link.active::before,
+        .nav-link:hover::after, .nav-link.active::after {
+            opacity: 1;
+        }
+
+        #crediti-link {
+            position: fixed;
+            top: 4vh;
+            right: 4vh; 
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); 
+            font-weight: 500;
+            z-index: 999999; 
+        }
+
+        /* =========================================
+           STRUTTURA PRINCIPALE E CONTENUTI
+           ========================================= */
+        .container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content {
+            position: absolute;
+            top: 14vh; 
+            left: 4vh; 
+            right: 4vh;
+            margin: 0; 
+            width: calc(100vw - 8vh); 
+            max-width: none; 
+            height: 82vh; 
+            overflow-y: auto; 
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: clamp(15px, 1.1vw, 18px); 
+            line-height: 1.7; 
+            word-wrap: break-word;
+            padding-bottom: 15vh; 
+            scrollbar-width: none;         
+            -ms-overflow-style: none;      
+            z-index: 2;
+        }
+
+        .content::-webkit-scrollbar { display: none; }
+
+        section { display: none; }
+        
+        #intro.active-section { 
+            display: flex; 
+            align-items: center; 
+            height: 100%; 
+            overflow: hidden; 
+        }
+        
+        section.active-section:not(#intro) { display: block; }
+        section:not(#intro) > * { opacity: 0; }
+        section#intro > * { opacity: 1; }
+
+        .cascade-element {
+            position: relative;
+            top: 15px; 
+            animation: cascadeReveal 0.5s ease forwards;
+        }
+
+        @keyframes cascadeReveal {
+            to { opacity: 1; top: 0; }
+        }
+
+        .app-container {
+            position: fixed;
+            top: 12vh; 
+            left: 0;
+            width: 100vw; 
+            height: 88vh; 
+            background: white; 
+            border: 1px solid #555;
+            cursor: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        section.active-section .app-container {
+            animation: appFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes appFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* =========================================
+           INTRODUZIONE E TYPING EFFECT
+           ========================================= */
+        .intro-large-text {
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 500; 
+            line-height: 1.15; 
+            letter-spacing: -0.01em;
+            text-align: left; 
+            width: 100%;
+            margin: 0;
+        }
+
+        .typing-word {
+            display: inline;
+        }
+
+        /* Effetti Interattivi Tipografici */
+        .anim-dim-circle {
+            display: inline-block;
+            width: 0.35em;
+            height: 0.35em;
+            background-color: white;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin: 0 0.15em;
+            animation: pulse-dim 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dim {
+            0%, 100% { transform: scale(0.6); }
+            50% { transform: scale(1.4); }
+        }
+
+        .anim-pos-orbit {
+            display: inline-block;
+            width: 0.45em; 
+            height: 0.45em;
+            background-color: white; 
+            border-radius: 50%;
+            vertical-align: middle;
+            margin: 0 0.15em;
+            animation: orbit-small 1.5s linear infinite;
+        }
+
+        @keyframes orbit-small {
+            from { transform: rotate(0deg) translateX(0.15em) rotate(0deg); }
+            to   { transform: rotate(360deg) translateX(0.15em) rotate(-360deg); }
+        }
+
+        .anim-dist-circles {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            vertical-align: middle;
+            height: 1em;
+            animation: expand-dist 3.5s ease-in-out infinite;
+        }
+
+        .anim-dist-circles .c1, 
+        .anim-dist-circles .c2 {
+            position: absolute;
+            width: 0.45em;
+            height: 0.45em;
+            border-radius: 50%;
+            background-color: white; 
+            top: 50%;
+            margin-top: -0.225em;
+        }
+
+        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
+        .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
+
+        @keyframes expand-dist {
+            0%, 100% { width: 0.45em; margin: 0 0.1em; }
+            50% { width: 2.5em; margin: 0 0.3em; }
+        }
+
+        @keyframes move-c1 {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-0.8em); }
+        }
+
+        @keyframes move-c2 {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(0.8em); }
+        }
+
+        /* =========================================
+           STILE TESTI E PARAGRAFI (Altre Sezioni)
+           ========================================= */
+        .section-title {
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: clamp(20px, 1.8vw, 26px);
+            font-weight: 500;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4vh;
+        }
+
+        .subsection {
+            border-left: 4px solid #555;
+            padding-left: 25px;
+            margin-bottom: 6vh;
+            margin-top: 2vh;
+            position: relative; 
+            z-index: 1; 
+            max-width: 900px;
+        }
+
+        section h4 { 
+            margin-bottom: 1.5vh; 
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: clamp(14px, 1.1vw, 18px); 
+            font-weight: 500; 
+            color: white; 
+            position: relative;
+        }
+
+        section h4::before {
+            content: '';
+            position: absolute;
+            left: -25px; 
+            top: 50%;
+            width: 15px; 
+            height: 4px; 
+            background: white; 
+        }
+
+        section h4::after {
+            content: '';
+            position: absolute;
+            left: -32px; 
+            top: 50%;
+            transform: translateY(-50%) scale(1.3);
+            width: 10px; 
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        section p { 
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 400;
+            margin-bottom: 2.5vh; 
+            max-width: 900px; 
+        } 
+
+        section em { 
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 400;
+            color: #888; 
+            font-size: 0.9em; 
+            display: block; 
+            margin-top: -1.5vh; 
+            margin-bottom: 3vh; 
+        }
+
+        section a {
+            font-family: 'Neue Montreal', sans-serif;
+            color: #ddd;
+            text-decoration: none;
+            border-bottom: 1px dashed #555;
+            transition: all 0.3s ease;
+            cursor: none;
+        }
+        section a:hover {
+            color: white;
+            border-bottom: 1px solid white;
+        }
+
+        /* =========================================
+           RESPONSIVE MOBILE
+           ========================================= */
+        @media (max-width: 900px) {
+            html, body { overflow-y: auto; overflow-x: hidden; }
+            .container { height: auto; min-height: 100vh; display: flex; flex-direction: column; padding: 40px 5vw; overflow: visible; }
+            
+            .menu { 
+                position: relative; top: auto; left: auto; width: 100%; 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 40px; 
+                align-items: flex-start;
+            }
+            
+            a[href="#crediti"] { position: relative; top: auto; right: auto; margin-top: 10px;}
+            
+            .content { 
+                position: relative; top: auto; left: auto; right: auto; margin: 0;
+                width: 100%; height: auto; overflow-y: visible; padding-bottom: 0;
+            }
+            
+            .app-container {
+                top: 20vh; 
+                height: 80vh; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <div id="preloader">
+        <img src="assets/sun_symbol.svg" alt="Sun symbol" class="preloader-sun">
+        <div class="preloader-title">NASA IN SCALA</div>
+        <div class="loading-percentage" id="loading-percentage">[0%]</div>
+    </div>
+
+    <div class="container">
+
+        <nav class="menu">
+            <a href="index.html" class="nasa-title" id="logo-link">
+                <img src="assets/sun_symbol.svg" alt="Sun symbol">
+                <span class="nasa-text-label">NASA IN SCALA</span>
+            </a>
+            <a href="index.html" class="nav-link active" id="intro-link">
+                <span class="text-label">Introduzione</span>
+            </a>
+            <a href="dimensioni.html" class="nav-link">
+                <span class="text-label">Dimensioni</span>
+            </a>
+            <a href="posizioni.html" class="nav-link">
+                <span class="text-label">Posizioni</span>
+            </a>
+            <a href="distanze.html" class="nav-link">
+                <span class="text-label">Distanze</span>
+            </a>
+            <a href="misurazioni.html" class="nav-link">
+                <span class="text-label">Metodi di misurazione</span>
+            </a>
+        </nav>
+        
+        <a href="#crediti" class="nav-link" id="crediti-link">
+            <span class="text-label">Crediti</span>
+        </a>
+
+        <div class="content" id="right-content">
+            
+            <section id="intro" class="active-section">
+                <div class="intro-large-text" id="dynamic-text">In vista del 70° anniversario della NASA nel 2028, questo progetto nasce per rendere veritiere le frequenti rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l'immenso archivio di dati scientifici ufficiali dell'agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un'esatta percezione delle vere dimensioni <span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni <span class="anim-pos-orbit"></span> orbitali e delle immense distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
+            </section>
+
+            <section id="metodi-misurazione">
+                <h2 class="section-title cascade-element">Metodi di Misurazione</h2>
+                
+                <div class="subsection cascade-element">
+                    <h4>Dimensioni: Dalla Micrometria ai Sensori LIDAR</h4>
+                    <p>Calcolare la grandezza fisica di un pianeta fu per secoli un lavoro di estrema precisione ottica. Gli astronomi misuravano il "diametro angolare" (l'ingombro visivo in secondi d'arco). Conoscendo la distanza e l'angolo visivo, la trigonometria forniva il diametro in chilometri.</p>
+                    <p>I diametri planetari odierni si misurano in modo strumentale. La tecnica regina è l'Occultazione Radio: quando una sonda vola dietro a un pianeta, il suo segnale verso la Terra scompare, disegnando l'ingombro fisico solido del pianeta al chilometro.</p>
+                </div>
+                
+                <div class="subsection cascade-element">
+                    <h4>Posizioni: Il Contesto Storico</h4>
+                    <p>Per oltre mille anni, l'astronomia è stata dominata dal modello geocentrico. La vera architettura del nostro vicinato cosmico iniziò a delinearsi nel 1543 con la formulazione del modello eliocentrico di Niccolò Copernico, perfezionato poi da Johannes Keplero.</p>
+                </div>
+                
+                <div class="subsection cascade-element">
+                    <h4>Distanze: Il Deep Space Network</h4>
+                    <p>Oggi le distanze sono calcolate con un margine di errore inferiore al metro grazie al Deep Space Network (DSN) della NASA, misurando il "tempo di volo" di un impulso radio tramite orologi atomici ultrasensibili.</p>
+                </div>
+            </section>
+
+            <section id="dimensioni">
+                <div class="app-container" id="app-dimensioni"></div>
+            </section>
+
+            <section id="posizioni">
+                <div class="app-container" id="app-posizioni"></div>
+            </section>
+
+            <section id="distanze">
+                <div class="app-container" id="app-distanze"></div>
+            </section>
+
+            <section id="crediti">
+                <h2 class="section-title cascade-element">Crediti</h2>
+                <p class="cascade-element">Progetto e Realizzazione<br><br>SUPSI DACD // A.A. 2025/26 // CV2<br>Studente: Luca Mazzola<br>Modulo: CV429 Progetto II M&I<br>Docenti: Andreas Gysin & Giovanni Profeta</p>
+            </section>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Logica Cursore Custom
+        const cursorDot = document.querySelector('[data-cursor-dot]');
+        const cursorOutline = document.querySelector('[data-cursor-outline]');
+
+        window.addEventListener('mousemove', e => {
+            cursorDot.style.left = e.clientX + 'px';
+            cursorDot.style.top  = e.clientY + 'px';
+            cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 250, fill: 'forwards' });
+        });
+
+        window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+        window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+
+        const interactiveElements = document.querySelectorAll('a, .app-container');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+            el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
+        });
+
+        // -------------------------------------------------------------
+        // SETUP TYPING EFFECT E GESTIONE TIMERS
+        // -------------------------------------------------------------
+        let typingTimeouts = []; 
+
+        function stopTypingEffect() {
+            typingTimeouts.forEach(clearTimeout);
+            typingTimeouts = [];
+        }
+
+        function setupTypingEffect() {
+            const container = document.getElementById('dynamic-text');
+            if (!container) return;
+            
+            const nodes = Array.from(container.childNodes);
+            container.innerHTML = '';
+
+            nodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const parts = node.textContent.split(/(\s+)/);
+                    parts.forEach(part => {
+                        if (/\s+/.test(part)) {
+                            container.appendChild(document.createTextNode(part));
+                        } else if (part.length > 0) {
+                            const span = document.createElement('span');
+                            span.textContent = part;
+                            span.classList.add('typing-word');
+                            span.style.opacity = '0';
+                            container.appendChild(span);
+                        }
+                    });
+                } else {
+                    if (node.tagName && node.tagName.toLowerCase() === 'br') {
+                        container.appendChild(node.cloneNode(true));
+                    } else {
+                        const span = document.createElement('span');
+                        span.classList.add('typing-word');
+                        span.style.opacity = '0';
+                        span.appendChild(node.cloneNode(true));
+                        container.appendChild(span);
+                    }
+                }
+            });
+        }
+
+        function playTypingEffect() {
+            stopTypingEffect(); 
+
+            const words = document.querySelectorAll('#dynamic-text .typing-word');
+            let delay = 0;
+            words.forEach((word) => {
+                const timeoutId = setTimeout(() => {
+                    word.style.transition = 'opacity 0.05s ease';
+                    word.style.opacity = '1';
+                }, delay);
+                typingTimeouts.push(timeoutId);
+                delay += 30 + Math.random() * 40; 
+            });
+        }
+
+        // -------------------------------------------------------------
+        // CALCOLATORE DINAMICO DEL FONT (Doppio passaggio Sicuro + Precisione)
+        // -------------------------------------------------------------
+        let lastWidth = 0;
+        let lastHeight = 0;
+
+        function fitIntroText() {
+            const textEl = document.getElementById('dynamic-text');
+            const container = document.getElementById('intro');
+            
+            if (!textEl || !container || !container.classList.contains('active-section')) return;
+
+            const targetHeight = container.clientHeight;
+            const targetWidth  = container.clientWidth;
+
+            if (targetWidth === lastWidth && targetHeight === lastHeight && textEl.style.fontSize) {
+                return;
+            }
+
+            let minSize = 10;
+            let maxSize = 300; 
+            let bestFit = minSize;
+
+            while (minSize <= maxSize) {
+                let midSize = Math.floor((minSize + maxSize) / 2);
+                textEl.style.fontSize = midSize + 'px';
+                
+                void textEl.offsetHeight; 
+
+                if (textEl.scrollHeight <= targetHeight && textEl.scrollWidth <= targetWidth) {
+                    bestFit = midSize;
+                    minSize = midSize + 1;
+                } else {
+                    maxSize = midSize - 1;
+                }
+            }
+            
+            let fineFit = bestFit;
+            for (let i = 1; i <= 9; i++) {
+                let testSize = bestFit + (i / 10);
+                textEl.style.fontSize = testSize + 'px';
+                void textEl.offsetHeight; 
+                
+                if (textEl.scrollHeight <= targetHeight && textEl.scrollWidth <= targetWidth) {
+                    fineFit = testSize;
+                } else {
+                    break;
+                }
+            }
+
+            textEl.style.fontSize = fineFit + 'px';
+            
+            lastWidth = targetWidth;
+            lastHeight = targetHeight;
+        }
+
+        // -------------------------------------------------------------
+        // RICALCOLO LARGHEZZA MENU DINAMICA
+        // -------------------------------------------------------------
+        function updateMenuWidths() {
+            const currentLogoText = logoSpan.innerText;
+            logoSpan.innerText = logoOriginal;
+            logoSpan.style.width = 'auto';
+            logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+            logoSpan.innerText = currentLogoText;
+
+            navLinks.forEach(link => {
+                const textSpan = link.querySelector('.text-label');
+                if (textSpan) {
+                    if (!textSpan.hasAttribute('data-original')) {
+                        textSpan.setAttribute('data-original', textSpan.innerText);
+                    }
+                    const orig = textSpan.getAttribute('data-original');
+                    const curr = textSpan.innerText;
+                    
+                    textSpan.innerText = orig;
+                    textSpan.style.width = 'auto';
+                    textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
+                    textSpan.innerText = curr;
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            lastWidth = 0;
+            fitIntroText();
+            updateMenuWidths();
+        });
+
+        // -------------------------------------------------------------
+        // GLYPHS E VARIABILI COMUNI
+        // -------------------------------------------------------------
+        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+        const navLinks  = document.querySelectorAll('.nav-link');
+        const sections  = document.querySelectorAll('section');
+        const contentBox = document.getElementById('right-content');
+
+        function hackerEffect(span, originalText, intervalRef) {
+            let iteration = 0;
+            clearInterval(intervalRef.id);
+            intervalRef.id = setInterval(() => {
+                span.innerText = originalText.split('').map((letter, i) => {
+                    if (i < iteration) return originalText[i];
+                    if (letter === ' ') return ' ';
+                    return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                }).join('');
+                if (iteration >= originalText.length) clearInterval(intervalRef.id);
+                iteration += 1;
+            }, 40);
+        }
+
+        // -------------------------------------------------------------
+        // LOGO E NAVIGAZIONE 
+        // -------------------------------------------------------------
+        const logoLink      = document.getElementById('logo-link');
+        const logoSpan      = logoLink.querySelector('.nasa-text-label');
+        const logoOriginal  = logoSpan.innerText;
+        const logoRef       = { id: null };
+
+        document.fonts.ready.then(() => {
+            logoSpan.style.display    = 'inline-block';
+            logoSpan.style.overflow   = 'hidden';
+            logoSpan.style.whiteSpace = 'nowrap';
+            
+            navLinks.forEach(link => {
+                const textSpan = link.querySelector('.text-label');
+                if (textSpan) {
+                    textSpan.style.display    = 'inline-block';
+                    textSpan.style.overflow   = 'hidden';
+                    textSpan.style.whiteSpace = 'nowrap';
+                }
+            });
+            
+            updateMenuWidths(); 
+        });
+
+        logoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
+        logoLink.addEventListener('mouseleave', () => {
+            clearInterval(logoRef.id);
+            logoSpan.innerText = logoOriginal;
+        });
+
+        function navToIntro(e) {
+            if (e) e.preventDefault();
+            
+            clearInterval(logoRef.id);
+            logoSpan.innerText = logoOriginal;
+            
+            navLinks.forEach(l => l.classList.remove('active'));
+            document.getElementById('intro-link').classList.add('active');
+            contentBox.style.overflowY = 'hidden';
+            contentBox.style.paddingBottom = '0';
+            sections.forEach(sec => sec.classList.remove('active-section'));
+            
+            const introSection = document.getElementById('intro');
+            introSection.classList.add('active-section');
+            
+            stopTypingEffect();
+
+            document.querySelectorAll('#dynamic-text .typing-word').forEach(w => {
+                w.style.transition = 'none';
+                w.style.opacity = '0';
+            });
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    fitIntroText();
+                    playTypingEffect();
+                });
+            });
+            
+            contentBox.scrollTop = 0;
+        }
+
+        logoLink.addEventListener('click', navToIntro);
+
+        navLinks.forEach(link => {
+            const textSpan = link.querySelector('.text-label');
+            if (!textSpan) return;
+
+            const originalText = textSpan.innerText;
+            const intervalRef  = { id: null };
+
+            link.addEventListener('mouseenter', () => hackerEffect(textSpan, originalText, intervalRef));
+            link.addEventListener('mouseleave', () => {
+                clearInterval(intervalRef.id);
+                textSpan.innerText = originalText;
+            });
+
+            link.addEventListener('click', function(e) {
+                clearInterval(intervalRef.id);
+                textSpan.innerText = originalText;
+                
+                const href = this.getAttribute('href');
+                
+                if (href && !href.startsWith('#') && href !== 'index.html') {
+                    return; 
+                }
+
+                e.preventDefault();
+                
+                let targetId = '';
+                if (href === 'index.html' || href === '#intro') {
+                    navToIntro(e);
+                    return;
+                } else if (href.startsWith('#')) {
+                    targetId = href.substring(1);
+                }
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+
+                const isNoScrollPage = ['intro', 'posizioni', 'dimensioni', 'distanze'].includes(targetId);
+
+                contentBox.style.overflowY    = isNoScrollPage ? 'hidden' : 'auto';
+                contentBox.style.paddingBottom = isNoScrollPage ? '0' : '15vh';
+
+                sections.forEach(sec => sec.classList.remove('active-section'));
+                const targetSection = document.getElementById(targetId);
+
+                if (targetSection) {
+                    targetSection.classList.add('active-section');
+                    if (!isNoScrollPage) {
+                        triggerCascadeAnimation(targetSection);
+                    }
+                }
+
+                contentBox.scrollTop = 0;
+            });
+        });
+
+        // -------------------------------------------------------------
+        // PRELOADER E SESSION STORAGE
+        // -------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            const preloader      = document.getElementById('preloader');
+            const percentageEl   = document.getElementById('loading-percentage');
+
+            contentBox.style.overflowY    = 'hidden';
+            contentBox.style.paddingBottom = '0';
+
+            setupTypingEffect();
+
+            // Se l'utente non ha ancora visto il caricamento in questa sessione
+            if (!sessionStorage.getItem('nasaPreloaderShown')) {
+                
+                let progress = 0;
+                const targetTime = 1000; 
+                const intervalTime = 30; 
+                const increment = 100 / (targetTime / intervalTime);
+
+                const loadingInterval = setInterval(() => {
+                    progress += increment;
+                    
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(loadingInterval);
+                        
+                        // Memorizza che il caricamento è avvenuto
+                        sessionStorage.setItem('nasaPreloaderShown', 'true');
+                        
+                        setTimeout(() => {
+                            preloader.classList.add('hidden');
+                            
+                            // Attendi il caricamento completo del font prima di calcolare le misure
+                            document.fonts.ready.then(() => {
+                                fitIntroText();
+                                playTypingEffect();
+                            });
+                        }, 300);
+                    }
+                    
+                    percentageEl.innerText = `[${Math.floor(progress)}%]`;
+                }, intervalTime);
+
+            } else {
+                // Utente di ritorno: salta il preloader e attendi i font per incastrare bene le parole
+                preloader.style.display = 'none';
+                document.fonts.ready.then(() => {
+                    fitIntroText();
+                    playTypingEffect();
+                });
+            }
+        });
+
+        function triggerCascadeAnimation(section) {
+            const children = section.querySelectorAll(':scope > .cascade-element, :scope > .subsection, :scope > p, :scope > .section-title');
+            children.forEach((child, index) => {
+                child.classList.remove('cascade-element');
+                void child.offsetWidth;
+                child.classList.add('cascade-element');
+                child.style.animationDelay = `${index * 150}ms`;
+            });
+        }
+    </script>
+</body>
+</html>
