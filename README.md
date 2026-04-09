@@ -6,7 +6,7 @@ Progetto 1: La conquista dello spazio
 
 # Titolo progetto
 Autore: Luca Mazzola \
-[NASA IN SCALA](https://github.com/ixd-supsi/2026/tree/main/esempi/es06_array_7)
+[SISTEMA SOLARE IN SCALA](https://lucamazzolaa.github.io/NASA70/)
 
 
 ## Introduzione e tema
