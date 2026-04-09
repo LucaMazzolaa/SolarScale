@@ -4,7 +4,7 @@ Docenti: A. Gysin, G. Profeta
 
 Progetto 1: La conquista dello spazio
 
-# Titolo progetto
+# SISTEMA SOLARE IN SCALA
 Autore: Luca Mazzola \
 [SISTEMA SOLARE IN SCALA](https://lucamazzolaa.github.io/NASA70/)
 
