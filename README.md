@@ -36,37 +36,209 @@ Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshw
 ## Design dell’interfaccia e modalità di interazione
 Facilisis magna etiam tempor orci eu. Felis donec et odio pellentesque diam volutpat commodo. Dis parturient montes nascetur ridiculus mus mauris vitae. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Accumsan sit amet nulla facilisi. Ultricies leo integer malesuada nunc vel risus. Est lorem ipsum dolor sit. Ultrices neque ornare aenean euismod elementum nisi. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget gravida. Placerat duis ultricies lacus sed turpis tincidunt id aliquet. Arcu dictum varius duis at consectetur lorem donec massa sapien. Pellentesque habitant morbi tristique senectus. Turpis massa sed elementum tempus egestas sed sed risus pretium. Eros donec ac odio tempor orci. Pellentesque id nibh tortor id aliquet lectus. Risus feugiat in ante metus dictum at. Quam pellentesque nec nam aliquam sem et tortor consequat id. Feugiat nibh sed pulvinar proin gravida hendrerit lectus a. Sit amet dictum sit amet justo donec enim.
 
-https://github.com/user-attachments/assets/38d1768e-a90e-45dd-b12b-1ac0aa1151b3
-
-[<img src="doc/cards.gif" width="500" alt="Magic trick">]()
-
 
 ## Tecnologia usata
-Nunc consequat interdum varius sit amet mattis vulputate. Vehicula ipsum a arcu cursus vitae congue. Odio ut sem nulla pharetra. Accumsan lacus vel facilisis volutpat est velit egestas dui id. Quisque egestas diam in arcu cursus. Eget nulla facilisi etiam dignissim diam. Aenean sed adipiscing diam donec adipiscing tristique. Porttitor massa id neque aliquam. Sem viverra aliquet eget sit amet tellus cras. Scelerisque eu ultrices vitae auctor eu augue ut lectus. Nunc aliquet bibendum enim facilisis gravida neque convallis a. Lacus sed turpis tincidunt id aliquet risus feugiat.
+
+Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
+
+Di seguito vengono presentati tre estratti di codice chiave che sono stati fondamentali nello sviluppo del progetto, in quanto determinanti per la costruzione della logica interattiva:<br>
 
 
-```JavaScript
-const image = new Image();
-image.onload = () => {
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.texImage2D(
-		gl.TEXTURE_2D,
-		level,
-		internalFormat,
-		srcFormat,
-		srcType,
-		image
-	);
-	if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-		gl.generateMipmap(gl.TEXTURE_2D);
-	} else {
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-	}
-};
-image.src = url;
+### 1. Motore grafico 3D (Three.js e Model-Viewer)
+Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella.
+
+**HTML** (da `distanze.html`):
+```html
+<model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
+
+<div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:140px;height:140px;"></div>
 ```
 
+**CSS** (da `distanze.html`):
+```css
+model-viewer {
+background-color: transparent; --poster-color: transparent; border-radius: 50%;
+display: block; flex-shrink: 0; z-index: 5; min-width: 0 !important; min-height: 0 !important; outline: none;
+}
+model-viewer::part(default-progress-bar), model-viewer::part(default-ar-button), model-viewer::part(default-progress-mask) { display: none; }
+
+.three-planet {
+display: block;
+flex-shrink: 0;
+z-index: 5;
+position: relative;
+}
+```
+
+**JavaScript** (da `distanze.html`):
+```javascript
+const threePlanetsElements = document.querySelectorAll('.three-planet');
+const renderersThree = [];
+if(threePlanetsElements.length > 0) {
+const loader = new THREE.GLTFLoader();
+threePlanetsElements.forEach(container => {
+const id = container.id;
+const file = container.getAttribute('data-file');
+const width = parseInt(container.style.width);
+const height = parseInt(container.style.height);
+const scene = new THREE.Scene();
+
+// [...] Setup luci omesso per brevità
+
+const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 5000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+renderer.setSize(width, height);
+renderer.setPixelRatio(window.devicePixelRatio);
+container.appendChild(renderer.domElement);
+let modelMesh = null;
+
+loader.load(`assets/${file}`, (gltf) => {
+const model = gltf.scene;
+const box = new THREE.Box3().setFromObject(model);
+const size = box.getSize(new THREE.Vector3());
+const center = box.getCenter(new THREE.Vector3());
+model.position.set(-center.x, -center.y, -center.z);
+const wrapper = new THREE.Group();
+wrapper.add(model);
+
+const maxDim = Math.max(size.x, size.y, size.z);
+const scaleFactor = (width * 0.95) / maxDim;
+wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+// [...] Setup materiali omesso per brevità
+
+scene.add(wrapper);
+modelMesh = wrapper;
+const dist = (width / 2) / Math.tan((45 * Math.PI / 180) / 2);
+camera.position.z = dist * 1.05;
+renderer.render(scene, camera);
+});
+renderersThree.push({ renderer, scene, camera, getMesh: () => modelMesh });
+});
+}
+```
+<br>
+
+#### 2. Dati scientifici in tempo reale (API NASA JPL)
+Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate.
+
+**HTML** (da `distanze.html` e `posizioni.html`):
+```html
+<p class="info" id="info-Jupiter">Giove (Gigante gassoso)<br>Distanza dal Sole: <span id="disSpa5Km">...</span> km</p>
+
+<div class="orbit orb-mercury"></div>
+```
+
+**CSS** (da `posizioni.html`):
+```css
+/* ORBITE: Rappresentazione geometrica in 2D usando CSS Transform Matrix (NASA JPL style) */
+.orbit {
+position: absolute;
+border-style: dashed;
+border-color: var(--ui-color);
+border-width: 1.8px;
+border-radius: 50%;
+left: 50%; top: 50%;
+width: calc(var(--semi-a) * 2 * var(--au-to-vmin));
+height: calc(var(--semi-b) * 2 * var(--au-to-vmin));
+margin-left: calc(var(--semi-a) * var(--au-to-vmin) * -1);
+margin-top: calc(var(--semi-b) * var(--au-to-vmin) * -1);
+/* La matematica CSS segue esattamente la proiezione ortografica di J2000 */
+transform: rotateZ(calc(var(--N) * 1deg)) rotateX(calc(var(--i) * 1deg)) rotateZ(calc(var(--w) * 1deg)) translateX(calc(var(--c) * var(--au-to-vmin) * -1));
+transform-style: flat;
+}
+```
+
+**JavaScript** (Estratto Fetch API da `distanze.html`):
+```javascript
+async function syncWithNasa() {
+for (let i = 1; i < planetsData.length; i++) {
+const p = planetsData[i];
+const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
+`https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='now'&STOP_TIME='now+1m'&STEP_SIZE='1m'`
+)}`;
+try {
+const r = await fetch(url);
+const j = await r.json();
+const res = JSON.parse(j.contents).result;
+const data = res.split('$$SOE')[1].split('$$EOE')[0].trim().split('\n')[0].split(',');
+
+const x = parseFloat(data[2]), y = parseFloat(data[3]), z = parseFloat(data[4]);
+const vx = parseFloat(data[5]), vy = parseFloat(data[6]), vz = parseFloat(data[7]);
+
+const d = Math.sqrt(x*x + y*y + z*z);
+p.baseDis = d / 1000;
+p.inc = ((x*vx + y*vy + z*vz) / d) / 1000;
+
+// [...] Aggiornamento interfaccia domDisKm
+} catch(e) {
+console.error("NASA Sync Error per " + p.name, e);
+}
+}
+}
+```
+<br>
+
+#### 3. Rendering 2D e Animazioni (Canvas e GSAP)
+Per mantenere altissime le prestazioni (60 fps), gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Transizioni e navigazioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo) sono orchestrate da GSAP.
+
+**HTML** (da `distanze.html`):
+```html
+<canvas id="stars" class="stars-canvas"></canvas>
+<canvas id="stars2" class="stars-canvas"></canvas>
+<canvas id="stars3" class="stars-canvas"></canvas>
+```
+
+**CSS** (da `distanze.html`):
+```css
+canvas.stars-canvas {
+position: fixed; left: 0; top: 0;
+z-index: 0; pointer-events: none; transition: opacity 2s;
+}
+```
+
+**JavaScript** (da `distanze.html`):
+```javascript
+// Classe per la generazione e animazione particellare (Canvas API)
+class Stars {
+constructor(id, density, maxS, minS, maxSz, minSz) {
+this.canvas = document.getElementById(id); this.ctx = this.canvas.getContext('2d');
+this.density = density; this.maxS = maxS; this.minS = minS; this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
+this.resize(); window.addEventListener('resize', () => this.resize());
+}
+// [...] Funzioni resize() e addDot() omesse per brevità
+draw(delta) {
+const ctx = this.ctx; ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+while (this.dots.length < this.num) this.addDot(delta > 0 ? this.rB : this.lB, Math.random() * window.innerHeight);
+for (let i = this.dots.length - 1; i >= 0; i--) {
+const dot = this.dots[i], oldX = dot.x; dot.x -= delta * dot.v;
+ctx.beginPath(); ctx.moveTo(oldX, dot.y + dot.s/2); ctx.lineTo(dot.x, dot.y + dot.s/2);
+ctx.strokeStyle = 'white'; ctx.lineWidth = dot.s; ctx.stroke();
+if (dot.x < this.lB || dot.x > this.rB) this.dots.splice(i, 1);
+else { ctx.fillStyle = 'white'; ctx.fillRect(dot.x, dot.y, dot.s, dot.s); }
+}
+}
+}
+
+// GSAP ScrollToPlugin per transizione e centraggio visivo
+function autoScroll(targetPla) {
+if (!targetPla || !targetPla.img) return;
+isTraveling = true; traveling.classList.add('traveling-active');
+const destX = scrollXToCenter(targetPla.img);
+const abort = () => { gsap.killTweensOf(window); cleanup(); };
+function cleanup() { isTraveling = false; traveling.classList.remove('traveling-active'); window.removeEventListener('wheel', abort); }
+window.addEventListener('wheel', abort, { once: true });
+gsap.to(window, {
+duration: 10, scrollTo: { x: destX, autoKill: true }, ease: 'p5',
+onUpdate: () => { const r = targetPla.img.getBoundingClientRect(); if (r.right > 0 && r.left < window.innerWidth) traveling.classList.remove('traveling-active'); },
+onComplete: cleanup, onInterrupt: cleanup,
+});
+}
+```
+<br>
+
+
 ## Target e contesto d’uso
-Sed enim ut sem viverra aliquet eget sit. Iaculis at erat pellentesque adipiscing commodo. Et pharetra pharetra massa massa ultricies mi quis hendrerit dolor. At tempor commodo ullamcorper a lacus vestibulum sed arcu. Ipsum faucibus vitae aliquet nec ullamcorper sit. Tempus quam pellentesque nec nam aliquam sem et tortor. Turpis egestas sed tempus urna et pharetra pharetra massa. Ridiculus mus mauris vitae ultricies leo integer malesuada nunc vel.
+Il progetto è rivolto a un pubblico generalista, in particolare a persone con conoscenze limitate o di base sul Sistema solare e sui pianeti, ma interessate alla scoperta dello spazio, alla divulgazione scientifica e alla comprensione dei dati attraverso la visualizzazione.<br>
+
+La piattaforma si inserisce in un contesto di uso principalmente educativo e divulgativo, pensato per essere consultato online in modo autonomo. Può essere utilizzata in ambiti scolastici e formativi, oppure come strumento di esplorazione personale per comprendere in modo intuitivo le proporzioni e le dinamiche del Sistema solare attraverso un’esperienza interattiva.
