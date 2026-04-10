@@ -29,12 +29,53 @@ Per posizioni e rotazioni, è stato utilizzato come base lo [strumento interatti
 <br>
 
 Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html) che rappresenta in modo  efficace la reale vastità degli spazi tra i pianeti, rendendo percepibile ciò che normalmente risulta astratto.
-<img width="1512" height="734" alt="Screenshot 2026-04-10 alle 09 22 52" src="https://github.com/user-attachments/assets/cde59bcd-cf58-4614-9bd0-9613b45e7c19" />
+<img width="1512" height="734" alt="Screenshot 2026-04-10 alle 09 22 52" src="https://github.com/user-attachments/assets/cde59bcd-cf58-4614-9bd0-9613b45e7c19" /><br>
 
 
 
 ## Design dell’interfaccia e modalità di interazione
-Facilisis magna etiam tempor orci eu. Felis donec et odio pellentesque diam volutpat commodo. Dis parturient montes nascetur ridiculus mus mauris vitae. Nisi vitae suscipit tellus mauris a diam maecenas sed enim. Accumsan sit amet nulla facilisi. Ultricies leo integer malesuada nunc vel risus. Est lorem ipsum dolor sit. Ultrices neque ornare aenean euismod elementum nisi. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget gravida. Placerat duis ultricies lacus sed turpis tincidunt id aliquet. Arcu dictum varius duis at consectetur lorem donec massa sapien. Pellentesque habitant morbi tristique senectus. Turpis massa sed elementum tempus egestas sed sed risus pretium. Eros donec ac odio tempor orci. Pellentesque id nibh tortor id aliquet lectus. Risus feugiat in ante metus dictum at. Quam pellentesque nec nam aliquam sem et tortor consequat id. Feugiat nibh sed pulvinar proin gravida hendrerit lectus a. Sit amet dictum sit amet justo donec enim.
+Il design dell'interfaccia è concepito per offrire un'esperienza immersiva, minimale e "data-driven". Richiama l'estetica dei terminali scientifici e dei database aerospaziali, utilizzando uno sfondo nero profondo (spazio), testo bianco in font rigorosi (Neue Montreal) e un cursore personalizzato che si adatta agli elementi interattivi.<br>
+
+Il design dell'interfaccia è strutturato secondo il principio della rivelazione progressiva: l'utente entra in una pagina con un'interfaccia minimale e, man mano che dimostra l'intento di esplorare, il sistema sblocca le visioni e i controlli avanzati.
+
+#### Mappa del sito (Pagine)
+* **`index.html`** – Home / Intro
+* **`dimensioni.html`** – Confronto scala
+* **`posizioni.html`** – Mappa orbitale
+* **`distanze.html`** – Viaggio lineare
+* **`misurazioni.html`** – Sezione informativa
+* **`crediti.html`** – Colophon
+
+
+### Livello 1: menu globale fisso
+Presente costantemente in tutte le pagine per garantire orientamento e coerenza visiva.
+* **Alto-sinistra:** logo, dimensioni, posizioni, distanze.
+* **Alto-destra:** metodi di misurazione, crediti.
+
+
+### Livello 2: trigger di esplorazione
+La soglia d'ingresso per le simulazioni (esclusi `index.html` e `crediti.html`).
+* **Gesto core:** "Scorri per esplorare / leggere".
+* **Meccanica:** l'azione di scroll (rotellina/trackpad) dissolve l'header introduttivo testuale e sblocca fisicamente la visione e la navigazione del motore visivo sottostante, immergendo l'utente nei dati.
+
+
+### Livello 3: interazioni secondarie
+Strumenti di controllo specifici che compaiono solo dopo aver superato il trigger di esplorazione iniziale (esclusi `index.html` e `crediti.html`).
+
+**`dimensioni.html`**
+* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido.
+* **Lati (centro):** frecce a comparsa con anteprima dati (Nome, Diametro).
+
+**`posizioni.html`**
+* **Centro-basso:** plancia del tempo spaziale (slider velocità, play/pausa/skip, data attuale).
+* **Basso-destra:** controlli fisici di zoom (+ / -).
+
+**`distanze.html`**
+* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido.
+* **Lati (centro):** frecce a comparsa con anteprima dati (distanza da un pianeta all'altro).
+
+**`misurazioni.html`**
+* **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
 
 
 ## Tecnologia usata
@@ -42,6 +83,8 @@ Facilisis magna etiam tempor orci eu. Felis donec et odio pellentesque diam volu
 Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
 
 Di seguito vengono presentati tre estratti di codice chiave che sono stati fondamentali nello sviluppo del progetto, in quanto determinanti per la costruzione della logica interattiva:<br>
+
+
 
 
 ### 1. Motore grafico 3D (Three.js e Model-Viewer)
