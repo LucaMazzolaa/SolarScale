@@ -165,7 +165,7 @@ renderersThree.push({ renderer, scene, camera, getMesh: () => modelMesh });
 ```
 <br>
 
-#### 2. Dati scientifici in tempo reale (API NASA JPL)
+### 2. Dati scientifici in tempo reale (API NASA JPL)
 Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate.
 
 **HTML** (da `distanze.html` e `posizioni.html`):
@@ -225,7 +225,7 @@ console.error("NASA Sync Error per " + p.name, e);
 ```
 <br>
 
-#### 3. Rendering 2D e Animazioni (Canvas e GSAP)
+### 3. Rendering 2D e Animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni (60 fps), gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Transizioni e navigazioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo) sono orchestrate da GSAP.
 
 **HTML** (da `distanze.html`):
