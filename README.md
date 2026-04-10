@@ -38,7 +38,7 @@ Il design dell'interfaccia è concepito per offrire un'esperienza immersiva, min
 
 Il design dell'interfaccia è strutturato secondo il principio della rivelazione progressiva: l'utente entra in una pagina con un'interfaccia minimale e, man mano che dimostra l'intento di esplorare, il sistema sblocca le visioni e i controlli avanzati.
 
-#### Mappa del sito (Pagine)
+### Mappa del sito (Pagine)
 * **`index.html`** – Home / Intro
 * **`dimensioni.html`** – Confronto scala
 * **`posizioni.html`** – Mappa orbitale
@@ -76,6 +76,9 @@ Strumenti di controllo specifici che compaiono solo dopo aver superato il trigge
 
 **`misurazioni.html`**
 * **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
+
+### Dimostrazione
+
 
 
 ## Tecnologia usata
