@@ -7,6 +7,7 @@ Progetto 1: La conquista dello spazio
 # SISTEMA SOLARE IN SCALA
 Autore: Luca Mazzola \
 [SISTEMA SOLARE IN SCALA](https://lucamazzolaa.github.io/NASA70/)
+<br><br>
 
 
 ## Introduzione e tema
@@ -15,6 +16,7 @@ Questo progetto esplora il Sistema solare a partire da una criticità evidente: 
 Per affrontare questo limite, il progetto scompone il Sistema solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole. Questa scelta permette di costruire visualizzazioni più chiare, leggibili e coerenti.<br>
 
 Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in un’esperienza visiva immediata, rendendo percepibili proporzioni normalmente astratte e restituendo in modo efficace la reale struttura e scala del Sistema solare.
+<br><br>
 
 
 ## Riferimenti progettuali
@@ -29,8 +31,8 @@ Per posizioni e rotazioni, è stato utilizzato come base lo [strumento interatti
 <br>
 
 Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html) che rappresenta in modo  efficace la reale vastità degli spazi tra i pianeti, rendendo percepibile ciò che normalmente risulta astratto.
-<img width="1512" height="734" alt="Screenshot 2026-04-10 alle 09 22 52" src="https://github.com/user-attachments/assets/cde59bcd-cf58-4614-9bd0-9613b45e7c19" /><br>
-
+<img width="1512" height="734" alt="Screenshot 2026-04-10 alle 09 22 52" src="https://github.com/user-attachments/assets/cde59bcd-cf58-4614-9bd0-9613b45e7c19" />
+<br><br>
 
 
 ## Design dell’interfaccia e modalità di interazione
@@ -78,7 +80,8 @@ Strumenti di controllo specifici che compaiono solo dopo aver superato il trigge
 * **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
 
 ### Dimostrazione
-
+<video src="https://github.com/user-attachments/assets/bcbb3ed4-d773-4657-a18b-299ced5210eb" loop autoplay muted controls style="max-width: 100%;"></video>
+<br>
 
 
 ## Tecnologia usata
@@ -171,7 +174,7 @@ if(threePlanetsElements.length > 0) {
     // [...] Funzione animateThree() omessa per brevità
 }
 ```
-<br>
+
 
 ### 2. Dati scientifici in tempo reale (API NASA JPL)
 Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate. Il sistema implementa anche un array di fallback in caso di fallimento del sync con l'Agenzia Spaziale.
@@ -231,7 +234,7 @@ async function syncWithNasa() {
     // [...]
 }
 ```
-<br>
+
 
 ### 3. Rendering 2D e Animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni, gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo rispetto a parametri dinamici o l'ancoraggio speciale al Sole) sono orchestrate con precisione tramite l'easing avanzato di GSAP.
