@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA IN SCALA - Introduzione</title>
+    <title>SISTEMA SOLARE IN SCALA - Introduzione</title>
     <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
     
     <style>
@@ -125,12 +126,33 @@
             letter-spacing: 1px;
         }
 
+        /* ─── STARS ──────────────────────────────────────────────── */
+        canvas.stars-canvas {
+            position: fixed; left: 0; top: 0;
+            z-index: 0; pointer-events: none;
+        }
+
         /* =========================================
-           TOP MENU
+           TOP MENU (Sinistra e Destra)
            ========================================= */
         .menu {
             position: fixed;
             left: 4vh; 
+            top: 4vh; 
+            width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); 
+            font-weight: 500;
+            z-index: 999999;
+            display: flex;
+            flex-direction: row; 
+            align-items: center; 
+            gap: 3vw; 
+        }
+
+        .right-menu {
+            position: fixed;
+            right: 4vh; 
             top: 4vh; 
             width: auto;
             font-family: 'Neue Montreal', sans-serif;
@@ -195,16 +217,6 @@
             opacity: 1;
         }
 
-        #crediti-link {
-            position: fixed;
-            top: 4vh;
-            right: 4vh; 
-            font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); 
-            font-weight: 500;
-            z-index: 999999; 
-        }
-
         /* =========================================
            STRUTTURA PRINCIPALE E CONTENUTI
            ========================================= */
@@ -228,7 +240,9 @@
             font-family: 'Neue Montreal', sans-serif;
             font-size: clamp(15px, 1.1vw, 18px); 
             line-height: 1.7; 
-            word-wrap: break-word;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
             padding-bottom: 15vh; 
             scrollbar-width: none;         
             -ms-overflow-style: none;      
@@ -293,6 +307,8 @@
             text-align: left; 
             width: 100%;
             margin: 0;
+            word-break: keep-all; 
+            overflow-wrap: normal;
         }
 
         .typing-word {
@@ -329,7 +345,7 @@
 
         @keyframes orbit-small {
             from { transform: rotate(0deg) translateX(0.15em) rotate(0deg); }
-            to   { transform: rotate(360deg) translateX(0.15em) rotate(-360deg); }
+            to   { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); }
         }
 
         .anim-dist-circles {
@@ -463,16 +479,26 @@
             .container { height: auto; min-height: 100vh; display: flex; flex-direction: column; padding: 40px 5vw; overflow: visible; }
             
             .menu { 
-                position: relative; top: auto; left: auto; width: 100%; 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 40px; 
+                position: relative; top: auto; left: auto; 
+                width: calc(100% - 8vh); 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; 
+                align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            }
+            
+            .right-menu { 
+                position: relative; top: auto; right: auto; 
+                margin: 0 4vh 4vh 4vh;
+                display: flex;
+                width: calc(100% - 8vh);
+                flex-wrap: wrap; gap: 15px;
                 align-items: flex-start;
             }
             
-            a[href="#crediti"] { position: relative; top: auto; right: auto; margin-top: 10px;}
-            
             .content { 
-                position: relative; top: auto; left: auto; right: auto; margin: 0;
-                width: 100%; height: auto; overflow-y: visible; padding-bottom: 0;
+                position: relative; top: auto; left: auto; right: auto; 
+                margin: 0 4vh;
+                width: calc(100% - 8vh); height: auto; 
+                overflow-y: visible; padding-bottom: 4vh;
             }
             
             .app-container {
@@ -489,19 +515,20 @@
 
     <div id="preloader">
         <img src="assets/sun_symbol.svg" alt="Sun symbol" class="preloader-sun">
-        <div class="preloader-title">NASA IN SCALA</div>
+        <div class="preloader-title">SISTEMA SOLARE IN SCALA</div>
         <div class="loading-percentage" id="loading-percentage">[0%]</div>
     </div>
+
+    <canvas id="stars"  class="stars-canvas"></canvas>
+    <canvas id="stars2" class="stars-canvas"></canvas>
+    <canvas id="stars3" class="stars-canvas"></canvas>
 
     <div class="container">
 
         <nav class="menu">
             <a href="index.html" class="nasa-title" id="logo-link">
                 <img src="assets/sun_symbol.svg" alt="Sun symbol">
-                <span class="nasa-text-label">NASA IN SCALA</span>
-            </a>
-            <a href="index.html" class="nav-link active" id="intro-link">
-                <span class="text-label">Introduzione</span>
+                <span class="nasa-text-label">SISTEMA SOLARE IN SCALA</span>
             </a>
             <a href="dimensioni.html" class="nav-link">
                 <span class="text-label">Dimensioni</span>
@@ -512,56 +539,21 @@
             <a href="distanze.html" class="nav-link">
                 <span class="text-label">Distanze</span>
             </a>
+        </nav>
+
+        <nav class="right-menu">
             <a href="misurazioni.html" class="nav-link">
                 <span class="text-label">Metodi di misurazione</span>
             </a>
+            <a href="crediti.html" class="nav-link">
+                <span class="text-label">Crediti</span>
+            </a>
         </nav>
-        
-        <a href="#crediti" class="nav-link" id="crediti-link">
-            <span class="text-label">Crediti</span>
-        </a>
 
         <div class="content" id="right-content">
             
             <section id="intro" class="active-section">
-                <div class="intro-large-text" id="dynamic-text">In vista del 70° anniversario della NASA nel 2028, questo progetto nasce per rendere veritiere le frequenti rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l'immenso archivio di dati scientifici ufficiali dell'agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un'esatta percezione delle vere dimensioni <span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni <span class="anim-pos-orbit"></span> orbitali e delle immense distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
-            </section>
-
-            <section id="metodi-misurazione">
-                <h2 class="section-title cascade-element">Metodi di Misurazione</h2>
-                
-                <div class="subsection cascade-element">
-                    <h4>Dimensioni: Dalla Micrometria ai Sensori LIDAR</h4>
-                    <p>Calcolare la grandezza fisica di un pianeta fu per secoli un lavoro di estrema precisione ottica. Gli astronomi misuravano il "diametro angolare" (l'ingombro visivo in secondi d'arco). Conoscendo la distanza e l'angolo visivo, la trigonometria forniva il diametro in chilometri.</p>
-                    <p>I diametri planetari odierni si misurano in modo strumentale. La tecnica regina è l'Occultazione Radio: quando una sonda vola dietro a un pianeta, il suo segnale verso la Terra scompare, disegnando l'ingombro fisico solido del pianeta al chilometro.</p>
-                </div>
-                
-                <div class="subsection cascade-element">
-                    <h4>Posizioni: Il Contesto Storico</h4>
-                    <p>Per oltre mille anni, l'astronomia è stata dominata dal modello geocentrico. La vera architettura del nostro vicinato cosmico iniziò a delinearsi nel 1543 con la formulazione del modello eliocentrico di Niccolò Copernico, perfezionato poi da Johannes Keplero.</p>
-                </div>
-                
-                <div class="subsection cascade-element">
-                    <h4>Distanze: Il Deep Space Network</h4>
-                    <p>Oggi le distanze sono calcolate con un margine di errore inferiore al metro grazie al Deep Space Network (DSN) della NASA, misurando il "tempo di volo" di un impulso radio tramite orologi atomici ultrasensibili.</p>
-                </div>
-            </section>
-
-            <section id="dimensioni">
-                <div class="app-container" id="app-dimensioni"></div>
-            </section>
-
-            <section id="posizioni">
-                <div class="app-container" id="app-posizioni"></div>
-            </section>
-
-            <section id="distanze">
-                <div class="app-container" id="app-distanze"></div>
-            </section>
-
-            <section id="crediti">
-                <h2 class="section-title cascade-element">Crediti</h2>
-                <p class="cascade-element">Progetto e Realizzazione<br><br>SUPSI DACD // A.A. 2025/26 // CV2<br>Studente: Luca Mazzola<br>Modulo: CV429 Progetto II M&I<br>Docenti: Andreas Gysin & Giovanni Profeta</p>
+                <div class="intro-large-text" id="dynamic-text">In occasione del 70º anniversario della NASA, questo progetto&nbsp;nasce&nbsp;per&nbsp;rendere&nbsp;veritiere&nbsp;le&nbsp;frequenti&nbsp;rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l’immenso archivio di dati scientifici ufficiali dell’agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un’esatta percezione delle vere dimensioni&nbsp;<span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni&nbsp;<span class="anim-pos-orbit"></span> orbitali e delle immense distanze&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
             </section>
 
         </div>
@@ -797,7 +789,8 @@
             logoSpan.innerText = logoOriginal;
             
             navLinks.forEach(l => l.classList.remove('active'));
-            document.getElementById('intro-link').classList.add('active');
+            logoLink.classList.add('active'); 
+            
             contentBox.style.overflowY = 'hidden';
             contentBox.style.paddingBottom = '0';
             sections.forEach(sec => sec.classList.remove('active-section'));
@@ -857,6 +850,7 @@
                     targetId = href.substring(1);
                 }
 
+                logoLink.classList.remove('active');
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
 
@@ -880,6 +874,58 @@
         });
 
         // -------------------------------------------------------------
+        // STELLE DI SFONDO (identiche a dimensioni.html)
+        // -------------------------------------------------------------
+        class Stars {
+            constructor(id, density, maxS, minS, maxSz, minSz) {
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                this.density = density; this.maxS = maxS; this.minS = minS;
+                this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.lB = -window.innerWidth; this.rB = window.innerWidth * 2;
+                this.num = Math.floor((window.innerWidth * window.innerHeight / 10000) * this.density);
+                this.dots = [];
+                for (let i = 0; i < this.num; i++) this.addDot(Math.random() * (this.rB - this.lB) + this.lB, Math.random() * window.innerHeight);
+            }
+            addDot(x, y) {
+                this.dots.push({ x, y, s: Math.random()*(this.maxSz-this.minSz)+this.minSz, v: Math.random()*(this.maxS-this.minS)+this.minS });
+            }
+            draw(delta) {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                while (this.dots.length < this.num) this.addDot(delta > 0 ? this.rB : this.lB, Math.random() * window.innerHeight);
+                for (let i = this.dots.length - 1; i >= 0; i--) {
+                    const dot = this.dots[i], oldX = dot.x;
+                    dot.x -= delta * dot.v;
+                    ctx.beginPath(); ctx.moveTo(oldX, dot.y + dot.s/2); ctx.lineTo(dot.x, dot.y + dot.s/2);
+                    ctx.strokeStyle = 'white'; ctx.lineWidth = dot.s; ctx.stroke();
+                    if (dot.x < this.lB || dot.x > this.rB) this.dots.splice(i, 1);
+                    else { ctx.fillStyle = 'white'; ctx.fillRect(dot.x, dot.y, dot.s, dot.s); }
+                }
+            }
+        }
+
+        const s1 = new Stars('stars',  1.5, 1.4,   0.1,  1.5, 0.5);
+        const s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
+        const s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
+
+        // Su questa pagina non c'è movimento di camera, quindi delta = 0:
+        // le stelle sono statiche, esattamente come appaiono a riposo in dimensioni.html.
+        function animateStars() {
+            requestAnimationFrame(animateStars);
+            s1.draw(0);
+            s2.draw(0);
+            s3.draw(0);
+        }
+        animateStars();
+
+        // -------------------------------------------------------------
         // PRELOADER E SESSION STORAGE
         // -------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
@@ -888,6 +934,8 @@
 
             contentBox.style.overflowY    = 'hidden';
             contentBox.style.paddingBottom = '0';
+
+            logoLink.classList.add('active');
 
             setupTypingEffect();
 
