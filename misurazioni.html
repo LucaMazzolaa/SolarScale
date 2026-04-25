@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SISTEMA SOLARE IN SCALA - Metodi di Misurazione</title>
+    <title>SolarScale - Measurement Methods</title>
     <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <style>
         /* =========================================
-           IMPORTAZIONE FONT
+           FONT IMPORT
            ========================================= */
         @font-face {
             font-family: 'Nasa';
@@ -38,11 +38,11 @@
             --font-62: clamp(32px, 2.5vw + 26px, 90px);
             --font-16: clamp(14px, 0.3vw + 11.68px, 22px);
             --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
-            /* Scalabilità parallela al menu: esattamente 18px su MacBook (~1440px) */
+            /* Parallel scalability to the menu: exactly 18px on MacBook (~1440px) */
             --font-18: clamp(15px, 0.3vw + 13.68px, 24px); 
         }
 
-        /* ─── SETUP BASE CON SCROLL BLOCCATO (GESTITO VIA JS) ─── */
+        /* ─── BASE SETUP WITH BLOCKED SCROLL (MANAGED VIA JS) ─── */
         html, body {
             margin: 0; padding: 0;
             width: 100vw; height: 100vh;
@@ -76,16 +76,16 @@
             font-weight: 500;
         }
 
-        /* ─── CONTENITORE PRINCIPALE ORIZZONTALE ─── */
+        /* ─── MAIN HORIZONTAL CONTAINER ─── */
         .horizontal-scroll-wrapper {
             display: flex;
             flex-direction: row;
             height: 100vh;
-            width: 200vw; /* Solo 2 Stati: Header e Contenuto Verticale */
+            width: 200vw; /* Only 2 States: Header and Vertical Content */
             will-change: transform;
         }
 
-        /* ─── DEFINIZIONE DELLE SLIDE ─── */
+        /* ─── SLIDE DEFINITION ─── */
         .slide {
             width: 100vw;
             height: 100vh;
@@ -100,18 +100,18 @@
             justify-content: center;
         }
 
-        /* SLIDE DEL CONTENUTO - ABILITATA ALLO SCROLL VERTICALE */
+        /* CONTENT SLIDE - ENABLED FOR VERTICAL SCROLL */
         .content-slide {
             overflow-y: auto;
             overflow-x: hidden;
             display: block;
             scroll-behavior: smooth;
-            /* MASCHERA DI SFUMATURA PERFETTA */
+            /* PERFECT FADE MASK */
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 16vh, black 22vh, black 100%);
             mask-image: linear-gradient(to bottom, transparent 0%, transparent 16vh, black 22vh, black 100%);
         }
 
-        /* Nascondi barra scorrimento per la slide verticale */
+        /* Hide scrollbar for vertical slide */
         .content-slide::-webkit-scrollbar { display: none; }
         .content-slide { scrollbar-width: none; }
 
@@ -125,7 +125,7 @@
             gap: 8vh; 
         }
 
-        /* ─── ELEMENTI UI FISSI ─── */
+        /* ─── FIXED UI ELEMENTS ─── */
         .scrollWrapper { 
             position: fixed; 
             bottom: 4vh; 
@@ -133,7 +133,15 @@
             cursor: none; 
             pointer-events: auto; 
             z-index: 500;
-            transition: opacity 0.4s;
+            transition: opacity 0.2s, transform 0.2s; /* Aggiunto transform per la fluidità */
+        }
+        
+        .scrollWrapper:hover {
+            transform: scale(1.03);
+        }
+        
+        .scrollWrapper:active {
+            transform: scale(0.97);
         }
         
         .scroll-sign { 
@@ -142,6 +150,11 @@
             align-items: center; 
             gap: 8px; 
             opacity: 0.4; 
+            transition: opacity 0.2s; 
+        }
+
+        .scrollWrapper:hover .scroll-sign {
+            opacity: 1;
         }
         
         .scroll-sign p, .scroll-arrow { font-size: var(--font-16); font-weight: 500; }
@@ -157,44 +170,98 @@
             position: fixed; top: 0; left: 0;
             transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
+            box-sizing: content-box; /* Force content-box to match index.html */
         }
         .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .3s, height .3s; }
         .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .3s, height .3s; }
         .mouse-down { width: 20px !important; height: 20px !important; }
         .hover      { width: 30px !important; height: 30px !important; }
 
-        .menu, .right-menu {
-            position: fixed; top: 4vh; width: auto;
+        /* =========================================
+           TOP MENU (Da dimensioni.html)
+           ========================================= */
+        .menu {
+            position: fixed;
+            left: 4vh; top: 4vh; width: auto;
             font-family: 'Neue Montreal', sans-serif;
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
         }
-        .menu { left: 4vh; }
-        .right-menu { right: 4vh; }
+
+        .right-menu {
+            position: fixed;
+            right: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+        }
         
         .nasa-title {
             font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
-            color: white; line-height: 1; pointer-events: auto;
+            color: white; line-height: 1; pointer-events: all; cursor: none;
             margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
         }
+
         .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
 
         .nav-link {
-            color: white; text-decoration: none; transition: opacity 0.2s;
-            pointer-events: auto; opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
-        .text-label, .nasa-text-label { display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap; overflow: hidden; pointer-events: none; }
-        .nav-link::before { content: "["; opacity: 1; transition: opacity 0.2s; }
-        .nav-link::after { content: "]"; opacity: 1; transition: opacity 0.2s; }
+
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
         .nav-link:hover, .nav-link.active { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before,
+        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+
+        @media (max-width: 900px) {
+            .menu { 
+                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            }
+            .right-menu { 
+                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
+                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+            }
+        }
+        /* ========================================= */
 
         canvas.stars-canvas {
             position: fixed; left: 0; top: 0;
             z-index: 0; pointer-events: none;
         }
 
-        /* ─── STILI CONTENUTO TESTUALE E VIDEO ─── */
+        /* ─── TEXT AND VIDEO CONTENT STYLES ─── */
         .titles { 
             position: absolute; bottom: 4vh; left: 4vh;
             display: flex; flex-direction: column; align-items: flex-start; gap: 10px; 
@@ -252,7 +319,7 @@
             padding-left: 0;
         }
 
-        /* ─── VIDEO WRAPPER RESPONSIVE ─── */
+        /* ─── RESPONSIVE VIDEO WRAPPER ─── */
         .video-container {
             position: relative;
             padding-bottom: 56.25%; /* Ratio 16:9 */
@@ -271,7 +338,7 @@
             border: none;
         }
 
-        /* Dimensioni fisiche per i glifi animati nel box nascosto */
+        /* Physical dimensions for animated glyphs in the hidden box */
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; margin: 0 0.15em; }
         .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; margin: 0 0.15em; }
         .anim-dist-circles { display: inline-flex; width: 2.5em; height: 0.5em; margin: 0 0.3em; vertical-align: middle; }
@@ -307,25 +374,25 @@
 <nav class="menu">
     <a href="index.html" class="nasa-title" id="logo-link">
         <img src="assets/sun_symbol.svg" alt="Sun symbol">
-        <span class="nasa-text-label">SISTEMA SOLARE IN SCALA</span>
+        <span class="nasa-text-label">SolarScale</span>
     </a>
     <a href="dimensioni.html" class="nav-link">
-        <span class="text-label">Dimensioni</span>
+        <span class="text-label">Sizes</span>
     </a>
     <a href="posizioni.html" class="nav-link">
-        <span class="text-label">Posizioni</span>
+        <span class="text-label">Positions</span>
     </a>
     <a href="distanze.html" class="nav-link">
-        <span class="text-label">Distanze</span>
+        <span class="text-label">Distances</span>
     </a>
 </nav>
 
 <nav class="right-menu">
     <a href="misurazioni.html" class="nav-link active" id="nav-misurazioni">
-        <span class="text-label">Metodi di misurazione</span>
+        <span class="text-label">Measurement Methods</span>
     </a>
     <a href="crediti.html" class="nav-link" id="crediti-link">
-        <span class="text-label">Crediti</span>
+        <span class="text-label">Credits</span>
     </a>
 </nav>
 
@@ -335,7 +402,7 @@
 
 <div class="scrollWrapper" id="header-scroll">
     <div id="scroll-sign" class="scroll-sign jump">
-        <p>Scorri per leggere</p>
+        <p>Scroll to read</p>
         <span class="scroll-arrow">→</span>
     </div>
 </div>
@@ -344,8 +411,8 @@
 
     <header id="main-header" class="slide header-slide">
         <div class="titles">
-            <h1 id="main-title">Metodi di misurazione</h1>
-            <h2 class="title">Scienza e tecnologie applicate</h2>
+            <h1 id="main-title">Measurement Methods</h1>
+            <h2 class="title">Applied Science and Technologies</h2>
         </div>
     </header>
 
@@ -353,66 +420,66 @@
         <div class="vertical-container">
             
             <div class="intro-text">
-                <p>Comprendere le vere proporzioni del Sistema Solare richiede misurazioni di precisione assoluta. L’era in cui ci si affidava esclusivamente all’osservazione ottica o alla geometria visiva è ormai superata. Oggi, per calcolare con esattezza le scale cosmiche, la NASA si affida ai tempi di propagazione delle onde elettromagnetiche, alle variazioni gravitazionali e all’immensa potenza di calcolo dei supercomputer.</p>
+                <p>Understanding the true proportions of the Solar System requires measurements of absolute precision. The era of relying exclusively on optical observation or visual geometry is long gone. Today, to accurately calculate cosmic scales, NASA relies on the propagation times of electromagnetic waves, gravitational variations, and the immense computing power of supercomputers.</p>
             </div>
 
             <div class="text-block">
-                <h2>La misura delle distanze: il cronometro della luce</h2>
-                <p>Il fondamento di ogni mappa spaziale è la distanza. Il metodo moderno più efficace è basato sul concetto di tempo di volo (time of flight). Utilizzando le immense antenne del Deep Space Network (DSN), gli scienziati inviano un segnale radio verso un pianeta o una sonda. Poiché conosciamo con precisione assoluta la velocità della luce nel vuoto, misurando il tempo esatto che il segnale impiega per compiere il viaggio di andata e ritorno, possiamo calcolare la distanza con un margine d’errore minimo. Per ottenere questa accuratezza, il DSN si affida a orologi atomici talmente precisi da perdere meno di un secondo ogni miliardo di anni. Per la Luna, questo processo viene raffinato ulteriormente con il lunar laser ranging: in questo caso, non si usano onde radio ma impulsi laser che rimbalzano su specchi lasciati sulla superficie lunare, permettendoci di monitorare la sua posizione con una precisione di pochi millimetri.</p>
+                <h2>Measuring Distances: The Stopwatch of Light</h2>
+                <p>The foundation of any spatial map is distance. The most effective modern method is based on the concept of time of flight. Using the immense antennas of the Deep Space Network (DSN), scientists send a radio signal toward a planet or probe. Since we know the speed of light in a vacuum with absolute precision, by measuring the exact time the signal takes to complete the round trip, we can calculate the distance with a minimal margin of error. To achieve this accuracy, the DSN relies on atomic clocks so precise they lose less than a second every billion years. For the Moon, this process is further refined with lunar laser ranging: in this case, radio waves are not used, but rather laser pulses that bounce off mirrors left on the lunar surface, allowing us to monitor its position with millimeter precision.</p>
                 <div class="video-container">
                     <iframe src="https://www.youtube.com/embed/NTo5-YsjWlI" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
             </div>
 
             <div class="text-block">
-                <h2>Orbite e posizioni: l’effetto Doppler e il telescopio virtuale</h2>
-                <p>Determinare dove si trova un pianeta oggi è relativamente semplice, ma capire esattamente dove sarà tra anni richiede di conoscere la sua velocità e la sua posizione angolare nel cielo. Per la velocità, i radiotelescopi sfruttano l’effetto Doppler: analizzando come la frequenza del segnale radio di ritorno si "comprime" o si "stira" a causa del movimento del pianeta, gli astronomi ne calcolano la velocità orbitale in tempo reale. Per la posizione angolare, si utilizza una tecnica chiamata VLBI (Very Long Baseline Interferometry). Collegando tra loro diverse antenne sparse per il globo, si crea un telescopio virtuale grande quanto la Terra capace di distinguere angoli minuscoli. Questi dati vengono poi inseriti in simulazioni gestite da supercomputer che risolvono il complesso problema a N-corpi, ovvero il calcolo delle reciproche influenze gravitazionali tra tutti i pianeti. È questa "navigazione digitale" che permette di lanciare una sonda oggi e farla arrivare su un obiettivo in movimento a miliardi di chilometri di distanza.</p>
+                <h2>Orbits and Positions: The Doppler Effect and the Telescope</h2>
+                <p>Determining where a planet is today is relatively simple, but understanding exactly where it will be in years requires knowing its speed and angular position in the sky. For speed, radio telescopes exploit the Doppler effect: by analyzing how the frequency of the returning radio signal "compresses" or "stretches" due to the planet's movement, astronomers calculate its orbital speed in real time. For the angular position, a technique called VLBI (Very Long Baseline Interferometry) is used. By linking various antennas scattered across the globe, a virtual telescope the size of the Earth is created, capable of distinguishing minuscule angles. This data is then fed into simulations run by supercomputers that solve the complex N-body problem, which is the calculation of the mutual gravitational influences among all the planets. It is this "digital navigation" that allows us to launch a probe today and have it reach a moving target billions of kilometers away.</p>
                 <div class="video-container">
                     <iframe src="https://www.youtube.com/embed/YAnxt1YPWbk" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
             </div>
 
             <div class="text-block">
-                <h2>Dimensioni e massa: pesare i mondi con la gravità</h2>
-                <p>Una volta stabilita la posizione, la sfida è determinare quanto sia grande un pianeta. Il metodo classico si basa sulla dimensione angolare e la trigonometria, ma la precisione aumenta drasticamente con le occultazioni stellari: cronometrando quanto tempo un pianeta oscura la luce di una stella lontana, ne calcoliamo il diametro con scarti minimi. Tuttavia, la tecnologia più precisa in assoluto è l’altimetria laser montata sulle sonde in orbita. Strumenti come il LOLA della NASA sparano impulsi luminosi che mappano la superficie punto per punto, fornendo il volume esatto e la forma reale del pianeta, valli e montagne comprese.</p>
-                <p>Per quanto riguarda la massa, la nostra "bilancia cosmica" è la radio-scienza. Non misuriamo il pianeta, ma l’effetto della sua gravità sulle sonde spaziali che gli passano vicino: analizzando le microscopiche variazioni di frequenza del segnale radio (effetto Doppler) inviato a terra, calcoliamo quanto il pianeta accelera il veicolo. Questo dato rivela la massa esatta del corpo celeste. Incrociando massa e volume, gli scienziati ottengono la densità, il parametro fondamentale per capire se un mondo è roccioso e solido come la Terra o un gigante gassoso come Saturno.</p>
+                <h2>Size and Mass: Weighing Worlds with Gravity</h2>
+                <p>Once the position is established, the challenge is determining how large a planet is. The classic method relies on angular size and trigonometry, but accuracy increases drastically with stellar occultations: by timing how long a planet obscures the light of a distant star, we calculate its diameter with minimal margins of error. However, the most precise technology of all is laser altimetry mounted on orbiting probes. Instruments like NASA's LOLA fire light pulses that map the surface point by point, providing the exact volume and true shape of the planet, including valleys and mountains.</p>
+                <p>As for mass, our "cosmic scale" is radio science. We do not measure the planet, but the effect of its gravity on spacecraft passing nearby: by analyzing microscopic variations in the frequency of the radio signal (Doppler effect) sent back to Earth, we calculate how much the planet accelerates the vehicle. This data reveals the exact mass of the celestial body. By crossing mass and volume, scientists obtain density, the fundamental parameter for understanding whether a world is rocky and solid like Earth or a gas giant like Saturn.</p>
                 <div class="video-container">
                     <iframe src="https://www.youtube.com/embed/pShWcrgPzQs" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
             </div>
             
             <div class="text-block">
-                <h2>Approfondimenti</h2>
+                <h2>In-Depth</h2>
                 <ul class="no-border-list">
                     <li>
-                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=zR3Igc3Rhfg" target="_blank">To Scale: THE SOLAR SYSTEM</a> - To Scale:</strong>
-                        Un gruppo di amici si reca nel deserto per costruire un modello in scala reale del sistema solare. Utilizzando una biglia per rappresentare la Terra, ci mostrano visivamente le immense distanze reali che separano i pianeti nel vuoto dello spazio.
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=zR3Igc3Rhfg" target="_blank">To Scale: THE SOLAR SYSTEM</a> - To Scale</strong>
+                        A group of friends goes to the desert to build a true-to-scale model of the solar system. Using a marble to represent the Earth, they visually show us the immense actual distances that separate the planets in the vacuum of space.
                     </li>
                     <li>
                         <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=libKVRa01L8" target="_blank">Solar System 101 | National Geographic</a> - National Geographic</strong>
-                        Una panoramica chiara e completa sul nostro vicinato cosmico. Il video illustra la formazione del sistema solare, le differenze strutturali tra pianeti rocciosi e giganti gassosi o ghiacciati, per poi spingersi fino alla fascia di Kuiper e alla Nube di Oort.
+                        A clear and comprehensive overview of our cosmic neighborhood. The video illustrates the formation of the solar system, the structural differences between rocky planets and gas or ice giants, and then ventures out to the Kuiper Belt and the Oort Cloud.
                     </li>
                     <li>
                         <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=MX3PIkbTQwQ" target="_blank">Our Milky Way Galaxy: How Big is Space?</a> - NASA Solar System</strong>
-                        Un viaggio visivo per farci comprendere le sconfinate dimensioni della Via Lattea. Attraverso il concetto di "tempo-luce", mostra i tempi effettivi che la luce impiega per viaggiare dal Sole verso i vari pianeti, fino ad arrivare alle stelle più vicine a noi.
+                        A visual journey to help us understand the boundless dimensions of the Milky Way. Through the concept of "light-time," it shows the actual times it takes for light to travel from the Sun to the various planets, all the way to our nearest stars.
                     </li>
                     <li>
                         <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=yaPhKc31zPs" target="_blank">The Basics of the Solar System in 10 Minutes!</a> - BlenderTimer</strong>
-                        Un concentrato di curiosità e dati affascinanti sui corpi celesti che orbitano attorno alla nostra stella. In soli dieci minuti esplora dimensioni, temperature, particolarità atmosferiche, record geologici e le stranezze orbitali di ciascun pianeta.
+                        A concentration of trivia and fascinating data on the celestial bodies orbiting our star. In just ten minutes, it explores dimensions, temperatures, atmospheric peculiarities, geological records, and the orbital oddities of each planet.
                     </li>
                     <li>
                         <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=d-z0eQOEzkE" target="_blank">The Birth of the Solar System</a> - SEA</strong>
-                        Un documentario profondo e dettagliato sulle origini del nostro sistema planetario. Partendo dal collasso della nebulosa primordiale, spiega la formazione dei protopianeti, le violente migrazioni orbitali e le dinamiche che hanno reso la Terra un’oasi abitabile.
+                        A deep and detailed documentary on the origins of our planetary system. Starting from the collapse of the primordial nebula, it explains the formation of protoplanets, violent orbital migrations, and the dynamics that made Earth a habitable oasis.
                     </li>
                     <li>
-                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=4aRr4bYiJFM" target="_blank">Why NASA’s Deep Space Network Is The Most Important Part Of Any Space Probe</a> - Scott Manley</strong>
-                        Un’analisi dell’infrastruttura fondamentale per l’esplorazione del cosmo: il Deep Space Network. Il video spiega come questa rete globale di enormi radiotelescopi della NASA permetta di comunicare, navigare e ricevere preziose immagini dalle sonde spaziali.
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=4aRr4bYiJFM" target="_blank">Why NASA’s Deep Space Network Is The Most Important Part</a> - Scott Manley</strong>
+                        An analysis of the fundamental infrastructure for cosmic exploration: the Deep Space Network. The video explains how this global network of massive NASA radio telescopes allows us to communicate, navigate, and receive precious images from space probes.
                     </li>
                 </ul>
             </div>
             
             <div class="text-block">
-                <h2>Fonti</h2>
+                <h2>Sources</h2>
                 <ul class="no-border-list">
                     <li>NASA. (2017, November 14). <em>Solar System: Facts</em>. NASA Science.<br><a href="https://science.nasa.gov/solar-system/solar-system-facts/" target="_blank">https://science.nasa.gov/solar-system/solar-system-facts/</a></li>
                     <li>NASA. (2018, January 12). <em>Planet Compare</em>. NASA Solar System Exploration.<br><a href="https://solarsystem.nasa.gov/planet-compare/" target="_blank">https://solarsystem.nasa.gov/planet-compare/</a></li>
@@ -428,19 +495,19 @@
 </div>
 
 <div id="hidden-intro-container">
-    <div id="hidden-dynamic-text">In vista del 70° anniversario della NASA nel 2028, questo progetto nasce per rendere veritiere le frequenti rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l’immenso archivio di dati scientifici ufficiali dell’agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un’esatta percezione delle vere dimensioni <span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni <span class="anim-pos-orbit"></span> orbitali e delle immense distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
+    <div id="hidden-dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* ─── 1. MOTORE DI NAVIGAZIONE IBRIDO (Stati X + Scroll Y nativo) ─── */
-    let currentState = 0; // 0 = Header, 1 = Contenuto Verticale
+    /* ─── 1. HYBRID NAVIGATION ENGINE (X States + Native Y Scroll) ─── */
+    let currentState = 0; // 0 = Header, 1 = Vertical Content
     let targetX = 0;
     let currentX = 0;
     let lastX = 0;
     
-    // Variabili per l'inerzia verticale delle stelle
+    // Variables for vertical inertia of stars
     let targetY = 0;
     let currentY = 0;
     let lastY = 0;
@@ -448,9 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTraveling = false;
     let scrollTimeout;
 
-    // --- NUOVE VARIABILI PER LA RESISTENZA ---
+    // --- NEW VARIABLES FOR RESISTANCE ---
     let scrollUpResistance = 0; 
-    const RESISTANCE_THRESHOLD = 530; // Aumenta o diminuisci questo valore per calibrare lo scroll
+    const RESISTANCE_THRESHOLD = 530; // Increase or decrease this value to calibrate the scroll
 
     const scrollIndicator = document.getElementById('header-scroll');
     const contentDiv = document.getElementById('vertical-content');
@@ -473,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Ascolto globale della rotellina
+    // Global mouse wheel listener
     window.addEventListener('wheel', (e) => {
         if (isTraveling || scrollTimeout) return;
         
@@ -483,19 +550,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
             }
         } else if (currentState === 1) {
-            // Se siamo in cima e l'utente prova a scorrere verso l'alto
+            // If we are at the top and the user tries to scroll up
             if (contentDiv.scrollTop <= 5 && (e.deltaY < 0 || e.deltaX < 0)) {
-                // Accumuliamo la resistenza
+                // Accumulate resistance
                 scrollUpResistance += Math.abs(e.deltaY || e.deltaX);
                 
-                // Se la resistenza supera la soglia, torniamo indietro
+                // If resistance exceeds the threshold, we go back
                 if (scrollUpResistance > RESISTANCE_THRESHOLD) {
                     jumpToState(0);
-                    scrollUpResistance = 0; // resettiamo per la prossima volta
+                    scrollUpResistance = 0; // reset for next time
                     scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
                 }
             } else {
-                // Se scorriamo verso il basso o non siamo in cima, resettiamo l'accumulatore
+                // If we scroll down or are not at the top, reset the accumulator
                 if (e.deltaY > 0 || e.deltaX > 0 || contentDiv.scrollTop > 5) {
                     scrollUpResistance = 0;
                 }
@@ -505,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     scrollIndicator.addEventListener('click', () => jumpToState(1));
 
-    // CLIC SUL MENU PER RICARICARE LA PAGINA
+    // MENU CLICK TO RELOAD PAGE
     const navMisurazioni = document.getElementById('nav-misurazioni');
     if (navMisurazioni) {
         navMisurazioni.addEventListener('click', (e) => {
@@ -532,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
             }
         } else if (currentState === 1) {
-            // Su mobile aumentiamo la distanza del "tiro" necessario (swipe lungo verso il basso)
+            // On mobile we increase the required "pull" distance (long downward swipe)
             if (contentDiv.scrollTop <= 5 && (deltaY < -180 || deltaX < -180)) {
                 jumpToState(0);
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
@@ -545,15 +612,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    /* ─── 2. GESTIONE CURSORE E MENU HACKER ─── */
+    /* ─── 2. CURSOR MANAGEMENT AND HACKER MENU ─── */
     const cursorDot     = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');
+    
+    // --- NEW CODE: Restore saved cursor position ---
+    const savedCursorX = sessionStorage.getItem('cursorPosX');
+    const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+    if (savedCursorX !== null && savedCursorY !== null) {
+        cursorDot.style.left = savedCursorX + 'px';
+        cursorDot.style.top  = savedCursorY + 'px';
+        cursorOutline.style.left = savedCursorX + 'px';
+        cursorOutline.style.top  = savedCursorY + 'px';
+    }
+    // -----------------------------------------------------------------
     
     window.addEventListener('mousemove', e => {
         cursorDot.style.left = e.clientX + 'px';
         cursorDot.style.top  = e.clientY + 'px';
         cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:250, fill:'forwards' });
+        
+        // --- NEW CODE: Save current cursor position ---
+        sessionStorage.setItem('cursorPosX', e.clientX);
+        sessionStorage.setItem('cursorPosY', e.clientY);
+        // ------------------------------------------------------------
     });
+
+    // --- NEW CODE: Additional click effect ---
+    window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+    window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+    // ----------------------------------------------
     
     function attachHoverEvents(el) {
         el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
@@ -615,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.fonts.ready.then(() => {
             logoSpan.style.display = 'inline-block';
-            logoSpan.style.overflow = 'hidden';
+            logoSpan.style.overflow = 'visible'; // BUG FIX
             logoSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -635,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.fonts.ready.then(() => {
             textSpan.style.display = 'inline-block';
-            textSpan.style.overflow = 'hidden';
+            textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
             textSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -646,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* ─── 3. SYNC FONT TITOLO CON LA HOMEPAGE ─── */
+    /* ─── 3. SYNC TITLE FONT WITH HOMEPAGE ─── */
     let lastIntroWidth = 0;
     let lastIntroHeight = 0;
 
@@ -700,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lastIntroHeight = targetHeight;
     }
 
-    // MODIFICA QUI: Esegue subito il calcolo per evitare il FOUC
+    // EDIT HERE: Execute calculation immediately to avoid FOUC
     syncTitleFontSize();
 
     document.fonts.ready.then(() => {
@@ -715,7 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    /* ─── 4. MOTORE STELLE DINAMICO ─── */
+    /* ─── 4. DYNAMIC STARS ENGINE ─── */
     class Stars {
         constructor(id, density, maxS, minS, maxSz, minSz) {
             this.canvas = document.getElementById(id);
@@ -786,13 +875,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateEngine() {
         requestAnimationFrame(animateEngine);
         
-        // 1. Calcolo Inerzia Orizzontale (Cambio Slide)
+        // 1. Calculate Horizontal Inertia (Slide Change)
         currentX += (targetX - currentX) * 0.04;
         scrollWrapper.style.transform = `translateX(-${currentX}px)`;
         let deltaX = (currentX - lastX);
         lastX = currentX;
 
-        // 2. Calcolo Inerzia Verticale (Scroll lettura)
+        // 2. Calculate Vertical Inertia (Reading Scroll)
         if (currentState === 1) {
             targetY = contentDiv.scrollTop;
         } else {
@@ -802,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let deltaY = (currentY - lastY);
         lastY = currentY;
 
-        // Le stelle vengono nutrite con ENTRAMBI i delta per non saltare a scatti
+        // Stars are fed with BOTH deltas to avoid skipping
         s1.draw(deltaX, deltaY); 
         s2.draw(deltaX, deltaY); 
         s3.draw(deltaX, deltaY);
