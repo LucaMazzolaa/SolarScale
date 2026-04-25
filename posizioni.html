@@ -247,7 +247,7 @@
     </div>
 
     <div id="hidden-intro-container">
-        <div id="hidden-dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
+        <div id="hidden-dynamic-text">On the occasion of NASA's 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency's immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
     </div>
 
     <script>
@@ -261,20 +261,16 @@
         let winWidth = window.innerWidth;
         let winHeight = window.innerHeight;
 
-        // ==========================================
-        // OTTIMIZZAZIONE 2: Cursore decuplicato per evitare stalli
-        // Non avviamo una nuova animazione Web API a ogni singolo pixel di spostamento del mouse.
-        // Registriamo le coordinate in modo passivo e muoviamo il cursore nel loop RequestAnimationFrame
-        // ==========================================
-        const cursorDot = document.querySelector('[data-cursor-dot]');
+        // ── CURSOR (every frame, cheap) ──────────────────────────────────────
+        const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         let mouseX = winWidth / 2, mouseY = winHeight / 2;
         let outlineX = mouseX, outlineY = mouseY;
 
         window.addEventListener('mousemove', e => {
-            mouseX = e.clientX; 
+            mouseX = e.clientX;
             mouseY = e.clientY;
-        }, { passive: true }); // Passive rende l'evento leggerissimo per lo scroll/mouse
+        }, { passive: true });
 
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
         window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
@@ -285,9 +281,7 @@
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
-        // ==========================================
-        // MENU HACKER EFFECT (Invariato)
-        // ==========================================
+        // ── MENU HACKER EFFECT ───────────────────────────────────────────────
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
         
@@ -310,14 +304,13 @@
         const logoRef = { id: null };
 
         function updateMenuWidths() {
-            if(logoSpan) {
-                const currentLogoText = logoSpan.innerText;
+            if (logoSpan) {
+                const curr = logoSpan.innerText;
                 logoSpan.innerText = logoOriginal;
                 logoSpan.style.width = 'auto';
                 logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
-                logoSpan.innerText = currentLogoText;
+                logoSpan.innerText = curr;
             }
-
             menuLinks.forEach(link => {
                 const textSpan = link.querySelector('.text-label');
                 if (textSpan) {
@@ -332,8 +325,8 @@
             });
         }
 
-        if(topLogoLink) {
-            logoSpan = topLogoLink.querySelector('.nasa-text-label');
+        if (topLogoLink) {
+            logoSpan    = topLogoLink.querySelector('.nasa-text-label');
             logoOriginal = logoSpan.innerText;
             document.fonts.ready.then(() => { logoSpan.style.display = 'inline-block'; logoSpan.style.overflow = 'visible'; logoSpan.style.whiteSpace = 'nowrap'; });
             topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
@@ -350,11 +343,11 @@
             link.addEventListener('mouseleave', () => { clearInterval(intervalRef.id); textSpan.innerText = originalText; });
         });
 
-        let lastIntroWidth = 0; let lastIntroHeight = 0;
+        let lastIntroWidth = 0, lastIntroHeight = 0;
         function syncTitleFontSize() {
-            const hiddenText = document.getElementById('hidden-dynamic-text');
+            const hiddenText      = document.getElementById('hidden-dynamic-text');
             const hiddenContainer = document.getElementById('hidden-intro-container');
-            const mainTitle = document.getElementById('main-title');
+            const mainTitle       = document.getElementById('main-title');
             if (!hiddenText || !hiddenContainer || !mainTitle) return;
 
             const targetHeight = hiddenContainer.clientHeight;
@@ -363,160 +356,180 @@
 
             let minSize = 10, maxSize = 300, bestFit = minSize;
             while (minSize <= maxSize) {
-                let midSize = Math.floor((minSize + maxSize) / 2);
-                hiddenText.style.fontSize = midSize + 'px'; void hiddenText.offsetHeight; 
-                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { bestFit = midSize; minSize = midSize + 1; } 
+                const midSize = Math.floor((minSize + maxSize) / 2);
+                hiddenText.style.fontSize = midSize + 'px'; void hiddenText.offsetHeight;
+                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { bestFit = midSize; minSize = midSize + 1; }
                 else { maxSize = midSize - 1; }
             }
-            
             let fineFit = bestFit;
             for (let i = 1; i <= 9; i++) {
-                let testSize = bestFit + (i / 10);
-                hiddenText.style.fontSize = testSize + 'px'; void hiddenText.offsetHeight; 
-                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { fineFit = testSize; } 
+                const testSize = bestFit + (i / 10);
+                hiddenText.style.fontSize = testSize + 'px'; void hiddenText.offsetHeight;
+                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { fineFit = testSize; }
                 else { break; }
             }
-
             mainTitle.style.fontSize = fineFit + 'px';
             lastIntroWidth = targetWidth; lastIntroHeight = targetHeight;
         }
 
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
-        // ==========================================
-        // OTTIMIZZAZIONE 3: Motore Stelle Unificato
-        // Gestiamo tutti e 3 i livelli di parallasse su UN SINGOLO canvas con sfondo nero solido (alpha: false).
-        // ==========================================
+        // ── STARS ENGINE ─────────────────────────────────────────────────────
+        // KEY OPTIMISATION: canvas is drawn with alpha:false (solid black backing).
+        // We only call draw() when the scroll position actually changes.
+        // Once the slide is settled the canvas pixels persist — zero cost at rest.
         class UnifiedStarsEngine {
             constructor(id) {
                 this.canvas = document.getElementById(id);
-                // alpha: false velocizza mostruosamente il rendering su hardware vecchio
-                this.ctx = this.canvas.getContext('2d', { alpha: false }); 
-                this.dots = [];
+                this.ctx    = this.canvas.getContext('2d', { alpha: false });
+                this.dots   = [];
+                this.offsetX = 0; // cumulative parallax offset
                 this.resize();
             }
-            
+
             resize() {
-                this.canvas.width = winWidth; 
+                this.canvas.width  = winWidth;
                 this.canvas.height = winHeight;
-                this.lB = -winWidth; 
-                this.rB = winWidth * 2;
+                this.lB = -winWidth;
+                this.rB =  winWidth * 2;
                 this.dots = [];
-                
-                // Popola i 3 layer in un solo array
-                this.addLayer(1.5, 1.4, 0.1, 1.5, 0.5); // Layer 1
-                this.addLayer(0.5, 0.25, 0.0, 1.0, 0.2); // Layer 2
-                this.addLayer(0.2, 0.001, 0.0, 0.5, 0.1); // Layer 3
+                this._addLayer(1.5, 1.4, 0.1, 1.5, 0.5);
+                this._addLayer(0.5, 0.25, 0.0, 1.0, 0.2);
+                this._addLayer(0.2, 0.001, 0.0, 0.5, 0.1);
             }
 
-            addLayer(density, maxS, minS, maxSz, minSz) {
-                let num = Math.floor((winWidth * winHeight / 10000) * density);
+            _addLayer(density, maxS, minS, maxSz, minSz) {
+                const num = Math.floor((winWidth * winHeight / 10000) * density);
                 for (let i = 0; i < num; i++) {
                     this.dots.push({
                         x: Math.random() * (this.rB - this.lB) + this.lB,
                         y: Math.random() * winHeight,
                         s: Math.random() * (maxSz - minSz) + minSz,
-                        v: Math.random() * (maxS - minS) + minS
+                        v: Math.random() * (maxS  - minS)  + minS
                     });
                 }
             }
 
+            // Called only when deltaX !== 0, or once on init/resize.
             draw(deltaX, deltaY) {
                 const ctx = this.ctx;
-                // Disegniamo lo sfondo nero solido anziché usare clearRect trasparente
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
                 ctx.fillStyle = 'white';
-                ctx.beginPath(); 
-                
+                ctx.beginPath();
                 for (let i = this.dots.length - 1; i >= 0; i--) {
                     const dot = this.dots[i];
                     dot.x -= deltaX * dot.v * 0.4;
                     dot.y -= deltaY * dot.v * 0.4;
-
-                    // Riciclo le stelle fuori schermo
-                    if (dot.x < this.lB) dot.x = this.rB;
-                    else if (dot.x > this.rB) dot.x = this.lB;
-                    
-                    if (dot.y < -100) dot.y = this.canvas.height + 100;
+                    if (dot.x < this.lB)                    dot.x = this.rB;
+                    else if (dot.x > this.rB)               dot.x = this.lB;
+                    if (dot.y < -100)                       dot.y = this.canvas.height + 100;
                     else if (dot.y > this.canvas.height + 100) dot.y = -100;
-
                     ctx.rect(dot.x, dot.y, dot.s, dot.s);
                 }
-                ctx.fill(); 
+                ctx.fill();
             }
         }
 
-        let starEngine;
+        // ── SCROLL / SLIDE STATE ─────────────────────────────────────────────
         let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
-        let isTraveling = false, scrollTimeout; 
+        let isTraveling = false, scrollTimeout;
         let isEngineActive = false, zoomEnabled = false;
         let currentAuScale = 12, targetAuScale = 12;
         let scrollOutResistance = 0;
-        const RESISTANCE_THRESHOLD = 1500; 
+        const RESISTANCE_THRESHOLD = 1500;
 
+        // ── JPL ORBITAL ELEMENTS ─────────────────────────────────────────────
         const jplData = {
             mercury: { name: 'Mercury', id: 'mercury', nasa: '199', scale: 0.3825, a0: 0.38709927, a1: 0.00000037, e0: 0.20563593, e1: 0.00001906, i0: 7.00497902, i1: -0.00594749, L0: 252.25032350, L1: 149472.67411175, lp0: 77.45779628, lp1: 0.16047689, N0: 48.33076593, N1: -0.12534081 },
-            venus: { name: 'Venus', id: 'venus', nasa: '299', scale: 0.9489, a0: 0.72333199, a1: 0.00000039, e0: 0.00677323, e1: -0.00004107, i0: 3.39467605, i1: -0.00078890, L0: 181.97973, L1: 58517.81538, lp0: 131.53298, lp1: 0.00128681, N0: 76.68069, N1: -0.27769418 },
-            earth: { name: 'Earth', id: 'earth', nasa: '399', scale: 1.0000, a0: 1.00000261, a1: 0.00000562, e0: 0.01671123, e1: -0.00004392, i0: -0.00001531, i1: -0.01294668, L0: 100.46457166, L1: 35999.37244981, lp0: 102.93768193, lp1: 0.32327364, N0: 0.0, N1: 0.0 },
-            mars: { name: 'Mars', id: 'mars', nasa: '499', scale: 0.5325, a0: 1.52371034, a1: 0.00001847, e0: 0.09339410, e1: 0.00007882, i0: 1.84969142, i1: -0.00813131, L0: -4.55343205, L1: 19140.30268499, lp0: -23.94362959, lp1: 0.44441088, N0: 49.55953891, N1: -0.29257343 },
+            venus:   { name: 'Venus',   id: 'venus',   nasa: '299', scale: 0.9489, a0: 0.72333199, a1: 0.00000039, e0: 0.00677323, e1: -0.00004107, i0: 3.39467605, i1: -0.00078890, L0: 181.97973, L1: 58517.81538, lp0: 131.53298, lp1: 0.00128681, N0: 76.68069, N1: -0.27769418 },
+            earth:   { name: 'Earth',   id: 'earth',   nasa: '399', scale: 1.0000, a0: 1.00000261, a1: 0.00000562, e0: 0.01671123, e1: -0.00004392, i0: -0.00001531, i1: -0.01294668, L0: 100.46457166, L1: 35999.37244981, lp0: 102.93768193, lp1: 0.32327364, N0: 0.0, N1: 0.0 },
+            mars:    { name: 'Mars',    id: 'mars',    nasa: '499', scale: 0.5325, a0: 1.52371034, a1: 0.00001847, e0: 0.09339410, e1: 0.00007882, i0: 1.84969142, i1: -0.00813131, L0: -4.55343205, L1: 19140.30268499, lp0: -23.94362959, lp1: 0.44441088, N0: 49.55953891, N1: -0.29257343 },
             jupiter: { name: 'Jupiter', id: 'jupiter', nasa: '599', scale: 11.2092, a0: 5.20288700, a1: -0.00011607, e0: 0.04838624, e1: -0.00013253, i0: 1.30439695, i1: -0.00183714, L0: 34.39644051, L1: 3034.74612775, lp0: 14.72847983, lp1: 0.21252668, N0: 100.47390909, N1: 0.20469106 },
-            saturn: { name: 'Saturn', id: 'saturn', nasa: '699', scale: 9.4494, a0: 9.53667594, a1: -0.00125060, e0: 0.05386179, e1: -0.00050991, i0: 2.48599187, i1: 0.00193609, L0: 49.95424423, L1: 1222.49362201, lp0: 92.59887831, lp1: -0.41897216, N0: 113.66242448, N1: -0.28867794 },
-            uranus: { name: 'Uranus', id: 'uranus', nasa: '799', scale: 4.0074, a0: 19.18916464, a1: -0.00196176, e0: 0.04725744, e1: -0.00004397, i0: 0.77263783, i1: -0.00242939, L0: 313.23818410, L1: 428.48202785, lp0: 170.95427630, lp1: 0.40805281, N0: 74.01692503, N1: 0.04240589 },
+            saturn:  { name: 'Saturn',  id: 'saturn',  nasa: '699', scale: 9.4494, a0: 9.53667594, a1: -0.00125060, e0: 0.05386179, e1: -0.00050991, i0: 2.48599187, i1: 0.00193609, L0: 49.95424423, L1: 1222.49362201, lp0: 92.59887831, lp1: -0.41897216, N0: 113.66242448, N1: -0.28867794 },
+            uranus:  { name: 'Uranus',  id: 'uranus',  nasa: '799', scale: 4.0074, a0: 19.18916464, a1: -0.00196176, e0: 0.04725744, e1: -0.00004397, i0: 0.77263783, i1: -0.00242939, L0: 313.23818410, L1: 428.48202785, lp0: 170.95427630, lp1: 0.40805281, N0: 74.01692503, N1: 0.04240589 },
             neptune: { name: 'Neptune', id: 'neptune', nasa: '899', scale: 3.8827, a0: 30.06992276, a1: 0.00026291, e0: 0.00859048, e1: 0.00005105, i0: 1.77004347, i1: 0.00035372, L0: -55.12002969, L1: 218.45945325, lp0: 44.96476227, lp1: -0.32241464, N0: 131.78422574, N1: -0.00508664 }
         };
 
-        const datePart = document.getElementById('date-part');
-        const timePart = document.getElementById('time-part');
+        // ── TIME CONTROLS ────────────────────────────────────────────────────
+        const datePart   = document.getElementById('date-part');
+        const timePart   = document.getElementById('time-part');
         const speedSlider = document.getElementById('speed-slider');
         const speedLabel  = document.getElementById('speed-label');
-        const btnPlay     = document.getElementById('btn-play');
-        const btnPrev     = document.getElementById('btn-prev');
-        const btnNext     = document.getElementById('btn-next');
-        const btnLive     = document.getElementById('btn-live');
+        const btnPlay    = document.getElementById('btn-play');
+        const btnPrev    = document.getElementById('btn-prev');
+        const btnNext    = document.getElementById('btn-next');
+        const btnLive    = document.getElementById('btn-live');
 
         const epochJ2000 = new Date('2000-01-01T12:00:00Z');
         let currentDate = new Date();
-        let isPlaying = true, isApiLive = true;
-        let lastApiFetchTime = null, needsOrbitUpdate = true, lastRenderedT = null;
+        let isPlaying = true;
+        // isLiveMode=true → planets frozen at API snapshot, zero per-frame computation
+        // isLiveMode=false → user scrubbing time, formula + throttled re-render
+        let isLiveMode = true;
+        let needsOrbitUpdate = true;
+        // dirty flag — set only when something visually changed
+        let planetsNeedUpdate = true;
+        let lastPlanetUpdateTime = 0;
+        let lastPlanetT = null;
+        let starsNeedRedraw = true;
 
+        function getPlanetInterval() {
+            const abs = Math.abs(getSpeed());
+            if (abs <= 86400) return 300;
+            return 50;
+        }
+
+        // ── SLIDE TRANSITIONS ────────────────────────────────────────────────
         function jumpToState(index) {
             if (index < 0 || index > 1) return;
-            currentState = index; targetX = currentState * winWidth; isTraveling = true;
+            currentState = index;
+            targetX = currentState * winWidth;
+            isTraveling = true;
+            starsNeedRedraw = true; // ensure stars repaint during transition
             setTimeout(() => { isTraveling = false; }, 1000);
 
             const scrollIndicator = document.getElementById('header-scroll');
             if (currentState === 1) {
                 scrollIndicator.style.opacity = '0'; scrollIndicator.style.pointerEvents = 'none';
-                isEngineActive = true; setTimeout(() => { zoomEnabled = true; }, 500);
-                timeControlsEl.classList.add('visible-ui'); zoomControlsEl.classList.add('visible-ui');
+                isEngineActive = true;
+                setTimeout(() => { zoomEnabled = true; }, 500);
+                timeControlsEl.classList.add('visible-ui');
+                zoomControlsEl.classList.add('visible-ui');
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
                 isEngineActive = false; zoomEnabled = false; targetAuScale = 12;
-                timeControlsEl.classList.remove('visible-ui'); zoomControlsEl.classList.remove('visible-ui');
+                timeControlsEl.classList.remove('visible-ui');
+                zoomControlsEl.classList.remove('visible-ui');
             }
         }
 
         window.addEventListener('wheel', (e) => {
             if (isTraveling || scrollTimeout) return;
             if (currentState === 0) {
-                const isScrollingDown = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
+                const isScrollingDown  = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
                 const isScrollingRight = e.deltaX > 0 && Math.abs(e.deltaX) > Math.abs(e.deltaY);
-
-                if (isScrollingDown || isScrollingRight) { 
-                    jumpToState(1); 
-                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); 
+                if (isScrollingDown || isScrollingRight) {
+                    jumpToState(1);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
                 }
             } else {
-                if (!zoomEnabled || !isEngineActive || e.target.closest('#time-controls-container') || e.target.closest('nav') || e.target.closest('#zoom-controls')) return;
-                
+                if (!zoomEnabled || !isEngineActive ||
+                    e.target.closest('#time-controls-container') ||
+                    e.target.closest('nav') ||
+                    e.target.closest('#zoom-controls')) return;
+
                 if (targetAuScale <= 1.51 && e.deltaY > 0) {
                     scrollOutResistance += Math.abs(e.deltaY);
-                    if (scrollOutResistance > RESISTANCE_THRESHOLD) { jumpToState(0); scrollOutResistance = 0; scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); }
+                    if (scrollOutResistance > RESISTANCE_THRESHOLD) {
+                        jumpToState(0);
+                        scrollOutResistance = 0;
+                        scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                    }
                 } else {
                     if (e.deltaY < 0 || targetAuScale > 1.51) scrollOutResistance = 0;
-                    targetAuScale += e.deltaY * -0.02; targetAuScale = Math.max(1.5, Math.min(targetAuScale, 35));
+                    targetAuScale += e.deltaY * -0.02;
+                    targetAuScale = Math.max(1.5, Math.min(targetAuScale, 35));
                 }
             }
         }, { passive: true });
@@ -524,22 +537,25 @@
         document.getElementById('header-scroll').addEventListener('click', () => jumpToState(1));
 
         let touchStartX = 0, touchStartY = 0;
-        window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
-        
-        window.addEventListener('touchend', e => {
-            if(isTraveling || scrollTimeout) return;
-            let deltaX = touchStartX - e.changedTouches[0].clientX; let deltaY = touchStartY - e.changedTouches[0].clientY;
-            
-            if (currentState === 0) {
-                const isSwipingUp = deltaY > 50 && Math.abs(deltaY) > Math.abs(deltaX);
-                const isSwipingLeft = deltaX > 50 && Math.abs(deltaX) > Math.abs(deltaY);
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
 
-                if(isSwipingUp || isSwipingLeft) { 
-                    jumpToState(1); 
-                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); 
+        window.addEventListener('touchend', e => {
+            if (isTraveling || scrollTimeout) return;
+            const dx = touchStartX - e.changedTouches[0].clientX;
+            const dy = touchStartY - e.changedTouches[0].clientY;
+            if (currentState === 0) {
+                if ((dy > 50 && Math.abs(dy) > Math.abs(dx)) || (dx > 50 && Math.abs(dx) > Math.abs(dy))) {
+                    jumpToState(1);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
                 }
             } else if (currentState === 1) {
-                if (deltaX < -250 || deltaY < -250) { jumpToState(0); scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); }
+                if (dx < -250 || dy < -250) {
+                    jumpToState(0);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                }
             }
         });
 
@@ -547,32 +563,42 @@
             winWidth = window.innerWidth; winHeight = window.innerHeight;
             targetX = currentState * winWidth;
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
-            if(starEngine) starEngine.resize();
+            if (starEngine) { starEngine.resize(); starsNeedRedraw = true; }
         });
 
         const navPosizioni = document.getElementById('nav-posizioni');
         if (navPosizioni) navPosizioni.addEventListener('click', (e) => { e.preventDefault(); window.location.reload(); });
 
-        document.getElementById('btn-zoom-in').addEventListener('click', () => { if (!isEngineActive) return; targetAuScale += 1.5; targetAuScale = Math.max(1.5, Math.min(targetAuScale, 35)); });
-        document.getElementById('btn-zoom-out').addEventListener('click', () => { if (!isEngineActive) return; targetAuScale -= 1.5; targetAuScale = Math.max(1.5, Math.min(targetAuScale, 35)); });
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            if (!isEngineActive) return;
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale + 1.5, 35));
+        });
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            if (!isEngineActive) return;
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 35));
+        });
 
+        // ── DATE UI (throttled to 200 ms in main loop) ───────────────────────
+        let lastUIUpdate = 0;
         function updateDateUI() {
             const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
-            const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false }).toUpperCase();
-            datePart.innerText = dateStr; timePart.innerText = timeStr;
-            if (!isApiLive) btnLive.classList.add('visible'); else btnLive.classList.remove('visible');
+            const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).toUpperCase();
+            datePart.innerText = dateStr;
+            timePart.innerText = timeStr;
+            if (!isLiveMode) btnLive.classList.add('visible'); else btnLive.classList.remove('visible');
         }
 
+        // ── SPEED HELPERS ────────────────────────────────────────────────────
         function getSpeed() {
-            let val = parseFloat(speedSlider.value);
+            const val = parseFloat(speedSlider.value);
             if (val === 0) return 1;
-            let sign = val < 0 ? -1 : 1;
+            const sign = val < 0 ? -1 : 1;
             return sign * Math.pow(Math.abs(val) / 1000, 3) * 31557600;
         }
 
         function formatSpeed(s) {
             if (s === 1) return "Real time";
-            let abs = Math.abs(s), pre = s > 0 ? "+" : "-";
+            const abs = Math.abs(s), pre = s > 0 ? "+" : "-";
             if (abs < 60)       return `${pre}${abs.toFixed(1)} sec/s`;
             if (abs < 3600)     return `${pre}${(abs/60).toFixed(1)} min/s`;
             if (abs < 86400)    return `${pre}${(abs/3600).toFixed(1)} hours/s`;
@@ -586,165 +612,249 @@
             if (val > -25 && val < 25) { speedSlider.value = 0; val = 0; }
             speedLabel.innerText = formatSpeed(getSpeed());
             if (val === 0) {
-                isApiLive = true; isPlaying = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
+                isLiveMode = true; isPlaying = true;
+                btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
             } else {
-                isApiLive = false; if (!isPlaying) { isPlaying = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active"; }
+                isLiveMode = false; planetsNeedUpdate = true;
+                if (!isPlaying) { isPlaying = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active"; }
             }
         });
 
-        speedSlider.addEventListener('mouseup', () => { let val = parseInt(speedSlider.value); if (val > -50 && val < 50) { speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input')); } });
-        speedSlider.addEventListener('touchend', () => { let val = parseInt(speedSlider.value); if (val > -50 && val < 50) { speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input')); } });
+        speedSlider.addEventListener('mouseup', () => {
+            if (parseInt(speedSlider.value) > -50 && parseInt(speedSlider.value) < 50) {
+                speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input'));
+            }
+        });
+        speedSlider.addEventListener('touchend', () => {
+            if (parseInt(speedSlider.value) > -50 && parseInt(speedSlider.value) < 50) {
+                speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input'));
+            }
+        });
 
-        function adjustSliderStep(amount) { speedSlider.value = Math.max(-1000, Math.min(1000, parseFloat(speedSlider.value) + amount)); speedSlider.dispatchEvent(new Event('input')); }
+        function adjustSliderStep(amount) {
+            speedSlider.value = Math.max(-1000, Math.min(1000, parseFloat(speedSlider.value) + amount));
+            speedSlider.dispatchEvent(new Event('input'));
+        }
         btnPrev.addEventListener('click', () => adjustSliderStep(-50));
         btnNext.addEventListener('click', () => adjustSliderStep(50));
 
         btnPlay.addEventListener('click', () => {
-            isPlaying = !isPlaying; isApiLive = false; 
-            btnPlay.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;"; btnPlay.className = isPlaying ? "btn btn-icon btn-active" : "btn btn-icon";
+            isPlaying = !isPlaying; isLiveMode = false; planetsNeedUpdate = true;
+            btnPlay.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
+            btnPlay.className = isPlaying ? "btn btn-icon btn-active" : "btn btn-icon";
         });
 
         btnLive.addEventListener('click', () => {
-            isPlaying = true; isApiLive = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
-            speedSlider.value = 0; speedLabel.innerText = "Real time"; currentDate = new Date(); updateDateUI(); fetchNasaApi();
+            isPlaying = true; isLiveMode = true;
+            btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
+            speedSlider.value = 0; speedLabel.innerText = "Real time";
+            currentDate = new Date(); updateDateUI();
+            // Instant re-render using cached API snapshot (no fetch, no wait)
+            needsOrbitUpdate = true; planetsNeedUpdate = true;
         });
 
+        // ── KEPLER SOLVER ────────────────────────────────────────────────────
         function solveKepler(M, e) {
             let E = M, delta = 1, iter = 0;
-            while (Math.abs(delta) > 1e-6 && iter < 100) { delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)); E -= delta; iter++; }
+            while (Math.abs(delta) > 1e-6 && iter < 100) {
+                delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+                E -= delta; iter++;
+            }
             return E;
         }
 
+        // ── DOM INIT ─────────────────────────────────────────────────────────
         function initializeDOM() {
             Object.values(jplData).forEach(p => {
-                const orb = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
+                const orb   = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
                 const model = document.createElement('div'); model.className = `planet-model pl-${p.id}`; model.style.setProperty('--scale', p.scale);
-                const hud = document.createElement('div'); hud.className = `hud-ring ${['jupiter','saturn','uranus','neptune'].includes(p.id) ? 'hud-default' : ''}`; hud.setAttribute('data-name', p.name);
+                const hud   = document.createElement('div'); hud.className = `hud-ring ${['jupiter','saturn','uranus','neptune'].includes(p.id) ? 'hud-default' : ''}`; hud.setAttribute('data-name', p.name);
                 const pixel = document.createElement('div'); pixel.className = `pixel-dot ${p.id}-pixel`;
                 model.appendChild(hud); model.appendChild(pixel);
-                document.getElementById('scene').appendChild(orb); document.getElementById('scene').appendChild(model);
-                p.orbEl = orb; 
-                p.modelEl = model;
-                p.lastTransform = ""; // Proprietà usata per l'ottimizzazione DOM
+                document.getElementById('scene').appendChild(orb);
+                document.getElementById('scene').appendChild(model);
+                p.orbEl        = orb;
+                p.modelEl      = model;
+                p.lastTransform = '';
             });
         }
 
+        // ── RENDER PLANETS ───────────────────────────────────────────────────
+        // Single code path: always JPL polynomial formula.
+        // Live mode uses api snapshot elements if available (accurate for "now"),
+        // otherwise formula. No per-frame drift extrapolation.
         function renderPlanets() {
             const T = (currentDate - epochJ2000) / 3155760000000;
-            const orbitsNeedUpdate = needsOrbitUpdate || (lastRenderedT === null || Math.abs(T - lastRenderedT) > 0.0001);
-            if (orbitsNeedUpdate) { lastRenderedT = T; needsOrbitUpdate = false; }
-            
-            let vminPxLocal = Math.min(winWidth, winHeight) / 100;
-            const auToPx = currentAuScale * vminPxLocal;
-            
+            const auToPx = currentAuScale * (Math.min(winWidth, winHeight) / 100);
+            const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
+            if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
+
             Object.values(jplData).forEach(p => {
                 let a, e, i, N, w, M_rad;
-                if (isApiLive && p.api_a !== undefined) {
+                // Use accurate API snapshot when in live mode and data is loaded
+                if (isLiveMode && p.api_a !== undefined) {
                     a = p.api_a; e = p.api_e; i = p.api_i; N = p.api_N; w = p.api_w;
-                    const daysSinceFetch = (currentDate - lastApiFetchTime) / 86400000;
-                    const meanMotion = 360 / (365.256 * Math.pow(a, 1.5));
-                    let M_deg = (p.api_MA + meanMotion * daysSinceFetch) % 360; M_rad = M_deg * Math.PI / 180;
+                    M_rad = p.api_MA * Math.PI / 180;
                 } else {
-                    a = p.a0 + p.a1 * T; e = p.e0 + p.e1 * T; i = p.i0 + p.i1 * T;
-                    let L = p.L0 + p.L1 * T; let lp = p.lp0 + p.lp1 * T; N = p.N0 + p.N1 * T; w = lp - N; M_rad = ((L - lp) % 360) * Math.PI / 180;
+                    a = p.a0 + p.a1 * T;
+                    e = p.e0 + p.e1 * T;
+                    i = p.i0 + p.i1 * T;
+                    const L  = p.L0 + p.L1 * T;
+                    const lp = p.lp0 + p.lp1 * T;
+                    N = p.N0 + p.N1 * T;
+                    w = lp - N;
+                    M_rad = ((L - lp) % 360) * Math.PI / 180;
                 }
+
                 if (M_rad < 0) M_rad += 2 * Math.PI;
                 const E_rad = solveKepler(M_rad, e);
-                const lx = a * (Math.cos(E_rad) - e); const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
-                const N_rad = N * Math.PI / 180; const i_rad = i * Math.PI / 180; const w_rad = w * Math.PI / 180;
-                const x1 = lx * Math.cos(w_rad) - ly * Math.sin(w_rad); const y1 = lx * Math.sin(w_rad) + ly * Math.cos(w_rad);
+                const lx = a * (Math.cos(E_rad) - e);
+                const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
+                const N_rad = N * Math.PI / 180, i_rad = i * Math.PI / 180, w_rad = w * Math.PI / 180;
+                const x1 = lx * Math.cos(w_rad) - ly * Math.sin(w_rad);
+                const y1 = lx * Math.sin(w_rad) + ly * Math.cos(w_rad);
                 const y2 = y1 * Math.cos(i_rad);
-                
-                const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad); const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
-                
-                // OTTIMIZZAZIONE 4: Limitiamo gli aggiornamenti del DOM solo se i valori sono visualmente percettibili.
-                // Usiamo un arrotondamento ai centesimi di pixel per stoppare l'attività DOM inutile se impostato su Real Time.
-                const newX = Math.round((abs_X * auToPx) * 100) / 100;
-                const newY = Math.round((abs_Y * auToPx) * 100) / 100;
-                const newTransform = `translate3d(${newX}px, ${newY}px, 0)`;
-                
+                const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad);
+                const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
+
+                const newX = Math.round(abs_X * auToPx * 2) / 2;
+                const newY = Math.round(abs_Y * auToPx * 2) / 2;
+                const newTransform = `translate3d(${newX}px,${newY}px,0)`;
                 if (p.lastTransform !== newTransform) {
                     p.modelEl.style.transform = newTransform;
                     p.lastTransform = newTransform;
                 }
-                
-                if (orbitsNeedUpdate) {
-                    const b = a * Math.sqrt(1 - e * e); const c = a * e; const orb = p.orbEl;
-                    orb.style.setProperty('--semi-a', a); orb.style.setProperty('--semi-b', b);
-                    orb.style.setProperty('--c', c); orb.style.setProperty('--i', i);
-                    orb.style.setProperty('--N', N); orb.style.setProperty('--w', w);
+
+                if (updateOrbits) {
+                    const b = a * Math.sqrt(1 - e * e), c = a * e;
+                    p.orbEl.style.setProperty('--semi-a', a);
+                    p.orbEl.style.setProperty('--semi-b', b);
+                    p.orbEl.style.setProperty('--c', c);
+                    p.orbEl.style.setProperty('--i', i);
+                    p.orbEl.style.setProperty('--N', N);
+                    p.orbEl.style.setProperty('--w', w);
                 }
             });
         }
 
+        // ── NASA HORIZONS API — called ONCE at boot only ─────────────────────
         async function fetchNasaApi() {
-            const targetDate = currentDate;
-            const startStr = targetDate.toISOString().slice(0, 16).replace('T', ' ');
-            const stopStr  = new Date(targetDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
+            const startStr = currentDate.toISOString().slice(0, 16).replace('T', ' ');
+            const stopStr  = new Date(currentDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
             await Promise.all(Object.values(jplData).map(async (p) => {
-                const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='@10'&START_TIME='${startStr}'&STOP_TIME='${stopStr}'&STEP_SIZE='1m'&OUT_UNITS='AU-D'&_t=${Date.now()}`)}`;
+                const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
+                    `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='@10'&START_TIME='${startStr}'&STOP_TIME='${stopStr}'&STEP_SIZE='1m'&OUT_UNITS='AU-D'&_t=${Date.now()}`
+                )}`;
                 try {
-                    const response = await fetch(url); const json = await response.json();
+                    const response = await fetch(url);
+                    const json = await response.json();
                     const soeData = JSON.parse(json.contents).result.split('$$SOE')[1].split('$$EOE')[0];
-                    const extract = (key) => { const m = soeData.match(new RegExp(`\\b${key}\\s*=\\s*([\\-\\d\\.E\\+]+)`)); return m ? parseFloat(m[1]) : null; };
-                    p.api_a = extract('A'); p.api_e = extract('EC'); p.api_i = extract('IN'); p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
-                } catch (err) {}
+                    const extract = (key) => {
+                        const m = soeData.match(new RegExp(`\\b${key}\\s*=\\s*([\\-\\d\\.E\\+]+)`));
+                        return m ? parseFloat(m[1]) : null;
+                    };
+                    p.api_a = extract('A'); p.api_e = extract('EC'); p.api_i = extract('IN');
+                    p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
+                } catch (_) {}
             }));
-            lastApiFetchTime = targetDate; needsOrbitUpdate = true;
+            // One render with fresh accurate positions, then planets stay frozen in live mode
+            needsOrbitUpdate = true; planetsNeedUpdate = true;
         }
 
+        // ── ZOOM CSS ─────────────────────────────────────────────────────────
         function updateZoomCSS() {
-            if(!universeEl) return;
+            if (!universeEl) return;
             const uiSize = 0.6 + ((currentAuScale - 1.5) / (35 - 1.5)) * (2.0 - 0.6);
             universeEl.style.setProperty('--au-to-vmin', `${currentAuScale}vmin`);
             universeEl.style.setProperty('--ui-ring-size', `${uiSize}vmin`);
         }
 
-        let lastTime = performance.now(); let lastUIUpdate = 0;
+        // ── MAIN LOOP ─────────────────────────────────────────────────────────
+        // This is the heart of the optimisation.  Three tiers of work:
+        //   1. Every frame  : cursor, scroll lerp, zoom lerp  (cheap transforms)
+        //   2. Every 50–2000 ms : planet Kepler solve + DOM write  (throttled)
+        //   3. Only when scroll moves : star canvas redraw  (dirty flag)
+        let lastTime = performance.now();
 
         function animate(time) {
-            const deltaTime = Math.min(time - lastTime, 32); 
+            const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Logica transizione mouse (fluida e senza trigger inutili)
+            // 1a. Cursor
             outlineX += (mouseX - outlineX) * 0.2;
             outlineY += (mouseY - outlineY) * 0.2;
-            cursorOutline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%)`;
-            cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+            cursorOutline.style.transform = `translate3d(${outlineX}px,${outlineY}px,0) translate(-50%,-50%)`;
+            cursorDot.style.transform     = `translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
 
+            // Scroll slide lerp
             currentX += (targetX - currentX) * 0.04;
-            if (Math.abs(currentX - lastX) > 0.01 && scrollWrapperEl) {
-                scrollWrapperEl.style.transform = `translate3d(-${currentX}px, 0, 0)`;
+            const deltaXSlide = currentX - lastX;
+            if (Math.abs(deltaXSlide) > 0.05) {
+                scrollWrapperEl.style.transform = `translate3d(-${currentX}px,0,0)`;
+                starsNeedRedraw = true;
             }
-            let deltaXSlide = currentX - lastX; lastX = currentX;
+            lastX = currentX;
 
-            const lerpFactor = 0.08; const auDiff = targetAuScale - currentAuScale; 
-            if (Math.abs(auDiff) > 0.001) { currentAuScale += auDiff * lerpFactor; updateZoomCSS(); }
+            // Zoom lerp
+            const auDiff = targetAuScale - currentAuScale;
+            if (Math.abs(auDiff) > 0.001) {
+                currentAuScale += auDiff * 0.08;
+                updateZoomCSS();
+                planetsNeedUpdate = true; // zoom changed → reposition planets
+            }
 
-            if (isPlaying) {
+            // Advance simulated time (only when scrubbing, not in live mode)
+            if (!isLiveMode && isPlaying) {
                 const speed = getSpeed();
-                if (speed !== 0) currentDate = new Date(currentDate.getTime() + speed * deltaTime);
-            } else if (isApiLive) {
-                currentDate = new Date();
+                if (speed !== 0) {
+                    currentDate = new Date(currentDate.getTime() + speed * deltaTime);
+                    planetsNeedUpdate = true;
+                }
             }
-            
+
+            // Date label (throttled)
             if (time - lastUIUpdate > 200) { updateDateUI(); lastUIUpdate = time; }
-            if (currentState === 1 || isTraveling) renderPlanets();
-            
-            if(starEngine) {
-                starEngine.draw(deltaXSlide, 0); 
+
+            // Planet positions — only when something actually changed
+            if (planetsNeedUpdate && (currentState === 1 || isTraveling)) {
+                if (isLiveMode) {
+                    // Live mode: render once, then freeze — zero work until next explicit trigger
+                    renderPlanets();
+                    planetsNeedUpdate = false;
+                } else {
+                    // Scrubbing: throttled re-render
+                    if (time - lastPlanetUpdateTime >= getPlanetInterval()) {
+                        renderPlanets();
+                        lastPlanetUpdateTime = time;
+                        if (!isPlaying) planetsNeedUpdate = false;
+                    }
+                }
+            }
+
+            // Stars — only on scroll transition
+            if (starEngine && starsNeedRedraw) {
+                starEngine.draw(deltaXSlide, 0);
+                starsNeedRedraw = false;
             }
 
             requestAnimationFrame(animate);
         }
-        
+
+        // ── BOOT ─────────────────────────────────────────────────────────────
         requestAnimationFrame(() => {
             setTimeout(() => {
                 starEngine = new UnifiedStarsEngine('stars-canvas');
-                initializeDOM(); updateZoomCSS(); updateDateUI(); fetchNasaApi(); renderPlanets();
+                initializeDOM();
+                updateZoomCSS();
+                updateDateUI();
+                fetchNasaApi();
+                renderPlanets();
+                starsNeedRedraw = true; // paint stars on first frame
                 requestAnimationFrame(animate);
             }, 0);
         });
+
+        let starEngine; // declared here so resize handler can reach it
 
     });
     </script>
