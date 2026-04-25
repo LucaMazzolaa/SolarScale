@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA SOLARE IN SCALA - Introduzione</title>
+    <title>SolarScale - Introduction</title>
     <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
     
     <style>
@@ -62,6 +62,7 @@
             border-radius: 50%; 
             z-index: 9999999; 
             pointer-events: none;
+            box-sizing: content-box; 
         }
         .cursor-dot {
             width: 5px; height: 5px;
@@ -190,7 +191,7 @@
             font-family: 'Neue Montreal', sans-serif;
             color: white;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease;
             cursor: none;
             opacity: 0.4; 
             display: flex;
@@ -199,17 +200,35 @@
             padding: 4px 6px;
         }
 
-        .text-label, .nasa-text-label {
-            display: inline-block;
-            line-height: 1;
-            vertical-align: middle;
-            white-space: nowrap;
-            overflow: hidden;
-            pointer-events: none; 
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        .nav-link::before { content: "["; opacity: 1; transition: opacity 0.2s; }
-        .nav-link::after { content: "]"; opacity: 1; transition: opacity 0.2s; }
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        
         .nav-link:hover, .nav-link.active { opacity: 1; }
 
         .nav-link:hover::before, .nav-link.active::before,
@@ -315,7 +334,12 @@
             display: inline;
         }
 
-        /* Effetti Interattivi Tipografici */
+        /* =========================================
+           EFFETTI INTERATTIVI TIPOGRAFICI COMPENSATI
+           ========================================= */
+        
+        /* DIMENSIONI: Il cerchio "sborda" di 0.07em quando è al 140%. 
+           Per un margine visivo di 0.3em, serve un margine CSS di 0.37em */
         .anim-dim-circle {
             display: inline-block;
             width: 0.35em;
@@ -323,7 +347,9 @@
             background-color: white;
             border-radius: 50%;
             vertical-align: middle;
-            margin: 0 0.15em;
+            position: relative;
+            top: -0.05em;
+            margin: 0 0.37em; /* Margine compensato */
             animation: pulse-dim 2s ease-in-out infinite;
         }
 
@@ -332,6 +358,8 @@
             50% { transform: scale(1.4); }
         }
 
+        /* POSIZIONI: Il cerchio trasla di 0.15em avvicinandosi al testo.
+           Per un margine visivo di 0.3em, serve un margine CSS di 0.45em (0.3 + 0.15) */
         .anim-pos-orbit {
             display: inline-block;
             width: 0.45em; 
@@ -339,7 +367,9 @@
             background-color: white; 
             border-radius: 50%;
             vertical-align: middle;
-            margin: 0 0.15em;
+            position: relative;
+            top: -0.05em; 
+            margin: 0 0.45em; /* Margine compensato */
             animation: orbit-small 1.5s linear infinite;
         }
 
@@ -348,6 +378,10 @@
             to   { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); }
         }
 
+        /* DISTANZE: Il box è ridotto all'ingombro massimo ESATTO dei pallini.
+           Ingombro max: 0.9em (lato sn) + 0.9em (lato dx) + 0.45em (diametro) = 2.25em.
+           In questo modo i pallini toccano il bordo invisibile del div e possiamo
+           impostare il margine CSS al valore reale desiderato di 0.3em. */
         .anim-dist-circles {
             display: inline-flex;
             align-items: center;
@@ -355,7 +389,8 @@
             position: relative;
             vertical-align: middle;
             height: 1em;
-            animation: expand-dist 3.5s ease-in-out infinite;
+            width: 2.25em; /* Larghezza ricalibrata */
+            margin: 0 0.3em; /* Margine visivo reale */
         }
 
         .anim-dist-circles .c1, 
@@ -366,25 +401,22 @@
             border-radius: 50%;
             background-color: white; 
             top: 50%;
+            left: 50%;
             margin-top: -0.225em;
+            margin-left: -0.225em;
         }
 
-        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
-        .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
-
-        @keyframes expand-dist {
-            0%, 100% { width: 0.45em; margin: 0 0.1em; }
-            50% { width: 2.5em; margin: 0 0.3em; }
-        }
+        .anim-dist-circles .c1 { animation: move-c1 2.5s ease-in-out infinite; }
+        .anim-dist-circles .c2 { animation: move-c2 2.5s ease-in-out infinite; }
 
         @keyframes move-c1 {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-0.8em); }
+            0%, 100% { transform: translateX(-0.3em); } 
+            50% { transform: translateX(-0.9em); }
         }
 
         @keyframes move-c2 {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(0.8em); }
+            0%, 100% { transform: translateX(0.3em); } 
+            50% { transform: translateX(0.9em); }
         }
 
         /* =========================================
@@ -515,7 +547,7 @@
 
     <div id="preloader">
         <img src="assets/sun_symbol.svg" alt="Sun symbol" class="preloader-sun">
-        <div class="preloader-title">SISTEMA SOLARE IN SCALA</div>
+        <div class="preloader-title">SolarScale</div>
         <div class="loading-percentage" id="loading-percentage">[0%]</div>
     </div>
 
@@ -528,32 +560,32 @@
         <nav class="menu">
             <a href="index.html" class="nasa-title" id="logo-link">
                 <img src="assets/sun_symbol.svg" alt="Sun symbol">
-                <span class="nasa-text-label">SISTEMA SOLARE IN SCALA</span>
+                <span class="nasa-text-label">SolarScale</span>
             </a>
-            <a href="dimensioni.html" class="nav-link">
-                <span class="text-label">Dimensioni</span>
+            <a href="dimensioni.html" class="nav-link" id="nav-dimensioni">
+                <span class="text-label">Sizes</span>
             </a>
             <a href="posizioni.html" class="nav-link">
-                <span class="text-label">Posizioni</span>
+                <span class="text-label">Positions</span>
             </a>
             <a href="distanze.html" class="nav-link">
-                <span class="text-label">Distanze</span>
+                <span class="text-label">Distances</span>
             </a>
         </nav>
 
         <nav class="right-menu">
             <a href="misurazioni.html" class="nav-link">
-                <span class="text-label">Metodi di misurazione</span>
+                <span class="text-label">Measurement Methods</span>
             </a>
-            <a href="crediti.html" class="nav-link">
-                <span class="text-label">Crediti</span>
+            <a href="crediti.html" class="nav-link" id="crediti-link">
+                <span class="text-label">Credits</span>
             </a>
         </nav>
 
         <div class="content" id="right-content">
             
             <section id="intro" class="active-section">
-                <div class="intro-large-text" id="dynamic-text">In occasione del 70º anniversario della NASA, questo progetto&nbsp;nasce&nbsp;per&nbsp;rendere&nbsp;veritiere&nbsp;le&nbsp;frequenti&nbsp;rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l’immenso archivio di dati scientifici ufficiali dell’agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un’esatta percezione delle vere dimensioni&nbsp;<span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni&nbsp;<span class="anim-pos-orbit"></span> orbitali e delle immense distanze&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
+                <div class="intro-large-text" id="dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
             </section>
 
         </div>
@@ -561,14 +593,26 @@
     </div>
 
     <script>
-        // Logica Cursore Custom
         const cursorDot = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
+
+        const savedCursorX = sessionStorage.getItem('cursorPosX');
+        const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+        if (savedCursorX !== null && savedCursorY !== null) {
+            cursorDot.style.left = savedCursorX + 'px';
+            cursorDot.style.top  = savedCursorY + 'px';
+            cursorOutline.style.left = savedCursorX + 'px';
+            cursorOutline.style.top  = savedCursorY + 'px';
+        }
 
         window.addEventListener('mousemove', e => {
             cursorDot.style.left = e.clientX + 'px';
             cursorDot.style.top  = e.clientY + 'px';
             cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 250, fill: 'forwards' });
+            
+            sessionStorage.setItem('cursorPosX', e.clientX);
+            sessionStorage.setItem('cursorPosY', e.clientY);
         });
 
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
@@ -580,9 +624,6 @@
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
-        // -------------------------------------------------------------
-        // SETUP TYPING EFFECT E GESTIONE TIMERS
-        // -------------------------------------------------------------
         let typingTimeouts = []; 
 
         function stopTypingEffect() {
@@ -640,9 +681,6 @@
             });
         }
 
-        // -------------------------------------------------------------
-        // CALCOLATORE DINAMICO DEL FONT (Doppio passaggio Sicuro + Precisione)
-        // -------------------------------------------------------------
         let lastWidth = 0;
         let lastHeight = 0;
 
@@ -696,15 +734,14 @@
             lastHeight = targetHeight;
         }
 
-        // -------------------------------------------------------------
-        // RICALCOLO LARGHEZZA MENU DINAMICA
-        // -------------------------------------------------------------
         function updateMenuWidths() {
-            const currentLogoText = logoSpan.innerText;
-            logoSpan.innerText = logoOriginal;
-            logoSpan.style.width = 'auto';
-            logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
-            logoSpan.innerText = currentLogoText;
+            if(logoSpan) {
+                const currentLogoText = logoSpan.innerText;
+                logoSpan.innerText = logoOriginal;
+                logoSpan.style.width = 'auto';
+                logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+                logoSpan.innerText = currentLogoText;
+            }
 
             navLinks.forEach(link => {
                 const textSpan = link.querySelector('.text-label');
@@ -729,9 +766,6 @@
             updateMenuWidths();
         });
 
-        // -------------------------------------------------------------
-        // GLYPHS E VARIABILI COMUNI
-        // -------------------------------------------------------------
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const navLinks  = document.querySelectorAll('.nav-link');
         const sections  = document.querySelectorAll('section');
@@ -751,9 +785,6 @@
             }, 40);
         }
 
-        // -------------------------------------------------------------
-        // LOGO E NAVIGAZIONE 
-        // -------------------------------------------------------------
         const logoLink      = document.getElementById('logo-link');
         const logoSpan      = logoLink.querySelector('.nasa-text-label');
         const logoOriginal  = logoSpan.innerText;
@@ -761,7 +792,7 @@
 
         document.fonts.ready.then(() => {
             logoSpan.style.display    = 'inline-block';
-            logoSpan.style.overflow   = 'hidden';
+            logoSpan.style.overflow   = 'visible'; // BUG FIX come dimensioni.html
             logoSpan.style.whiteSpace = 'nowrap';
             
             navLinks.forEach(link => {
@@ -873,9 +904,6 @@
             });
         });
 
-        // -------------------------------------------------------------
-        // STELLE DI SFONDO (identiche a dimensioni.html)
-        // -------------------------------------------------------------
         class Stars {
             constructor(id, density, maxS, minS, maxSz, minSz) {
                 this.canvas = document.getElementById(id);
@@ -915,8 +943,6 @@
         const s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
         const s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
 
-        // Su questa pagina non c'è movimento di camera, quindi delta = 0:
-        // le stelle sono statiche, esattamente come appaiono a riposo in dimensioni.html.
         function animateStars() {
             requestAnimationFrame(animateStars);
             s1.draw(0);
@@ -925,9 +951,6 @@
         }
         animateStars();
 
-        // -------------------------------------------------------------
-        // PRELOADER E SESSION STORAGE
-        // -------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
             const preloader      = document.getElementById('preloader');
             const percentageEl   = document.getElementById('loading-percentage');
@@ -939,7 +962,6 @@
 
             setupTypingEffect();
 
-            // Se l'utente non ha ancora visto il caricamento in questa sessione
             if (!sessionStorage.getItem('nasaPreloaderShown')) {
                 
                 let progress = 0;
@@ -954,13 +976,11 @@
                         progress = 100;
                         clearInterval(loadingInterval);
                         
-                        // Memorizza che il caricamento è avvenuto
                         sessionStorage.setItem('nasaPreloaderShown', 'true');
                         
                         setTimeout(() => {
                             preloader.classList.add('hidden');
                             
-                            // Attendi il caricamento completo del font prima di calcolare le misure
                             document.fonts.ready.then(() => {
                                 fitIntroText();
                                 playTypingEffect();
@@ -972,7 +992,6 @@
                 }, intervalTime);
 
             } else {
-                // Utente di ritorno: salta il preloader e attendi i font per incastrare bene le parole
                 preloader.style.display = 'none';
                 document.fonts.ready.then(() => {
                     fitIntroText();
