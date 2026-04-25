@@ -710,10 +710,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── 2. DIMENSIONS DATASET ─── */
     const celestialData = [
-        { id: 'mercury', name: "Mercury", dia: "4,879", mass: "3.30 × 10²³ kg", vol: "6.08 × 10¹⁰ km³", type: "Rocky planet", scale: 0.3825 },
-        { id: 'mars',    name: "Mars",    dia: "6,792", mass: "6.42 × 10²³ kg", vol: "1.63 × 10¹¹ km³", type: "Rocky planet", scale: 0.5325 },
-        { id: 'venus',   name: "Venus",   dia: "12,104", mass: "4.87 × 10²⁴ kg", vol: "9.28 × 10¹¹ km³", type: "Rocky planet", scale: 0.9489 },
-        { id: 'earth',   name: "Earth",   dia: "12,756", mass: "5.97 × 10²⁴ kg", vol: "1.08 × 10¹² km³", type: "Rocky planet", scale: 1.0000 },
+        { id: 'mercury', name: "Mercury", dia: "4,879", mass: "3.30 × 10²³ kg", vol: "6.08 × 10¹⁰ km³", type: "Terrestrial planet", scale: 0.3825 },
+        { id: 'mars',    name: "Mars",    dia: "6,792", mass: "6.42 × 10²³ kg", vol: "1.63 × 10¹¹ km³", type: "Terrestrial planet", scale: 0.5325 },
+        { id: 'venus',   name: "Venus",   dia: "12,104", mass: "4.87 × 10²⁴ kg", vol: "9.28 × 10¹¹ km³", type: "Terrestrial planet", scale: 0.9489 },
+        { id: 'earth',   name: "Earth",   dia: "12,756", mass: "5.97 × 10²⁴ kg", vol: "1.08 × 10¹² km³", type: "Terrestrial planet", scale: 1.0000 },
         { id: 'neptune', name: "Neptune", dia: "49,528", mass: "1.02 × 10²⁶ kg", vol: "6.25 × 10¹³ km³", type: "Ice giant", scale: 3.8827 },
         { id: 'uranus',  name: "Uranus",  dia: "51,118", mass: "8.68 × 10²⁵ kg", vol: "6.83 × 10¹³ km³", type: "Ice giant", scale: 4.0074 },
         { id: 'saturn',  name: "Saturn",  dia: "120,536", mass: "5.68 × 10²⁶ kg", vol: "8.27 × 10¹⁴ km³", type: "Gas giant", scale: 9.4494 },
@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.clearRect(0, 0, 2600, 10);
         sCtx.beginPath();
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(2570 + LINE_X0, LINE_Y);
-        sCtx.strokeStyle = 'rgba(255,255,255,0.22)'; 
+        sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; /* Modificato qui: opacità passata a 0.4 per matchare gli altri componenti dim/gray */
         sCtx.lineWidth = 1.5; 
         sCtx.stroke();
         
