@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SISTEMA SOLARE IN SCALA - Distanze</title>
+    <title>SolarScale - Distances</title>
     <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -16,7 +16,7 @@
 
     <style>
         /* =========================================
-           IMPORTAZIONE FONT
+           FONT IMPORT
            ========================================= */
         @font-face {
             font-family: 'Nasa';
@@ -41,13 +41,13 @@
             --color-live:  #ffffff;
             --color-dashed: rgba(255, 255, 255, 0.25);
             
-            /* Calcoli per Macbook Pro 13" */
+            /* Calculations for Macbook Pro 13" */
             --font-62: clamp(32px, 2.5vw + 26px, 90px);
             --font-16: clamp(14px, 0.3vw + 11.68px, 22px);
             --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
         }
 
-        /* Reset essenziale per evitare pixel di scarto */
+        /* Essential reset to avoid pixel shifts */
         * {
             margin: 0;
             padding: 0;
@@ -72,7 +72,7 @@
             user-select: none;
         }
 
-        /* Regole generali testi */
+        /* General text rules */
         h1, h2, h3, p, a {
             color: var(--color-white); margin: 0;
             font-family: 'Neue Montreal', sans-serif; 
@@ -80,9 +80,9 @@
             z-index: 10; cursor: none;
         }
 
-        /* ─── TITOLI E TESTI ─── */
+        /* ─── TITLES AND TEXTS ─── */
         h1 { 
-            font-size: var(--font-62); /* Dimensione Fallback iniziale */
+            font-size: var(--font-62); /* Initial fallback size */
             line-height: 1.15; 
             letter-spacing: -0.01em;
             white-space: nowrap;
@@ -116,31 +116,54 @@
         }
         .navlabel p { font-size: var(--font-14); }
 
-        /* ─── ANIMAZIONI AGGIORNATE ─── */
+        /* ─── UPDATED ANIMATIONS ─── */
+        
+        /* DISTANCES: The box is reduced to the EXACT maximum footprint of the dots.
+           Max footprint: 0.9em (left side) + 0.9em (right side) + 0.45em (diameter) = 2.25em.
+           This way the dots touch the invisible edge of the div and we can
+           set the CSS margin to the actual desired value of 0.3em. */
         .anim-dist-circles {
-            display: inline-flex; align-items: center; justify-content: center;
-            position: relative; 
-            vertical-align: middle; /* Rimesso al centro per perfetto allineamento */
-            height: 0.5em; /* Abbassato l'involucro per non alterare il bounding box dell'h1 */
-            animation: expand-dist 3.5s ease-in-out infinite;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            vertical-align: middle;
+            height: 1em;
+            width: 2.25em; /* Recalibrated width */
+            margin: 0 0.3em; /* Real visual margin */
         }
-        .anim-dist-circles .c1, .anim-dist-circles .c2 {
-            position: absolute; width: 0.45em; height: 0.45em;
-            border-radius: 50%; background-color: white; 
-            top: 50%; margin-top: -0.225em;
-        }
-        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
-        .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
 
-        @keyframes expand-dist { 0%, 100% { width: 0.45em; margin: 0 0.1em; } 50% { width: 2.5em; margin: 0 0.3em; } }
-        @keyframes move-c1 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-0.8em); } }
-        @keyframes move-c2 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.8em); } }
+        .anim-dist-circles .c1, 
+        .anim-dist-circles .c2 {
+            position: absolute;
+            width: 0.45em;
+            height: 0.45em;
+            border-radius: 50%;
+            background-color: white; 
+            top: 50%;
+            left: 50%;
+            margin-top: -0.225em;
+            margin-left: -0.225em;
+        }
+
+        .anim-dist-circles .c1 { animation: move-c1 2.5s ease-in-out infinite; }
+        .anim-dist-circles .c2 { animation: move-c2 2.5s ease-in-out infinite; }
+
+        @keyframes move-c1 {
+            0%, 100% { transform: translateX(-0.3em); } 
+            50% { transform: translateX(-0.9em); }
+        }
+
+        @keyframes move-c2 {
+            0%, 100% { transform: translateX(0.3em); } 
+            50% { transform: translateX(0.9em); }
+        }
 
         @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } }
         .jump { animation: jumpX 1s ease-in-out infinite alternate; }
 
         /* =========================================
-           CONTENITORE NASCOSTO (Il "Clone" per calcolare il font)
+           HIDDEN CONTAINER (The "Clone" to calculate font size)
            ========================================= */
         #hidden-intro-container {
             position: absolute;
@@ -177,14 +200,14 @@
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; margin: 0 0.15em; }
         .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; margin: 0 0.15em; }
 
-        /* Blocca le animazioni nel testo nascosto per evitare FOUC */
+        /* Disable animations in the hidden text to avoid FOUC */
         #hidden-dynamic-text .anim-pos-orbit,
         #hidden-dynamic-text .anim-dim-circle,
         #hidden-dynamic-text .anim-dist-circles {
             animation: none !important;
         }
         #hidden-dynamic-text .anim-dist-circles {
-            width: 2.5em !important;
+            width: 2.25em !important;
             margin: 0 0.3em !important;
         }
 
@@ -193,58 +216,76 @@
             position: fixed; top: 0; left: 0;
             transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
+            box-sizing: content-box; /* Forces content-box to match index.html */
         }
         .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .3s, height .3s; }
         .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .3s, height .3s; }
         .mouse-down { width: 20px !important; height: 20px !important; }
         .hover      { width: 30px !important; height: 30px !important; }
 
-        /* ─── TOP MENU ─── */
+        /* =========================================
+           TOP MENU
+           ========================================= */
         .menu {
             position: fixed;
-            left: 4vh; 
-            top: 4vh; 
-            width: auto;
+            left: 4vh; top: 4vh; width: auto;
             font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); 
-            font-weight: 500;
-            z-index: 999999;
-            display: flex;
-            flex-direction: row; 
-            align-items: center; 
-            gap: 3vw; 
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
         }
 
         .right-menu {
             position: fixed;
-            right: 4vh; 
-            top: 4vh; 
-            width: auto;
+            right: 4vh; top: 4vh; width: auto;
             font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); 
-            font-weight: 500;
-            z-index: 999999;
-            display: flex;
-            flex-direction: row; 
-            align-items: center; 
-            gap: 3vw; 
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
         }
         
         .nasa-title {
-            font-weight: 700; font-size: clamp(22px, 2vw, 32px); color: white;
-            line-height: 1; pointer-events: all; cursor: none;
+            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
+            color: white; line-height: 1; pointer-events: all; cursor: none;
             margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
         }
+
         .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
 
         .nav-link {
-            font-family: 'Neue Montreal', sans-serif;
-            color: white; text-decoration: none; transition: opacity 0.2s; cursor: none;
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
         }
-        .text-label, .nasa-text-label { display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap; overflow: hidden; pointer-events: none; }
-        .nav-link::before { content: "["; opacity: 1; transition: opacity 0.2s; }
-        .nav-link::after { content: "]"; opacity: 1; transition: opacity 0.2s; }
+
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
         .nav-link:hover, .nav-link.active { opacity: 1; }
         .nav-link:hover::before, .nav-link.active::before,
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
@@ -255,7 +296,7 @@
             z-index: 0; pointer-events: none; transition: opacity 2s;
         }
 
-        /* ─── MAIN HORIZONTAL CONTENT E HEADER INIZIALE ─── */
+        /* ─── MAIN HORIZONTAL CONTENT AND INITIAL HEADER ─── */
         #main-content {
             display: flex; flex-direction: row; align-items: center;
             height: 100vh; position: relative; z-index: 5;
@@ -272,16 +313,30 @@
             text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
         }
         
+        /* ─── SCROLL TO EXPLORE ─── */
         .scrollWrapper { 
             position: absolute; bottom: 4vh; right: 4vh;
             cursor: none; pointer-events: auto; 
-        }
-        .scroll-sign { 
-            display: flex; flex-direction: row; align-items: center; gap: 8px; opacity: 0.4; 
-            transition: opacity 0.5s;
+            transition: opacity 0.2s, transform 0.2s;
         }
 
-        /* ─── PLANET DIV E SPAZIO ─── */
+        .scrollWrapper:hover {
+            transform: scale(1.03);
+        }
+        
+        .scrollWrapper:active {
+            transform: scale(0.97);
+        }
+
+        .scroll-sign { 
+            display: flex; flex-direction: row; align-items: center; gap: 8px; opacity: 0.4; 
+            transition: opacity 0.2s;
+        }
+        .scrollWrapper:hover .scroll-sign {
+            opacity: 1;
+        }
+
+        /* ─── PLANET DIV AND SPACE ─── */
         .planetdiv {
             display: flex; flex-direction: row; align-items: center; justify-content: center;
             height: 100vh; flex-shrink: 0; position: relative; z-index: 10;
@@ -291,6 +346,7 @@
             flex-shrink: 0; position: relative; min-width: 320px; 
         }
         
+        /* ─── PLANET TEXTS / INFO TEXT (Updated for Data Brackets) ─── */
         .info {
             font-family: 'Neue Montreal', sans-serif;
             font-size: var(--font-14); 
@@ -298,7 +354,41 @@
             color: var(--color-white);
             opacity: 0.4;
             line-height: 1.5; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .info-title {
+            margin-bottom: 16px; 
+        }
+
+        .data-brackets {
+            position: relative;
+            padding: 0px 8px; 
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8)); 
+        }
+
+        .data-brackets::before,
+        .data-brackets::after {
+            content: '';
+            position: absolute;
+            top: 3px;    
+            bottom: 3px; 
+            width: 2px;
+            border: 2px solid white; 
+        }
+
+        .data-brackets::before { left: 0; border-right: none; }
+        .data-brackets::after { right: 0; border-left: none; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 32px; 
+            text-align: left; 
         }
 
         .planet-cell .info {
@@ -332,7 +422,7 @@
             position: relative;
         }
 
-        /* ─── NAVBAR LATERALE ─── */
+        /* ─── SIDE NAVBAR ─── */
         .navbar {
             position: fixed; width: 100%; height: 100%; top: 0; left: 0;
             pointer-events: none; z-index: 100; display: flex; flex-direction: row;
@@ -356,17 +446,17 @@
 
         /* ─── BOTTOM SIDEBAR ─── */
         .sidebar {
-            position: fixed; bottom: 0; left: 0; width: 100vw; height: 90px;
+            position: fixed; bottom: 0; left: 0; width: 100vw; height: calc(4vh + 90px);
             z-index: 100; pointer-events: none; opacity: 0; transition: opacity 0.5s; overflow: visible;
         }
         .sidebarWrapper {
             position: absolute; left: 0; bottom: 0; width: 2700px; height: 100%; pointer-events: auto;
         }
-        #sidebar-canvas { position: absolute; left: 0; bottom: 26px; z-index: -1; display: block; }
+        #sidebar-canvas { position: absolute; left: 0; bottom: 4vh; z-index: -1; display: block; }
         .sidebardiv { position: absolute; left: 25px; bottom: 0; height: 100%; width: 2570px; }
         
         .sidebaritem {
-            position: absolute; bottom: 54px; transform: translateX(-50%);
+            position: absolute; bottom: calc(4vh + 28px); transform: translateX(-50%);
             display: flex; flex-direction: column; align-items: center; width: 40px; pointer-events: auto;
         }
         .sidebaricon {
@@ -396,18 +486,12 @@
 
         @media (max-width: 900px) {
             .menu { 
-                position: relative; top: auto; left: auto; 
-                width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; 
-                align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
             }
             .right-menu { 
-                position: relative; top: auto; right: auto; 
-                margin: 0 4vh 4vh 4vh;
-                display: flex;
-                width: calc(100% - 8vh);
-                flex-wrap: wrap; gap: 15px;
-                align-items: flex-start;
+                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
+                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
             }
             .itemname { display: none; }
         }
@@ -421,25 +505,25 @@
 <nav class="menu">
     <a href="index.html" class="nasa-title" id="logo-link">
         <img src="assets/sun_symbol.svg" alt="Sun symbol">
-        <span class="nasa-text-label">SISTEMA SOLARE IN SCALA</span>
+        <span class="nasa-text-label">SolarScale</span>
     </a>
     <a href="dimensioni.html" class="nav-link">
-        <span class="text-label">Dimensioni</span>
+        <span class="text-label">Sizes</span>
     </a>
     <a href="posizioni.html" class="nav-link">
-        <span class="text-label">Posizioni</span>
+        <span class="text-label">Positions</span>
     </a>
     <a href="distanze.html" class="nav-link active" id="nav-distanze">
-        <span class="text-label">Distanze</span>
+        <span class="text-label">Distances</span>
     </a>
 </nav>
 
 <nav class="right-menu">
     <a href="misurazioni.html" class="nav-link">
-        <span class="text-label">Metodi di misurazione</span>
+        <span class="text-label">Measurement Methods</span>
     </a>
     <a href="crediti.html" class="nav-link" id="crediti-link">
-        <span class="text-label">Crediti</span>
+        <span class="text-label">Credits</span>
     </a>
 </nav>
 
@@ -452,47 +536,47 @@
         <canvas id="sidebar-canvas" width="2600" height="10"></canvas>
         <div class="sidebardiv" id="sidebardiv">
             <div class="sidebaritem" style="left:0px"       data-target="Sun">
-                <img class="sidebaricon button" id="nav-Sun"     src="./assets/sunicon.svg"     alt="Sole">
-                <p class="itemname">Sole</p>
+                <img class="sidebaricon button" id="nav-Sun"     src="./assets/sunicon.svg"     alt="Sun">
+                <p class="itemname">Sun</p>
             </div>
             <div class="sidebaritem" style="left:36.88px"   data-target="Mercury">
-                <img class="sidebaricon button" id="nav-Mercury" src="./assets/mercuryicon.svg" alt="Mercurio">
-                <p class="itemname">Mercurio</p>
+                <img class="sidebaricon button" id="nav-Mercury" src="./assets/mercuryicon.svg" alt="Mercury">
+                <p class="itemname">Mercury</p>
             </div>
             <div class="sidebaritem" style="left:60.09px"   data-target="Venus">
-                <img class="sidebaricon button" id="nav-Venus"   src="./assets/venusicon.svg"   alt="Venere">
-                <p class="itemname">Venere</p>
+                <img class="sidebaricon button" id="nav-Venus"   src="./assets/venusicon.svg"   alt="Venus">
+                <p class="itemname">Venus</p>
             </div>
             <div class="sidebaritem" style="left:82.81px"   data-target="Earth">
-                <img class="sidebaricon button" id="nav-Earth"   src="./assets/earthicon.svg"   alt="Terra">
-                <p class="itemname">Terra</p>
+                <img class="sidebaricon button" id="nav-Earth"   src="./assets/earthicon.svg"   alt="Earth">
+                <p class="itemname">Earth</p>
             </div>
             <div class="sidebaritem" style="left:114.80px"  data-target="Mars">
-                <img class="sidebaricon button" id="nav-Mars"    src="./assets/marsicon.svg"    alt="Marte">
-                <p class="itemname">Marte</p>
+                <img class="sidebaricon button" id="nav-Mars"    src="./assets/marsicon.svg"    alt="Mars">
+                <p class="itemname">Mars</p>
             </div>
             <div class="sidebaritem" style="left:435.57px"  data-target="Jupiter">
-                <img class="sidebaricon button" id="nav-Jupiter" src="./assets/jupitericon.svg" alt="Giove">
-                <p class="itemname">Giove</p>
+                <img class="sidebaricon button" id="nav-Jupiter" src="./assets/jupitericon.svg" alt="Jupiter">
+                <p class="itemname">Jupiter</p>
             </div>
             <div class="sidebaritem" style="left:789.02px"  data-target="Saturn">
-                <img class="sidebaricon button" id="nav-Saturn"  src="./assets/saturnicon.svg"  alt="Saturno">
-                <p class="itemname">Saturno</p>
+                <img class="sidebaricon button" id="nav-Saturn"  src="./assets/saturnicon.svg"  alt="Saturn">
+                <p class="itemname">Saturn</p>
             </div>
             <div class="sidebaritem" style="left:1618.64px" data-target="Uranus">
-                <img class="sidebaricon button" id="nav-Uranus"  src="./assets/uranusicon.svg"  alt="Urano">
-                <p class="itemname">Urano</p>
+                <img class="sidebaricon button" id="nav-Uranus"  src="./assets/uranusicon.svg"  alt="Uranus">
+                <p class="itemname">Uranus</p>
             </div>
             <div class="sidebaritem" style="left:2483.55px" data-target="Neptune">
-                <img class="sidebaricon button" id="nav-Neptune" src="./assets/neptuneicon.svg" alt="Nettuno">
-                <p class="itemname">Nettuno</p>
+                <img class="sidebaricon button" id="nav-Neptune" src="./assets/neptuneicon.svg" alt="Neptune">
+                <p class="itemname">Neptune</p>
             </div>
         </div>
     </div>
 </nav>
 
 <div id="hidden-intro-container">
-    <div id="hidden-dynamic-text">In vista del 70° anniversario della NASA nel 2028, questo progetto nasce per rendere veritiere le frequenti rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l'immenso archivio di dati scientifici ufficiali dell'agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un'esatta percezione delle vere dimensioni <span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni <span class="anim-pos-orbit"></span> orbitali e delle immense distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
+    <div id="hidden-dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
 </div>
 
 <nav class="navbar">
@@ -501,7 +585,7 @@
             <span class="nav-arrow">←</span>
             <div class="navlabel">
                 <p><span id="topNam">…</span></p>
-                <p style="margin: 2px 0;">Distanza</p>
+                <p style="margin: 2px 0;">Distance</p>
                 <p><span id="topDisKm">0</span> km</p>
             </div>
         </button>
@@ -511,7 +595,7 @@
         <button id="btn-bot" style="visibility:hidden;">
             <div class="navlabel">
                 <p><span id="botNam">…</span></p>
-                <p style="margin: 2px 0;">Distanza</p>
+                <p style="margin: 2px 0;">Distance</p>
                 <p><span id="botDisKm">0</span> km</p>
             </div>
             <span class="nav-arrow">→</span>
@@ -523,12 +607,12 @@
 
     <header id="main-header">
         <div class="titles">
-            <h1 id="main-title">Distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span></h1>
-            <h2 class="title">Distanze dei pianeti dal Sole in diretta (dati JPL), 1 px = 1.000 km</h2>
+            <h1 id="main-title">Distances <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span></h1>
+            <h2 class="title">Live planetary distances from the Sun (JPL data), 1 px = 1,000 km</h2>
         </div>
         <div class="scrollWrapper" id="header-scroll">
             <div id="scroll-sign" class="scroll-sign jump">
-                <p>Scorri per esplorare</p>
+                <p>Scroll to explore</p>
                 <span class="scroll-arrow">→</span>
             </div>
         </div>
@@ -536,117 +620,175 @@
 
     <div class="planetdiv" id="div-Sun">
         <div id="Sun" class="three-planet" data-file="sun.glb" data-rot="3" style="width:1393px;height:1393px;"></div>
-        <p class="info" id="info-Sun" style="position:relative; left:0; transform:none; margin-left:30px; text-align:left; flex-shrink:0; max-width:300px; white-space:nowrap;">Sole (Stella nana gialla)</p>
+        <div class="info" id="info-Sun" style="position:relative; left:0; transform:none; margin-left:30px; text-align:left; flex-shrink:0; max-width:300px; white-space:nowrap; align-items:flex-start;">
+            <div class="info-title" style="margin-bottom:0;"><span style="font-weight:500;">Sun</span> (Yellow dwarf star)</div>
+        </div>
     </div>
     
     <div class="space" style="width:46000px;" id="space-Sun">
         <p></p>
-        <p class="infoAphPer" style="opacity:.23;">Perielio di Mercurio: 46.000.000 km</p>
+        <p class="infoAphPer" style="opacity:.23;">Mercury's Perihelion: 46,000,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mercury">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <model-viewer id="Mercury" src="./assets/mercury.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:5px;height:5px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
-            <p class="info" id="info-Mercury">Mercurio (Pianeta terrestre)<br>Distanza dal Sole: <span id="disSpa1Km">...</span> km</p>
+            <div class="info" id="info-Mercury">
+                <div class="info-title"><span style="font-weight:500;">Mercury</span> (Terrestrial planet)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa1Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:37655px;">
-        <p class="infoAphPer" style="opacity:.22;">Afelio di Mercurio: 69.820.000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Perielio di Venere: 107.480.000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Mercury's Aphelion: 69,820,000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Venus's Perihelion: 107,480,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Venus">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <model-viewer id="Venus" src="./assets/venus.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:12px;height:12px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
-            <p class="info" id="info-Venus">Venere (Pianeta terrestre)<br>Distanza dal Sole: <span id="disSpa2Km">...</span> km</p>
+            <div class="info" id="info-Venus">
+                <div class="info-title"><span style="font-weight:500;">Venus</span> (Terrestrial planet)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa2Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:38138px;">
-        <p class="infoAphPer" style="opacity:.22;">Afelio di Venere: 108.940.000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Perielio della Terra: 147.090.000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Venus's Aphelion: 108,940,000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Earth's Perihelion: 147,090,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Earth">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
-            <p class="info" id="info-Earth">Terra (Pianeta terrestre)<br>Distanza dal Sole: <span id="disSpa3Km">...</span> km</p>
+            <div class="info" id="info-Earth">
+                <div class="info-title"><span style="font-weight:500;">Earth</span> (Terrestrial planet)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa3Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:54507px;">
-        <p class="infoAphPer" style="opacity:.22;">Afelio della Terra: 152.100.000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Perielio di Marte: 206.620.000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Earth's Aphelion: 152,100,000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Mars's Perihelion: 206,620,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mars">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <model-viewer id="Mars" src="./assets/mars.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:7px;height:7px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
-            <p class="info" id="info-Mars">Marte (Pianeta terrestre)<br>Distanza dal Sole: <span id="disSpa4Km">...</span> km</p>
+            <div class="info" id="info-Mars">
+                <div class="info-title"><span style="font-weight:500;">Mars</span> (Terrestrial planet)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa4Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:491283px;">
-        <p class="infoAphPer" style="opacity:.2;">Afelio di Marte: 249.230.000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Perielio di Giove: 740.520.000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Mars's Aphelion: 249,230,000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Jupiter's Perihelion: 740,520,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Jupiter">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:140px;height:140px;"></div>
-            <p class="info" id="info-Jupiter">Giove (Gigante gassoso)<br>Distanza dal Sole: <span id="disSpa5Km">...</span> km</p>
+            <div class="info" id="info-Jupiter">
+                <div class="info-title"><span style="font-weight:500;">Jupiter</span> (Gas giant)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa5Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:535790px;">
-        <p class="infoAphPer" style="opacity:.2;">Afelio di Giove: 816.620.000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Perielio di Saturno: 1.352.550.000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Jupiter's Aphelion: 816,620,000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Saturn's Perihelion: 1,352,550,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Saturn">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <div id="Saturn" class="three-planet" data-file="saturn.glb" data-rot="5" style="width:232px;height:232px;"></div>
-            <p class="info" id="info-Saturn">Saturno (Gigante gassoso)<br>Distanza dal Sole: <span id="disSpa6Km">...</span> km</p>
+            <div class="info" id="info-Saturn">
+                <div class="info-title"><span style="font-weight:500;">Saturn</span> (Gas giant)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa6Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1226568px;">
-        <p class="infoAphPer" style="opacity:.22;">Afelio di Saturno: 1.514.500.000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Perielio di Urano: 2.741.300.000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Saturn's Aphelion: 1,514,500,000 km</p>
+        <p class="infoAphPer" style="opacity:.22;">Uranus's Perihelion: 2,741,300,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Uranus">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <div id="Uranus" class="three-planet" data-file="uranus.glb" data-rot="4" style="width:51px;height:51px;"></div>
-            <p class="info" id="info-Uranus">Urano (Gigante ghiacciato)<br>Distanza dal Sole: <span id="disSpa7Km">...</span> km</p>
+            <div class="info" id="info-Uranus">
+                <div class="info-title"><span style="font-weight:500;">Uranus</span> (Ice giant)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa7Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1440779px;">
-        <p class="infoAphPer" style="opacity:.2;">Afelio di Urano: 3.003.620.000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Perielio di Nettuno: 4.444.450.000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Uranus's Aphelion: 3,003,620,000 km</p>
+        <p class="infoAphPer" style="opacity:.2;">Neptune's Perihelion: 4,444,450,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Neptune">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
             <div id="Neptune" class="three-planet" data-file="neptune.glb" data-rot="4" style="width:49px;height:49px;"></div>
-            <p class="info" id="info-Neptune">Nettuno (Gigante ghiacciato)<br>Distanza dal Sole: <span id="disSpa8Km">...</span> km</p>
+            <div class="info" id="info-Neptune">
+                <div class="info-title"><span style="font-weight:500;">Neptune</span> (Ice giant)</div>
+                <div class="data-brackets">
+                    <div class="info-grid">
+                        <span>Distance from the Sun</span><span><span id="disSpa8Km">...</span> km</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="aphelion"><div></div></div>
     </div>
 
     <div class="footer">
-        <p class="infoAphPer" style="opacity:.22;">Afelio di Nettuno: 4.545.670.000 km</p>
-        <h3 class="title credits">Il Sistema Solare in Scala — 1 px = 1.000 km</h3>
+        <p class="infoAphPer" style="opacity:.22;">Neptune's Aphelion: 4,545,670,000 km</p>
+        <h3 class="title credits">The Solar System to Scale — 1 px = 1,000 km</h3>
     </div>
 
 </div>
@@ -658,7 +800,42 @@ document.addEventListener('DOMContentLoaded', () => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
 
-    /* ─── INITIALIZATION THREE.JS PER PIANETI MAGGIORI ─── */
+    /* ─── VISUAL CURSOR (Exactly as in index.html) ─── */
+    const cursorDot     = document.querySelector('[data-cursor-dot]');
+    const cursorOutline = document.querySelector('[data-cursor-outline]');
+    
+    // Restore the saved cursor position
+    const savedCursorX = sessionStorage.getItem('cursorPosX');
+    const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+    if (savedCursorX !== null && savedCursorY !== null) {
+        cursorDot.style.left = savedCursorX + 'px';
+        cursorDot.style.top  = savedCursorY + 'px';
+        cursorOutline.style.left = savedCursorX + 'px';
+        cursorOutline.style.top  = savedCursorY + 'px';
+    }
+
+    window.addEventListener('mousemove', e => {
+        cursorDot.style.left = e.clientX + 'px';
+        cursorDot.style.top  = e.clientY + 'px';
+        cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 250, fill: 'forwards' });
+        
+        // Save the current cursor position
+        sessionStorage.setItem('cursorPosX', e.clientX);
+        sessionStorage.setItem('cursorPosY', e.clientY);
+    });
+
+    window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+    window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+
+    function attachHoverEvents(el) {
+        el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+        el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
+    }
+    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper, .sidebaritem').forEach(el => attachHoverEvents(el));
+
+
+    /* ─── THREE.JS INITIALIZATION FOR MAJOR PLANETS ─── */
     const threePlanetsElements = document.querySelectorAll('.three-planet');
     const renderersThree = [];
 
@@ -763,7 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
         animateThree();
     }
 
-    /* ─── EFFETTO HACKER E MENU ─── */
+    /* ─── HACKER EFFECT AND MENU ─── */
     const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
     const menuLinks = document.querySelectorAll('.nav-link');
     
@@ -817,7 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.fonts.ready.then(() => {
             logoSpan.style.display = 'inline-block';
-            logoSpan.style.overflow = 'hidden';
+            logoSpan.style.overflow = 'visible';
             logoSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -848,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* ─── LOGICA CALCOLO TITOLO SINCRONIZZATO ─── */
+    /* ─── SYNCHRONIZED TITLE CALCULATION LOGIC ─── */
     let lastIntroWidth = 0;
     let lastIntroHeight = 0;
 
@@ -902,13 +1079,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lastIntroHeight = targetHeight;
     }
 
-    // NOVITÀ: Esegue subito il calcolo con il font di sistema prima ancora che la pagina
-    // venga disegnata, per applicare la scala corretta ed evitare il salto (FOUC).
     syncTitleFontSize();
 
     document.fonts.ready.then(() => { 
         updateMenuWidths(); 
-        syncTitleFontSize(); // Affina il calcolo di qualche pixel quando il font definitivo è pronto
+        syncTitleFontSize();
     });
 
     const navDistanze = document.getElementById('nav-distanze');
@@ -925,25 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         syncTitleFontSize();
     });
 
-    /* ─── CURSORE VISIVO ─── */
-    const cursorDot     = document.querySelector('[data-cursor-dot]');
-    const cursorOutline = document.querySelector('[data-cursor-outline]');
-    
-    window.addEventListener('mousemove', e => {
-        cursorDot.style.left = e.clientX + 'px';
-        cursorDot.style.top  = e.clientY + 'px';
-        cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:250, fill:'forwards' });
-    });
-    window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
-    window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
-
-    function attachHoverEvents(el) {
-        el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
-        el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
-    }
-    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper, .sidebaritem').forEach(el => attachHoverEvents(el));
-
-    /* ─── LOGICA SCROLL DISTANZE E NASA API ─── */
+    /* ─── DISTANCE SCROLL LOGIC AND NASA API ─── */
     const template = { name:null, left:null, right:null, userDis:null, img:null, sidebarIcon:null };
     let topPla = { ...template };
     let curPla = { ...template };
@@ -970,17 +1127,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarWrapper= document.getElementById('sidebarWrapper');
     const sidebardiv    = document.getElementById('sidebardiv');
     const scrollSign    = document.getElementById('scroll-sign');
+    const headerScroll  = document.getElementById('header-scroll');
 
     const planetsConfig = [
-        { id: 'Sun', name: 'Sole', nasa: '10', baseDis: 0, radius: 696340 },
-        { id: 'Mercury', name: 'Mercurio', nasa: '199', baseDis: 66390.711, peri: 46000, aph: 69820, radius: 2440 },
-        { id: 'Venus', name: 'Venere', nasa: '299', baseDis: 108161.279, peri: 107480, aph: 108940, radius: 6052 },
-        { id: 'Earth', name: 'Terra', nasa: '399', baseDis: 149065.661, peri: 147090, aph: 152100, radius: 6371 },
-        { id: 'Mars', name: 'Marte', nasa: '499', baseDis: 206648.695, peri: 206620, aph: 249230, radius: 3390 },
-        { id: 'Jupiter', name: 'Giove', nasa: '599', baseDis: 784032.492, peri: 740520, aph: 816620, radius: 69911 },
-        { id: 'Saturn', name: 'Saturno', nasa: '699', baseDis: 1420236.497, peri: 1352550, aph: 1514500, radius: 58232 },
-        { id: 'Uranus', name: 'Urano', nasa: '799', baseDis: 2913545.774, peri: 2741300, aph: 3003620, radius: 25362 },
-        { id: 'Neptune', name: 'Nettuno', nasa: '899', baseDis: 4470398.428, peri: 4444450, aph: 4545670, radius: 24622 }
+        { id: 'Sun', name: 'Sun', nasa: '10', baseDis: 0, radius: 696340 },
+        { id: 'Mercury', name: 'Mercury', nasa: '199', baseDis: 66390.711, peri: 46000, aph: 69820, radius: 2440 },
+        { id: 'Venus', name: 'Venus', nasa: '299', baseDis: 108161.279, peri: 107480, aph: 108940, radius: 6052 },
+        { id: 'Earth', name: 'Earth', nasa: '399', baseDis: 149065.661, peri: 147090, aph: 152100, radius: 6371 },
+        { id: 'Mars', name: 'Mars', nasa: '499', baseDis: 206648.695, peri: 206620, aph: 249230, radius: 3390 },
+        { id: 'Jupiter', name: 'Jupiter', nasa: '599', baseDis: 784032.492, peri: 740520, aph: 816620, radius: 69911 },
+        { id: 'Saturn', name: 'Saturn', nasa: '699', baseDis: 1420236.497, peri: 1352550, aph: 1514500, radius: 58232 },
+        { id: 'Uranus', name: 'Uranus', nasa: '799', baseDis: 2913545.774, peri: 2741300, aph: 3003620, radius: 25362 },
+        { id: 'Neptune', name: 'Neptune', nasa: '899', baseDis: 4470398.428, peri: 4444450, aph: 4545670, radius: 24622 }
     ];
 
     const planetsData = planetsConfig.map((p, i) => {
@@ -1003,7 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
-    const fmt = n => new Intl.NumberFormat('it-IT', { maximumFractionDigits:0 }).format(n);
+    const fmt = n => new Intl.NumberFormat('en-US', { maximumFractionDigits:0 }).format(n);
 
     async function syncWithNasa() {
         for (let i = 1; i < planetsData.length; i++) {
@@ -1036,11 +1194,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (p.sidebarItemDiv && p.id !== 'Sun') p.sidebarItemDiv.style.left = (p.baseDis / shrinkerFactor) + "px";
             } catch(e) { 
-                console.error("NASA Sync Error per " + p.name, e); 
+                console.error("NASA Sync Error for " + p.name, e); 
                 p.inc = [0, 0.0042, -0.0001, 0.0005, 0.0021, 0.0015, -0.0012, 0.0008, -0.0002][i];
             }
         }
-        if (document.getElementById('live')) document.getElementById('live').textContent = "Distanza reale (NASA JPL)";
+        if (document.getElementById('live')) document.getElementById('live').textContent = "Real distance (NASA JPL)";
         cacheSidebarSegments();
     }
 
@@ -1074,8 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
 
     const traduciNome = (nome) => {
-        const mappa = { 'Sun':'Sole', 'Mercurio':'Mercurio', 'Venus':'Venere', 'Earth':'Terra', 'Mars':'Marte', 'Jupiter':'Giove', 'Saturn':'Saturno', 'Uranus':'Urano', 'Neptune':'Nettuno' };
-        return mappa[nome] || nome;
+        return nome;
     };
 
     function getDocCentreX(el) { const r = el.getBoundingClientRect(); return r.left + window.scrollX + r.width / 2; }
@@ -1089,14 +1246,15 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebarNav.style.opacity = '1';
             sidebarNav.style.pointerEvents = 'auto';
             sidebarWrapper.style.pointerEvents = 'auto';
-            scrollSign.style.opacity = '0';
-            scrollSign.style.pointerEvents = 'none';
+            headerScroll.style.opacity = '0';
+            headerScroll.style.pointerEvents = 'none';
         } else {
             sidebarNav.style.opacity = '0';
             sidebarNav.style.pointerEvents = 'none';
             sidebarWrapper.style.pointerEvents = 'none'; 
-            scrollSign.style.opacity = '0.4';
-            scrollSign.style.pointerEvents = 'auto';
+            headerScroll.style.opacity = '1';
+            headerScroll.style.pointerEvents = 'auto';
+            scrollSign.style.opacity = ''; // reset inline style per abilitare hover CSS
         }
     }
 
@@ -1248,7 +1406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* ─── STELLE CON PARALLAX ─── */
+    /* ─── STARS WITH PARALLAX ─── */
     class Stars {
         constructor(id, density, maxS, minS, maxSz, minSz) {
             this.canvas = document.getElementById(id); this.ctx = this.canvas.getContext('2d');
@@ -1290,7 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateUIVisibility(); updatePlanetStates(); updateSidebarUI();
 
-    /* ─── CALCOLO DESTINAZIONE INIZIALE (HOME TARGET) ─── */
+    /* ─── INITIAL DESTINATION CALCULATION (HOME TARGET) ─── */
     function getHomeTargetScrollX() {
         const sunEl = planetsData[0].img;
         const sunRect = sunEl.getBoundingClientRect(); 
@@ -1305,7 +1463,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.max(0, labelRightInDoc - targetViewportPos);
     }
 
-    /* ─── ANIMAZIONE INIZIALE DI ENTRATA (Veloce - 1.5s) ─── */
+    /* ─── INITIAL ENTRY ANIMATION (Fast - 1.5s) ─── */
     function doInitialScroll() {
         const targetScrollX = getHomeTargetScrollX();
 
@@ -1322,7 +1480,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ─── ANIMAZIONE INVERSA ALLA HOME (Veloce - 1.5s) ─── */
+    /* ─── REVERSE ANIMATION TO HOME (Fast - 1.5s) ─── */
     function returnToHome() {
         if (isTraveling || !isInitialized) return;
         
@@ -1351,12 +1509,10 @@ document.addEventListener('DOMContentLoaded', () => {
         doInitialScroll();
     }
 
-    const headerScroll = document.getElementById('header-scroll');
-    const scrollSignEl = document.getElementById('scroll-sign');
     headerScroll.style.pointerEvents = 'auto';
-    scrollSignEl.style.pointerEvents = 'auto';
+    scrollSign.style.pointerEvents = 'auto';
     headerScroll.addEventListener('click', triggerIntroOnce);
-    scrollSignEl.addEventListener('click', triggerIntroOnce);
+    scrollSign.addEventListener('click', triggerIntroOnce);
 
     window.addEventListener('wheel', e => {
         e.preventDefault();
