@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SISTEMA SOLARE IN SCALA - Dimensioni</title>
+    <title>SolarScale - Dimensions</title>
     <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -13,7 +13,7 @@
 
     <style>
         /* =========================================
-           IMPORTAZIONE FONT
+           FONT IMPORT
            ========================================= */
         @font-face {
             font-family: 'Nasa';
@@ -39,7 +39,7 @@
             --color-dashed: rgba(255, 255, 255, 0.25);
             
             /* ======================================================
-               CALCOLI MATEMATICI PER MACBOOK PRO 13" (Base 1440px)
+               MATH CALCULATIONS FOR MACBOOK PRO 13" (Base 1440px)
                ====================================================== */
             --font-62: clamp(32px, 2.5vw + 26px, 90px);   
             --font-16: clamp(14px, 0.3vw + 11.68px, 22px);
@@ -58,7 +58,7 @@
             user-select: none;
         }
         
-        /* Regole generali testi */
+        /* General text rules */
         h1, h2, h3, p, a {
             color: var(--color-white); margin: 0;
             font-family: 'Neue Montreal', sans-serif; 
@@ -66,7 +66,7 @@
             z-index: 10; cursor: none;
         }
         
-        /* ─── TITOLO: Dimensioni (Scala tramite JS per match Homepage) ─── */
+        /* ─── TITLE: Dimensions (JS scale to match Homepage) ─── */
         h1 { 
             font-size: var(--font-62); 
             line-height: 1.15; 
@@ -74,19 +74,19 @@
             white-space: nowrap;
         }
 
-        /* ─── SOTTOTITOLO: Confronto dal più piccolo... (16px) ─── */
+        /* ─── SUBTITLE: Comparison from the smallest... (16px) ─── */
         .title { 
             font-size: var(--font-16);
             opacity: 0.4; 
             transition: opacity 0.3s;
         }
         
-        /* ─── SCORRI PER ESPLORARE (16px) ─── */
+        /* ─── SCROLL TO EXPLORE (16px) ─── */
         .scroll-sign p {
             font-size: var(--font-16);
         }
 
-        /* ─── FRECCE ─── */
+        /* ─── ARROWS ─── */
         .scroll-arrow { 
             font-size: var(--font-16); 
             font-weight: 500; 
@@ -100,7 +100,7 @@
             transform: translateY(1px); 
         }
 
-        /* ─── BOTTONI / OVER PULSANTI (14px) ─── */
+        /* ─── BUTTONS / BUTTON HOVER (14px) ─── */
         button {
             padding: 0; background: transparent; border: none;
             color: white; font-weight: 500; cursor: none;
@@ -110,7 +110,7 @@
             font-size: var(--font-14); 
         }
 
-        /* ─── SCRITTE PIANETI / INFO TEST (14px) ─── */
+        /* ─── PLANET TEXTS / INFO TEXT (14px) ─── */
         .itemname {
             position: absolute; bottom: calc(100% + 6px); left: 50%;
             transform: translateX(-50%);
@@ -122,10 +122,49 @@
 
         .info { 
             position: absolute; transform: translate(-50%, 0);
+            display: flex; flex-direction: column; align-items: center; 
             text-align: center; opacity: 0; transition: opacity 0.5s ease; 
             font-size: var(--font-14); 
             font-weight: 500; 
             line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            white-space: nowrap;
+        }
+
+        .info-title {
+            margin-bottom: 16px; 
+        }
+
+        .data-brackets {
+            position: relative;
+            padding: 0px 8px; 
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8)); 
+        }
+
+        .data-brackets::before,
+        .data-brackets::after {
+            content: '';
+            position: absolute;
+            top: 3px;    
+            bottom: 3px; 
+            width: 2px; /* <-- Modificato per accorciare i margini orizzontali */
+            border: 2px solid white; 
+        }
+
+        .data-brackets::before {
+            left: 0;
+            border-right: none;
+        }
+
+        .data-brackets::after {
+            right: 0;
+            border-left: none;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 32px; 
+            text-align: left; 
         }
 
         /* ─── CURSOR ──────────────────────────────────────────────── */
@@ -133,6 +172,7 @@
             position: fixed; top: 0; left: 0;
             transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
+            box-sizing: content-box; 
         }
         .cursor-dot {
             width: 5px; height: 5px;
@@ -182,13 +222,34 @@
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
         }
 
-        .text-label, .nasa-text-label {
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
         }
 
-        .nav-link::before { content: "["; opacity: 1; transition: opacity 0.2s; }
-        .nav-link::after { content: "]"; opacity: 1; transition: opacity 0.2s; }
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
         .nav-link:hover, .nav-link.active { opacity: 1; }
         .nav-link:hover::before, .nav-link.active::before,
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
@@ -204,7 +265,7 @@
             }
         }
 
-        /* ─── STARS E CANVAS ──────────────────────────────────────── */
+        /* ─── STARS AND CANVAS ──────────────────────────────────────── */
         canvas.stars-canvas {
             position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none;
         }
@@ -213,7 +274,7 @@
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;
         }
 
-        /* ─── HEADER E ANIMAZIONI ────────────────────────── */
+        /* ─── HEADER AND ANIMATIONS ────────────────────────── */
         header {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -226,18 +287,32 @@
             position: absolute; bottom: 4vh; left: 4vh;
             display: flex; flex-direction: column; align-items: flex-start; 
             gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-            will-change: transform; /* Preparazione per lo slide laterale */
+            will-change: transform; 
         }
         
         .scrollWrapper { 
             position: absolute; bottom: 4vh; right: 4vh;
             cursor: none; pointer-events: auto; 
-            transition: opacity 0.5s ease;
+            transition: opacity 0.2s, transform 0.2s; /* Aggiunto transform per la fluidità */
+        }
+        
+        /* Hover e Active con ingrandimento leggermente ridotto (1.03 invece di 1.05) */
+        .scrollWrapper:hover {
+            transform: scale(1.03);
+        }
+        
+        .scrollWrapper:active {
+            transform: scale(0.97);
         }
         
         .scroll-sign { 
             display: flex; flex-direction: row; align-items: center; 
             gap: 8px; opacity: 0.4; 
+            transition: opacity 0.2s; 
+        }
+
+        .scrollWrapper:hover .scroll-sign {
+            opacity: 1;
         }
         
         @keyframes jumpX { 
@@ -246,10 +321,17 @@
         }
         .jump { animation: jumpX 1s ease-in-out infinite alternate; }
 
+        /* DIMENSIONS */
         .anim-dim-circle {
-            display: inline-block; width: 0.35em; height: 0.35em;
-            background-color: white; border-radius: 50%;
-            vertical-align: middle; margin: 0 0.15em;
+            display: inline-block;
+            width: 0.35em;
+            height: 0.35em;
+            background-color: white;
+            border-radius: 50%;
+            vertical-align: middle;
+            position: relative;
+            top: -0.05em;
+            margin: 0 0.37em; 
             animation: pulse-dim 2s ease-in-out infinite;
         }
 
@@ -259,7 +341,7 @@
         }
 
         /* =========================================
-           CONTENITORE NASCOSTO (Per calcolare il font)
+           HIDDEN CONTAINER (To calculate font size)
            ========================================= */
         #hidden-intro-container {
             position: absolute; top: 14vh; left: 4vh; right: 4vh;
@@ -284,7 +366,7 @@
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; margin: 0 0.15em; }
         .anim-dist-circles { display: inline-flex; width: 2.5em; height: 1em; margin: 0 0.3em; }
 
-        /* ─── CLOCK TOP LEFT (Vuoto) ─ */
+        /* ─── CLOCK TOP LEFT (Empty) ─ */
         .time {
             position: fixed; top: 0; left: 0;
             display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
@@ -295,7 +377,7 @@
         .timeWrapper > div { display: flex; gap: 6px; }
         #live { color: var(--color-live); font-weight: 500;}
 
-        /* ─── NAVBAR LATERALE ─────────────────────────────────────── */
+        /* ─── SIDE NAVBAR ─────────────────────────────────────── */
         .navbar {
             position: fixed; width: 100%; height: 100%; top: 0; left: 0;
             pointer-events: none; z-index: 100;
@@ -311,10 +393,10 @@
         #btn-top:active, #btn-bot:active { transform: scale(.95); }
         .navlabel { display: flex; flex-direction: column; align-items: center; }
 
-        /* ─── BOTTOM SIDEBAR CON SVG ──────────────────────────────── */
+        /* ─── BOTTOM SIDEBAR WITH SVG ──────────────────────────────── */
         .sidebar {
             position: fixed; bottom: 0; left: 0;
-            width: 100vw; height: 90px; z-index: 100; pointer-events: none;
+            width: 100vw; height: calc(4vh + 90px); z-index: 100; pointer-events: none;
             opacity: 0; transition: opacity 0.5s; overflow: visible;
         }
         .sidebarWrapper {
@@ -322,11 +404,11 @@
             width: 2700px; height: 100%; pointer-events: auto;
             transition: left 0.5s ease-out;
         }
-        #sidebar-canvas { position: absolute; left: 0; bottom: 26px; z-index: -1; display: block; }
+        #sidebar-canvas { position: absolute; left: 0; bottom: 4vh; z-index: -1; display: block; }
         .sidebardiv { position: absolute; left: 25px; bottom: 0; height: 100%; width: 2570px; }
         
         .sidebaritem {
-            position: absolute; bottom: 54px; transform: translateX(-50%);
+            position: absolute; bottom: calc(4vh + 28px); transform: translateX(-50%);
             display: flex; flex-direction: column; align-items: center;
             width: 40px; pointer-events: auto;
         }
@@ -346,7 +428,7 @@
         .sidebaritem:hover .itemname { opacity: 1 !important; }
 
         @media (max-width:600px) { .itemname { display: none; } .time { display: none; } }
-        @media (hover:none) { #btn-top:hover, #btn-bot:hover, .sidebaricon:hover { transform: none; } }
+        @media (hover:none) { #btn-top:hover, #btn-bot:hover, .scrollWrapper:hover, .sidebaricon:hover { transform: none; } }
     </style>
 </head>
 <body>
@@ -357,25 +439,25 @@
 <nav class="menu">
     <a href="index.html" class="nasa-title" id="logo-link">
         <img src="assets/sun_symbol.svg" alt="Sun symbol">
-        <span class="nasa-text-label">SISTEMA SOLARE IN SCALA</span>
+        <span class="nasa-text-label">SolarScale</span>
     </a>
     <a href="dimensioni.html" class="nav-link active" id="nav-dimensioni">
-        <span class="text-label">Dimensioni</span>
+        <span class="text-label">Sizes</span>
     </a>
     <a href="posizioni.html" class="nav-link">
-        <span class="text-label">Posizioni</span>
+        <span class="text-label">Positions</span>
     </a>
     <a href="distanze.html" class="nav-link">
-        <span class="text-label">Distanze</span>
+        <span class="text-label">Distances</span>
     </a>
 </nav>
 
 <nav class="right-menu">
     <a href="misurazioni.html" class="nav-link">
-        <span class="text-label">Metodi di misurazione</span>
+        <span class="text-label">Measurement Methods</span>
     </a>
     <a href="crediti.html" class="nav-link" id="crediti-link">
-        <span class="text-label">Crediti</span>
+        <span class="text-label">Credits</span>
     </a>
 </nav>
 
@@ -389,12 +471,12 @@
 
 <header id="main-header">
     <div class="titles" id="titles-layer">
-        <h1 id="main-title">Dimensioni <span class="anim-dim-circle"></span></h1>
-        <h2 class="title">Confronto dimensionale dal pianeta più piccolo al più grande (dati JPL)</h2>
+        <h1 id="main-title">Sizes <span class="anim-dim-circle"></span></h1>
+        <h2 class="title">Dimensional comparison from the smallest to the largest planet (JPL data)</h2>
     </div>
     <div class="scrollWrapper" id="header-scroll">
         <div id="scroll-sign" class="scroll-sign jump">
-            <p>Scorri per esplorare</p>
+            <p>Scroll to explore</p>
             <span class="scroll-arrow">→</span>
         </div>
     </div>
@@ -403,7 +485,7 @@
 <div class="time" id="time-clock"></div>
 
 <div id="hidden-intro-container">
-    <div id="hidden-dynamic-text">In vista del 70° anniversario della NASA nel 2028, questo progetto nasce per rendere veritiere le frequenti rappresentazioni grafiche fuorvianti del nostro Sistema Solare. Sfruttando l'immenso archivio di dati scientifici ufficiali dell'agenzia, questa piattaforma interattiva offre una visualizzazione semplificata, chiara e rigorosa delle reali proporzioni cosmiche, restituendo così allo spettatore un'esatta percezione delle vere dimensioni <span class="anim-dim-circle"></span> fisiche dei pianeti, delle loro mutevoli posizioni <span class="anim-pos-orbit"></span> orbitali e delle immense distanze <span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> vuote che li separano.</div>
+    <div id="hidden-dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
 </div>
 
 <nav class="navbar">
@@ -412,7 +494,7 @@
             <span class="nav-arrow">←</span>
             <div class="navlabel">
                 <p><span id="topNam">...</span></p>
-                <p style="margin: 2px 0;">Diametro</p>
+                <p style="margin: 2px 0;">Diameter</p>
                 <p><span id="topDis">0</span> km</p>
             </div>
         </button>
@@ -421,7 +503,7 @@
         <button id="btn-bot">
             <div class="navlabel">
                 <p><span id="botNam">...</span></p>
-                <p style="margin: 2px 0;">Diametro</p>
+                <p style="margin: 2px 0;">Diameter</p>
                 <p><span id="botDis">0</span> km</p>
             </div>
             <span class="nav-arrow">→</span>
@@ -441,15 +523,31 @@ THREE.Cache.enabled = true;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* ─── 1. GESTIONE CURSORE VISIVO E ANIMAZIONI ─── */
+    /* ─── 1. VISUAL CURSOR AND ANIMATIONS MANAGEMENT ─── */
     const cursorDot     = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');
+    
+    const savedCursorX = sessionStorage.getItem('cursorPosX');
+    const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+    if (savedCursorX !== null && savedCursorY !== null) {
+        cursorDot.style.left = savedCursorX + 'px';
+        cursorDot.style.top  = savedCursorY + 'px';
+        cursorOutline.style.left = savedCursorX + 'px';
+        cursorOutline.style.top  = savedCursorY + 'px';
+    }
     
     window.addEventListener('mousemove', e => {
         cursorDot.style.left = e.clientX + 'px';
         cursorDot.style.top  = e.clientY + 'px';
         cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:250, fill:'forwards' });
+        
+        sessionStorage.setItem('cursorPosX', e.clientX);
+        sessionStorage.setItem('cursorPosY', e.clientY);
     });
+
+    window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+    window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
     
     function attachHoverEvents(el) {
         el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
@@ -511,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.fonts.ready.then(() => {
             logoSpan.style.display = 'inline-block';
-            logoSpan.style.overflow = 'hidden';
+            logoSpan.style.overflow = 'visible'; // BUG FIX
             logoSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -531,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.fonts.ready.then(() => {
             textSpan.style.display = 'inline-block';
-            textSpan.style.overflow = 'hidden';
+            textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
             textSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -595,7 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lastIntroHeight = targetHeight;
     }
 
-    // MODIFICA QUI: Calcolo immediato prima del completamento dei font
     syncTitleFontSize();
 
     document.fonts.ready.then(() => {
@@ -611,20 +708,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ─── 2. DATASET DIMENSIONI ─── */
+    /* ─── 2. DIMENSIONS DATASET ─── */
     const celestialData = [
-        { id: 'mercury', name: "Mercurio", dia: "4.879", mass: "3,30 × 10²³ kg", vol: "6,08 × 10¹⁰ km³", type: "Pianeta roccioso", scale: 0.3825 },
-        { id: 'mars',    name: "Marte",    dia: "6.792", mass: "6,42 × 10²³ kg", vol: "1,63 × 10¹¹ km³", type: "Pianeta roccioso", scale: 0.5325 },
-        { id: 'venus',   name: "Venere",   dia: "12.104", mass: "4,87 × 10²⁴ kg", vol: "9,28 × 10¹¹ km³", type: "Pianeta roccioso", scale: 0.9489 },
-        { id: 'earth',   name: "Terra",    dia: "12.756", mass: "5,97 × 10²⁴ kg", vol: "1,08 × 10¹² km³", type: "Pianeta roccioso", scale: 1.0000 },
-        { id: 'neptune', name: "Nettuno",  dia: "49.528", mass: "1,02 × 10²⁶ kg", vol: "6,25 × 10¹³ km³", type: "Gigante ghiacciato", scale: 3.8827 },
-        { id: 'uranus',  name: "Urano",    dia: "51.118", mass: "8,68 × 10²⁵ kg", vol: "6,83 × 10¹³ km³", type: "Gigante ghiacciato", scale: 4.0074 },
-        { id: 'saturn',  name: "Saturno",  dia: "120.536", mass: "5,68 × 10²⁶ kg", vol: "8,27 × 10¹⁴ km³", type: "Gigante gassoso", scale: 9.4494 },
-        { id: 'jupiter', name: "Giove",    dia: "142.984", mass: "1,898 × 10²⁷ kg", vol: "1,43 × 10¹⁵ km³", type: "Gigante gassoso", scale: 11.2092 },
-        { id: 'sun',     name: "Sole",     dia: "1.392.700", mass: "1,989 × 10³⁰ kg", vol: "1,41 × 10¹⁸ km³", type: "Stella nana gialla", scale: 109.1800 }
+        { id: 'mercury', name: "Mercury", dia: "4,879", mass: "3.30 × 10²³ kg", vol: "6.08 × 10¹⁰ km³", type: "Rocky planet", scale: 0.3825 },
+        { id: 'mars',    name: "Mars",    dia: "6,792", mass: "6.42 × 10²³ kg", vol: "1.63 × 10¹¹ km³", type: "Rocky planet", scale: 0.5325 },
+        { id: 'venus',   name: "Venus",   dia: "12,104", mass: "4.87 × 10²⁴ kg", vol: "9.28 × 10¹¹ km³", type: "Rocky planet", scale: 0.9489 },
+        { id: 'earth',   name: "Earth",   dia: "12,756", mass: "5.97 × 10²⁴ kg", vol: "1.08 × 10¹² km³", type: "Rocky planet", scale: 1.0000 },
+        { id: 'neptune', name: "Neptune", dia: "49,528", mass: "1.02 × 10²⁶ kg", vol: "6.25 × 10¹³ km³", type: "Ice giant", scale: 3.8827 },
+        { id: 'uranus',  name: "Uranus",  dia: "51,118", mass: "8.68 × 10²⁵ kg", vol: "6.83 × 10¹³ km³", type: "Ice giant", scale: 4.0074 },
+        { id: 'saturn',  name: "Saturn",  dia: "120,536", mass: "5.68 × 10²⁶ kg", vol: "8.27 × 10¹⁴ km³", type: "Gas giant", scale: 9.4494 },
+        { id: 'jupiter', name: "Jupiter", dia: "142,984", mass: "1.898 × 10²⁷ kg", vol: "1.43 × 10¹⁵ km³", type: "Gas giant", scale: 11.2092 },
+        { id: 'sun',     name: "Sun",     dia: "1,392,700", mass: "1.989 × 10³⁰ kg", vol: "1.41 × 10¹⁸ km³", type: "Yellow dwarf star", scale: 109.1800 }
     ];
 
-    /* ─── 3. CREAZIONE HTML INFO & SIDEBAR ─── */
+    /* ─── 3. HTML INFO & SIDEBAR CREATION ─── */
     const infoLayer = document.getElementById('info-layer');
     const sidebardiv = document.getElementById('sidebardiv');
     const totalWidth = 2570;
@@ -633,7 +730,18 @@ document.addEventListener('DOMContentLoaded', () => {
     celestialData.forEach((data, i) => {
         let infoDiv = document.createElement('div');
         infoDiv.className = 'info';
-        infoDiv.innerHTML = `<span style="font-weight:500;">${data.name}</span> (${data.type})<br>Diametro: ${data.dia} km<br>Massa: ${data.mass}<br>Volume: ${data.vol}`;
+        
+        infoDiv.innerHTML = `
+            <div class="info-title"><span style="font-weight:500;">${data.name}</span> (${data.type})</div>
+            <div class="data-brackets">
+                <div class="info-grid">
+                    <span>Diameter</span><span>${data.dia} km</span>
+                    <span>Mass</span><span>${data.mass}</span>
+                    <span>Volume</span><span>${data.vol}</span>
+                </div>
+            </div>
+        `;
+        
         infoLayer.appendChild(infoDiv);
         data.infoEl = infoDiv;
 
@@ -651,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
         data.sidebarIcon.addEventListener('click', () => jumpToState(i));
     });
 
-    /* ─── 4. MOTORE 3D E POSIZIONAMENTO ─── */
+    /* ─── 4. 3D ENGINE AND POSITIONING ─── */
     const canvasContainer = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 40000);
@@ -678,7 +786,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let zDist = radius * 5.2; 
         if (zDist < 8.5) zDist = 8.5; 
-        if (data.id === 'saturn') zDist *= 1.4; 
+        
+        if (data.id === 'uranus' || data.id === 'neptune') zDist *= 1.4; 
+        if (data.id === 'jupiter') zDist *= 1.5; 
+        if (data.id === 'saturn') zDist *= 1.8; 
+        
         if (data.id === 'sun') zDist *= 1.05;
 
         data.targetZ = zDist;
@@ -783,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedCount++;
             if (loadedCount === celestialData.length) {
                 renderer.compile(scene, camera); 
-                jumpToState(-1, true); 
+                // CRITICAL EDIT: Removed jumpToState(-1, true) so it never forces return to home screen if you are already scrolling
             }
         });
     });
@@ -862,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isTraveling = true;
             setTimeout(() => { 
                 isTraveling = false; 
-            }, 1000); // 1 secondo di blocco standard su ogni transizione
+            }, 1000); 
         }
 
         if (currentState === -1) {
@@ -885,28 +997,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBot.addEventListener('click', () => jumpToState(currentState + 1));
     headerScrollWrapper.addEventListener('click', () => jumpToState(0));
 
-    // SISTEMA DI SCROLL CON ANTI-INERZIA (OTTIMIZZATO PER TRACKPAD)
     let wheelReleaseTimer;
     let wheelLock = false;
     let scrollUpResistance = 0; 
     const RESISTANCE_THRESHOLD = 500; 
 
     window.addEventListener('wheel', (e) => {
-        // 1. Ogni volta che la rotellina gira o il trackpad rileva un movimento fisico/inerzia, resettiamo il timer
         clearTimeout(wheelReleaseTimer);
         
-        // 2. Se passa questo tempo SENZA nessun evento wheel (il dito o la rotella si è fermata fisicamente), sblocchiamo il prossimo salto
         wheelReleaseTimer = setTimeout(() => {
             wheelLock = false;
             scrollUpResistance = 0;
         }, 150);
 
-        // 3. Se l'interfaccia si sta ancora muovendo o abbiamo già registrato un comando e aspettiamo la fine dell'inerzia, ignora l'input
         if (wheelLock || isTraveling) return;
 
         let delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         
-        // Ignora micro-tocchi
         if (Math.abs(delta) < 5) return;
 
         if (currentState === -1) {
@@ -915,7 +1022,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 wheelLock = true;
             }
         } else if (currentState === 0) {
-            // Gestione resistenza elastica per tornare alla Home
             if (delta < 0) {
                 scrollUpResistance += Math.abs(delta);
                 if (scrollUpResistance > RESISTANCE_THRESHOLD) {
@@ -928,7 +1034,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 wheelLock = true;
             }
         } else {
-            // Navigazione standard tra i pianeti
             if (delta < 0) {
                 jumpToState(currentState - 1);
                 wheelLock = true;
@@ -939,7 +1044,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { passive: true });
 
-    /* ─── 6. DRAG & DROP 3D (RAYCASTER) + GESTIONE TOUCH MOBILE ─── */
     const raycaster = new THREE.Raycaster();
     const mouseVector = new THREE.Vector2();
     let isDragging = false;
@@ -1017,35 +1121,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('touchend', (e) => {
         isDragging = false;
-        
-        // Navigazione Swipe su Mobile
         if (!draggedPlanet && !isTraveling) {
             let deltaX = touchStartX - e.changedTouches[0].clientX;
             let deltaY = touchStartY - e.changedTouches[0].clientY;
             let delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
             
             if (currentState === -1) {
-                if (delta > 50) { 
-                    jumpToState(0);
-                }
+                if (delta > 50) jumpToState(0);
             } else if (currentState === 0) {
-                if (delta < -150) { // Resistenza touch swipe per uscire verso home
-                    jumpToState(-1);
-                } else if (delta > 50) {
-                    jumpToState(1);
-                }
+                if (delta < -150) jumpToState(-1);
+                else if (delta > 50) jumpToState(1);
             } else {
-                if (delta < -50) {
-                    jumpToState(currentState - 1);
-                } else if (delta > 50) {
-                    jumpToState(currentState + 1);
-                }
+                if (delta < -50) jumpToState(currentState - 1);
+                else if (delta > 50) jumpToState(currentState + 1);
             }
         }
         draggedPlanet = null;
     });
 
-    /* ─── 7. SIDEBAR CANVAS LINE (RISOLUZIONE RETINA) ─── */
+    /* ─── 7. SIDEBAR CANVAS LINE (RETINA RESOLUTION) ─── */
     const sidebarCanvas = document.getElementById('sidebar-canvas');
     const sCtx = sidebarCanvas.getContext('2d');
     const LINE_Y = 5, LINE_X0 = 25;
@@ -1061,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.clearRect(0, 0, 2600, 10);
         sCtx.beginPath();
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(2570 + LINE_X0, LINE_Y);
-        sCtx.strokeStyle = 'rgba(255,255,255,0.4)'; 
+        sCtx.strokeStyle = 'rgba(255,255,255,0.22)'; 
         sCtx.lineWidth = 1.5; 
         sCtx.stroke();
         
@@ -1069,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const percentage = currentState / (celestialData.length - 1);
             const dotX = LINE_X0 + (percentage * 2570);
             sCtx.beginPath();
-            sCtx.arc(dotX, LINE_Y, 4, 0, Math.PI * 2);
+            sCtx.arc(dotX, LINE_Y, 2.5, 0, Math.PI * 2);
             sCtx.fillStyle = 'white'; sCtx.fill();
         }
     }
@@ -1120,11 +1214,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function animate() {
         requestAnimationFrame(animate);
 
-        // SLIDE DEL TESTO: sincronizzato con la velocità generica dell'interfaccia/camera
         currentTitleX += (targetTitleX - currentTitleX) * 0.04;
         titlesEl.style.transform = `translateX(${currentTitleX}px)`;
 
-        // Movimento Camera 3D
         camera.position.x += (targetCamX - camera.position.x) * 0.04; 
         camera.position.y += (targetCamY - camera.position.y) * 0.04;
         camera.position.z += (targetCamZ - camera.position.z) * 0.04;
@@ -1133,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lookAtTarget.y += (targetCamY - lookAtTarget.y) * 0.04;
         camera.lookAt(lookAtTarget);
 
-        const deltaCam = (camera.position.x - lastCamX) * 15; // Velocità parallax uniformata
+        const deltaCam = (camera.position.x - lastCamX) * 15; 
         lastCamX = camera.position.x;
         s1.draw(deltaCam); s2.draw(deltaCam); s3.draw(deltaCam);
 
@@ -1170,13 +1262,15 @@ document.addEventListener('DOMContentLoaded', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        if (currentState !== -1) targetTitleX = -window.innerWidth; // Aggiorna in background
+        if (currentState !== -1) targetTitleX = -window.innerWidth; 
         if (currentState >= 0) updateUIStates();
         updateMenuWidths();
         lastIntroWidth = 0; 
         syncTitleFontSize();
     });
 
+    // CRITICAL EDIT: Immediately initialize the UI to state -1 even before the render loop and 3D loads begin.
+    jumpToState(-1, true);
     animate();
 });
 </script>
