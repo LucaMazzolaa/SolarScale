@@ -39,7 +39,7 @@
             --color-black: #000000;
             --color-white: #ffffff;
             --color-live:  #ffffff;
-            --color-dashed: rgba(255, 255, 255, 0.25);
+            --color-dashed: rgba(255, 255, 255, 0.4);
             
             /* Calculations for Macbook Pro 13" */
             --font-62: clamp(32px, 2.5vw + 26px, 90px);
@@ -395,11 +395,20 @@
             position: absolute; top: calc(50% + 40px); left: 50%;
             transform: translateX(-50%); width: max-content; margin: 0; pointer-events: none; 
             text-align: center;
+            z-index: 20; 
         }
         #div-Jupiter .planet-cell .info { top: calc(50% + 90px); }
-        #div-Saturn .planet-cell .info { top: calc(50% + 85px); } /* Modificato per avvicinare i dati a Saturno */
+        #div-Saturn .planet-cell .info { top: calc(50% + 85px); } 
 
-        .perihelion, .aphelion { flex-shrink: 0; height: 1px; border-top: 1px dashed var(--color-dashed); align-self: center; }
+        /* MODIFICATO: Utilizzo di un SVG vettoriale per replicare esattamente la resa del Canvas su ogni schermo */
+        .perihelion, .aphelion { 
+            flex-shrink: 0; 
+            height: 10px; /* Spazio contenitore maggiorato per non tagliare l'anti-aliasing */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='10'%3E%3Cline x1='0' y1='5' x2='8' y2='5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-dasharray='4,4'/%3E%3C/svg%3E"); 
+            background-repeat: repeat-x; 
+            background-position: left center;
+            align-self: center; 
+        }
         .perihelion > div, .aphelion > div { display: block; height: 100%; width: 100%; }
 
         .space {
@@ -442,7 +451,7 @@
             color: white; opacity: 0; pointer-events: none; font-size: var(--font-14); font-weight: 500;
         }
         .traveling-active { opacity: 1 !important; animation: flicker .5s ease-in-out infinite alternate; }
-        @keyframes flicker { from { opacity:.25; } to { opacity:1; } }
+        @keyframes flicker { from { opacity: 0.4; } to { opacity: 1; } }
 
         /* ─── BOTTOM SIDEBAR ─── */
         .sidebar {
@@ -481,7 +490,7 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             gap: 20px; position: relative; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-        .credits { opacity: .45; font-size: var(--font-14); font-weight: 500; }
+        .credits { opacity: 0.4; font-size: var(--font-14); font-weight: 500; }
         .credits a { color: white; border-bottom: 1px solid white; }
 
         @media (max-width: 900px) {
@@ -627,7 +636,7 @@
     
     <div class="space" style="width:46000px;" id="space-Sun">
         <p></p>
-        <p class="infoAphPer" style="opacity:.23;">Mercury's Perihelion: 46,000,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mercury's Perihelion: 46,000,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mercury">
@@ -646,8 +655,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:37655px;">
-        <p class="infoAphPer" style="opacity:.22;">Mercury's Aphelion: 69,820,000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Venus's Perihelion: 107,480,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mercury's Aphelion: 69,820,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Venus's Perihelion: 107,480,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Venus">
@@ -666,8 +675,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:38138px;">
-        <p class="infoAphPer" style="opacity:.22;">Venus's Aphelion: 108,940,000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Earth's Perihelion: 147,090,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Venus's Aphelion: 108,940,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Earth's Perihelion: 147,090,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Earth">
@@ -686,8 +695,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:54507px;">
-        <p class="infoAphPer" style="opacity:.22;">Earth's Aphelion: 152,100,000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Mars's Perihelion: 206,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Earth's Aphelion: 152,100,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mars's Perihelion: 206,620,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mars">
@@ -706,14 +715,14 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:491283px;">
-        <p class="infoAphPer" style="opacity:.2;">Mars's Aphelion: 249,230,000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Jupiter's Perihelion: 740,520,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mars's Aphelion: 249,230,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Jupiter's Perihelion: 740,520,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Jupiter">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:140px;height:140px;"></div>
+            <div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:143px;height:143px;"></div>
             <div class="info" id="info-Jupiter">
                 <div class="info-title"><span style="font-weight:500;">Jupiter</span> (Gas giant)</div>
                 <div class="data-brackets">
@@ -726,14 +735,14 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:535790px;">
-        <p class="infoAphPer" style="opacity:.2;">Jupiter's Aphelion: 816,620,000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Saturn's Perihelion: 1,352,550,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Jupiter's Aphelion: 816,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Saturn's Perihelion: 1,352,550,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Saturn">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <div id="Saturn" class="three-planet" data-file="saturn.glb" data-rot="5" style="width:232px;height:232px;"></div>
+            <div id="Saturn" class="three-planet" data-file="saturn.glb" data-rot="5" style="width:281px;height:281px;"></div>
             <div class="info" id="info-Saturn">
                 <div class="info-title"><span style="font-weight:500;">Saturn</span> (Gas giant)</div>
                 <div class="data-brackets">
@@ -746,8 +755,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1226568px;">
-        <p class="infoAphPer" style="opacity:.22;">Saturn's Aphelion: 1,514,500,000 km</p>
-        <p class="infoAphPer" style="opacity:.22;">Uranus's Perihelion: 2,741,300,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Saturn's Aphelion: 1,514,500,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Uranus's Perihelion: 2,741,300,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Uranus">
@@ -766,14 +775,14 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1440779px;">
-        <p class="infoAphPer" style="opacity:.2;">Uranus's Aphelion: 3,003,620,000 km</p>
-        <p class="infoAphPer" style="opacity:.2;">Neptune's Perihelion: 4,444,450,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Uranus's Aphelion: 3,003,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Neptune's Perihelion: 4,444,450,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Neptune">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <div id="Neptune" class="three-planet" data-file="neptune.glb" data-rot="4" style="width:49px;height:49px;"></div>
+            <div id="Neptune" class="three-planet" data-file="neptune.glb" data-rot="4" style="width:50px;height:50px;"></div>
             <div class="info" id="info-Neptune">
                 <div class="info-title"><span style="font-weight:500;">Neptune</span> (Ice giant)</div>
                 <div class="data-brackets">
@@ -787,7 +796,7 @@
     </div>
 
     <div class="footer">
-        <p class="infoAphPer" style="opacity:.22;">Neptune's Aphelion: 4,545,670,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Neptune's Aphelion: 4,545,670,000 km</p>
         <h3 class="title credits">The Solar System to Scale — 1 px = 1,000 km</h3>
     </div>
 
@@ -1130,15 +1139,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerScroll  = document.getElementById('header-scroll');
 
     const planetsConfig = [
-        { id: 'Sun', name: 'Sun', nasa: '10', baseDis: 0, radius: 696340 },
+        { id: 'Sun', name: 'Sun', nasa: '10', baseDis: 0, radius: 696350 },
         { id: 'Mercury', name: 'Mercury', nasa: '199', baseDis: 66390.711, peri: 46000, aph: 69820, radius: 2440 },
         { id: 'Venus', name: 'Venus', nasa: '299', baseDis: 108161.279, peri: 107480, aph: 108940, radius: 6052 },
-        { id: 'Earth', name: 'Earth', nasa: '399', baseDis: 149065.661, peri: 147090, aph: 152100, radius: 6371 },
-        { id: 'Mars', name: 'Mars', nasa: '499', baseDis: 206648.695, peri: 206620, aph: 249230, radius: 3390 },
-        { id: 'Jupiter', name: 'Jupiter', nasa: '599', baseDis: 784032.492, peri: 740520, aph: 816620, radius: 69911 },
-        { id: 'Saturn', name: 'Saturn', nasa: '699', baseDis: 1420236.497, peri: 1352550, aph: 1514500, radius: 58232 },
-        { id: 'Uranus', name: 'Uranus', nasa: '799', baseDis: 2913545.774, peri: 2741300, aph: 3003620, radius: 25362 },
-        { id: 'Neptune', name: 'Neptune', nasa: '899', baseDis: 4470398.428, peri: 4444450, aph: 4545670, radius: 24622 }
+        { id: 'Earth', name: 'Earth', nasa: '399', baseDis: 149065.661, peri: 147090, aph: 152100, radius: 6378 },
+        { id: 'Mars', name: 'Mars', nasa: '499', baseDis: 206648.695, peri: 206620, aph: 249230, radius: 3396 },
+        { id: 'Jupiter', name: 'Jupiter', nasa: '599', baseDis: 784032.492, peri: 740520, aph: 816620, radius: 71492 },
+        { id: 'Saturn', name: 'Saturn', nasa: '699', baseDis: 1420236.497, peri: 1352550, aph: 1514500, radius: 60268 },
+        { id: 'Uranus', name: 'Uranus', nasa: '799', baseDis: 2913545.774, peri: 2741300, aph: 3003620, radius: 25559 },
+        { id: 'Neptune', name: 'Neptune', nasa: '899', baseDis: 4470398.428, peri: 4444450, aph: 4545670, radius: 24764 }
     ];
 
     const planetsData = planetsConfig.map((p, i) => {
@@ -1334,15 +1343,64 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => requestAnimationFrame(cacheSidebarSegments));
 
     function drawSidebarLine() {
+        sCtx.globalCompositeOperation = 'source-over';
         sCtx.clearRect(0, 0, 2600, 10);
+        
+        // Disegna la linea continua di base
         sCtx.beginPath();
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(2570 + LINE_X0, LINE_Y);
-        sCtx.strokeStyle = 'rgba(255,255,255,0.22)'; sCtx.lineWidth = 1.5; sCtx.stroke();
-        if (cachedSegments) {
+        sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; 
+        sCtx.lineWidth = 1.5; 
+        sCtx.stroke();
+        
+        if (cachedSegments && cachedSegments.length > 0) {
+            // 1. CANCELLA FISICAMENTE la linea continua
+            sCtx.globalCompositeOperation = 'destination-out';
+            sCtx.lineWidth = 4; // Più largo per assicurare una cancellazione totale netta
+            sCtx.strokeStyle = 'rgba(0,0,0,1)';
+            sCtx.beginPath();
             cachedSegments.forEach(({ x0, x1 }) => {
-                sCtx.beginPath(); sCtx.moveTo(x0, LINE_Y); sCtx.lineTo(x1, LINE_Y);
-                sCtx.strokeStyle = 'rgba(255,255,255,0.9)'; sCtx.lineWidth = 2; sCtx.stroke();
+                // Per Venere e Terra, l'escursione è molto piccola (1-3px).
+                // Per rendere il buco minimamente visibile, assicuriamo una larghezza minima di 4px
+                let drawX0 = x0;
+                let drawX1 = x1;
+                if (x1 - x0 < 4) {
+                    const mid = (x0 + x1) / 2;
+                    drawX0 = mid - 2;
+                    drawX1 = mid + 2;
+                }
+                sCtx.moveTo(drawX0, LINE_Y); sCtx.lineTo(drawX1, LINE_Y);
             });
+            sCtx.stroke();
+            
+            // 2. Disegna i trattini
+            sCtx.globalCompositeOperation = 'source-over';
+            sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            sCtx.lineWidth = 1.5; 
+            
+            cachedSegments.forEach(({ x0, x1 }) => {
+                const len = x1 - x0;
+                
+                if (len > 15) {
+                    // Da Marte in poi: tratteggio standard ripetuto.
+                    sCtx.setLineDash([4, 4]); 
+                    sCtx.beginPath();
+                    sCtx.moveTo(x0, LINE_Y); 
+                    sCtx.lineTo(x1, LINE_Y);
+                    sCtx.stroke();
+                } else if (len > 5) {
+                    // Mercurio (~13px): un solo trattino al centro del buco
+                    sCtx.setLineDash([]); 
+                    const mid = (x0 + x1) / 2;
+                    sCtx.beginPath();
+                    sCtx.moveTo(mid - 1.5, LINE_Y); 
+                    sCtx.lineTo(mid + 1.5, LINE_Y);
+                    sCtx.stroke();
+                }
+                // Altrimenti (Venere e Terra, len < 5): non disegniamo nulla, resta solo il buco vuoto.
+            });
+            
+            sCtx.setLineDash([]); 
         }
     }
 
@@ -1355,6 +1413,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebarWrapper.style.left = Math.min(c, Math.max(d, c + t * (d - c))) + 'px';
         drawSidebarLine();
         const dotX = LINE_X0 + scrollX / shrinkerFactor;
+        
+        // Disegna il punto scorrevole di navigazione
+        sCtx.globalCompositeOperation = 'source-over';
         sCtx.beginPath(); sCtx.arc(dotX, LINE_Y, 3, 0, Math.PI * 2);
         sCtx.fillStyle = 'white'; sCtx.fill();
     }
