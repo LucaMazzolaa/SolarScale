@@ -41,109 +41,60 @@
 
         h1, h2, h3, p, a, button, input { color: var(--color-white); margin: 0; font-family: 'Neue Montreal', sans-serif; font-weight: 500; z-index: 10; cursor: none; }
 
-        /* =========================================
-           CUSTOM CURSOR - OPTIMIZED (GPU Accelerated)
-           ========================================= */
+        /* CURSOR */
         .cursor-dot, .cursor-outline {
-            position: fixed; 
-            top: 0; 
-            left: 0;
-            border-radius: 50%; 
-            z-index: 9999999; 
-            pointer-events: none;
-            box-sizing: content-box; 
-            will-change: transform; /* Hardware acceleration */
+            position: fixed; top: 0; left: 0; border-radius: 50%; z-index: 9999999; pointer-events: none; box-sizing: content-box; will-change: transform; 
         }
-        .cursor-dot {
-            width: 5px; height: 5px;
-            background: white; 
-            mix-blend-mode: difference;
-            transition: width .2s, height .2s;
-        }
-        .cursor-outline {
-            width: 15px; height: 15px;
-            border: 2px solid white; 
-            mix-blend-mode: difference;
-            transition: width .2s, height .2s;
-        }
+        .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .2s, height .2s; }
+        .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .2s, height .2s; }
         .mouse-down { width: 20px !important; height: 20px !important; }
         .hover      { width: 30px !important; height: 30px !important; }
 
-        canvas.stars-canvas { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; transition: opacity 2s; }
+        canvas.stars-canvas { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; }
 
-        /* =========================================
-           TOP MENU
-           ========================================= */
+        /* MENU */
         .menu, .right-menu {
-            position: fixed; top: 4vh; width: auto;
-            font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); font-weight: 500;
-            z-index: 999999; display: flex; flex-direction: row; 
-            align-items: center; gap: 3vw; 
-            contain: layout paint; transform: translateZ(0); backface-visibility: hidden;
+            position: fixed; top: 4vh; width: auto; font-family: 'Neue Montreal', sans-serif; font-size: var(--font-16); font-weight: 500; z-index: 999999; display: flex; flex-direction: row; align-items: center; gap: 3vw; contain: layout paint; transform: translateZ(0); backface-visibility: hidden;
         }
         .menu { left: 4vh; }
         .right-menu { right: 4vh; }
         
-        .nasa-title {
-            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
-            color: white; line-height: 1; pointer-events: all; cursor: none;
-            margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
-        }
-
+        .nasa-title { font-weight: 700; font-size: clamp(22px, 2vw, 32px); color: white; line-height: 1; pointer-events: all; cursor: none; margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none; }
         .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
-
-        .nav-link {
-            font-family: 'Neue Montreal', sans-serif; color: white;
-            text-decoration: none; transition: opacity 0.2s; cursor: none;
-            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
-        }
-
-        .nasa-text-label, .text-label {
-            display: inline-block; line-height: 1; vertical-align: middle;
-            white-space: nowrap; pointer-events: none; 
-        }
-        .nasa-text-label { overflow: visible; }
-        .text-label { overflow: hidden; }
+        .nav-link { font-family: 'Neue Montreal', sans-serif; color: white; text-decoration: none; transition: opacity 0.2s; cursor: none; opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto; }
+        .nasa-text-label, .text-label { display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap; pointer-events: none; }
+        .nasa-text-label { overflow: visible; } .text-label { overflow: hidden; }
 
         .nav-link::before { content: "["; margin-right: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
         .nav-link::after { content: "]"; margin-left: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
         .nav-link:hover, .nav-link.active { opacity: 1; }
-        .nav-link:hover::before, .nav-link.active::before,
-        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before, .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
         @media (max-width: 900px) {
             .menu { position: relative; top: auto; left: auto; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh; }
             .right-menu { position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh; display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start; }
         }
 
-        /* ========================================= */
         .horizontal-scroll-wrapper { display: flex; flex-direction: row; height: 100vh; width: 200vw; will-change: transform; }
-
         .slide { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; z-index: 150; }
-        .header-slide { display: block; }
-        .content-slide { display: block; position: relative; overflow: hidden; }
+        .header-slide { display: block; } .content-slide { display: block; position: relative; overflow: hidden; }
 
         .titles { position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; }
         h1 { font-size: var(--font-62); line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
         .title { font-size: var(--font-16); opacity: 0.4; transition: opacity 0.3s; }
         
-        /* ─── SCROLL TO EXPLORE ─── */
         .scrollWrapper { position: fixed; bottom: var(--margin-screen); right: var(--margin-screen); cursor: none; pointer-events: auto; z-index: 500; transition: opacity 0.2s, transform 0.2s; }
-        .scrollWrapper:hover { transform: scale(1.03); }
-        .scrollWrapper:active { transform: scale(0.97); }
+        .scrollWrapper:hover { transform: scale(1.03); } .scrollWrapper:active { transform: scale(0.97); }
         .scroll-sign { display: flex; flex-direction: row; align-items: center; gap: 8px; opacity: 0.4; transition: opacity 0.2s; }
-        .scrollWrapper:hover .scroll-sign { opacity: 1; }
-        .scroll-sign p { font-size: var(--font-16); }
+        .scrollWrapper:hover .scroll-sign { opacity: 1; } .scroll-sign p { font-size: var(--font-16); }
         .scroll-arrow { font-size: var(--font-16); font-weight: 500; display: inline-block; transform: translateY(1px); }
-        @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } }
-        .jump { animation: jumpX 1s ease-in-out infinite alternate; }
+        @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } } .jump { animation: jumpX 1s ease-in-out infinite alternate; }
 
         #hidden-intro-container { position: absolute; top: 14vh; left: 4vh; right: 4vh; margin: 0; width: calc(100vw - 8vh); height: 82vh; opacity: 0; pointer-events: none; z-index: -9999; visibility: hidden; overflow: hidden; }
         #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-break: keep-all; overflow-wrap: normal; }
         @media (max-width: 900px) { #hidden-intro-container { top: auto; left: auto; right: auto; margin: 0; width: 100%; height: 100vh; } }
 
-        /* POSITIONS ANIMATIONS */
+        /* ANIMATIONS */
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; background-color: white; border-radius: 50%; vertical-align: middle; position: relative; top: -0.05em; margin: 0 0.45em; animation: orbit-small 1.5s linear infinite; }
         @keyframes orbit-small { from { transform: rotate(0deg) translateX(0.15em) rotate(0deg); } to { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); } }
         .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; background-color: white; border-radius: 50%; vertical-align: middle; margin: 0 0.15em; animation: pulse-dim 2s ease-in-out infinite; }
@@ -161,23 +112,10 @@
         .planet-model { position: absolute; left: 50%; top: 50%; width: calc(var(--planet-base) * var(--scale)); height: calc(var(--planet-base) * var(--scale)); margin-left: calc(var(--planet-base) * var(--scale) * -0.5); margin-top: calc(var(--planet-base) * var(--scale) * -0.5); display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
         .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; margin-left: calc(var(--planet-base) * var(--scale-sun) * -0.5); margin-top: calc(var(--planet-base) * var(--scale-sun) * -0.5); width: calc(var(--planet-base) * var(--scale-sun)); height: calc(var(--planet-base) * var(--scale-sun)); }
 
-        .orbit { 
-            position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1px; border-radius: 50%; 
-            left: 50%; top: 50%; width: calc(var(--semi-a) * 2 * var(--au-to-vmin)); height: calc(var(--semi-b) * 2 * var(--au-to-vmin)); 
-            margin-left: calc(var(--semi-a) * var(--au-to-vmin) * -1); margin-top: calc(var(--semi-b) * var(--au-to-vmin) * -1); 
-            transform: rotateZ(calc(var(--N) * 1deg)) rotateX(calc(var(--i) * 1deg)) rotateZ(calc(var(--w) * 1deg)) translateX(calc(var(--c) * var(--au-to-vmin) * -1)); 
-            transform-style: flat; will-change: transform;
-        }
+        .orbit { position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1px; border-radius: 50%; left: 50%; top: 50%; width: calc(var(--semi-a) * 2 * var(--au-to-vmin)); height: calc(var(--semi-b) * 2 * var(--au-to-vmin)); margin-left: calc(var(--semi-a) * var(--au-to-vmin) * -1); margin-top: calc(var(--semi-b) * var(--au-to-vmin) * -1); transform: rotateZ(calc(var(--N) * 1deg)) rotateX(calc(var(--i) * 1deg)) rotateZ(calc(var(--w) * 1deg)) translateX(calc(var(--c) * var(--au-to-vmin) * -1)); transform-style: flat; will-change: transform; }
 
-        .hud-ring, .sun-hud-ring { 
-            position: absolute; left: 50%; top: 50%; margin-left: calc(var(--ui-ring-size) * -0.5); margin-top: calc(var(--ui-ring-size) * -0.5); border-radius: 50%; width: var(--ui-ring-size); height: var(--ui-ring-size); border: 1.2px solid var(--ui-color); pointer-events: none; 
-            transform: scaleY(-1) translateZ(0); backface-visibility: hidden; 
-        }
-        
-        .hud-ring::after, .sun-hud-ring::after { 
-            content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; 
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; 
-        }
+        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; margin-left: calc(var(--ui-ring-size) * -0.5); margin-top: calc(var(--ui-ring-size) * -0.5); border-radius: 50%; width: var(--ui-ring-size); height: var(--ui-ring-size); border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
+        .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
         
         .sun-hud-ring::after { content: "Sun"; right: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: right;}
         .pl-earth .hud-ring::after { right: calc(100% + 0.5vmin); top: 50%; transform: translateY(-50%) translateZ(0); text-align: right; }
@@ -226,9 +164,7 @@
     <div class="cursor-dot" data-cursor-dot></div>
     <div class="cursor-outline" data-cursor-outline></div>
 
-    <canvas id="stars"  class="stars-canvas"></canvas>
-    <canvas id="stars2" class="stars-canvas"></canvas>
-    <canvas id="stars3" class="stars-canvas"></canvas>
+    <canvas id="stars-canvas" class="stars-canvas"></canvas>
 
     <nav class="menu">
         <a href="index.html" class="nasa-title" id="logo-link">
@@ -326,32 +262,19 @@
         let winHeight = window.innerHeight;
 
         // ==========================================
-        // CURSOR LOGIC (GPU Accelerated)
+        // OTTIMIZZAZIONE 2: Cursore decuplicato per evitare stalli
+        // Non avviamo una nuova animazione Web API a ogni singolo pixel di spostamento del mouse.
+        // Registriamo le coordinate in modo passivo e muoviamo il cursore nel loop RequestAnimationFrame
         // ==========================================
         const cursorDot = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
-
-        const savedCursorX = sessionStorage.getItem('cursorPosX');
-        const savedCursorY = sessionStorage.getItem('cursorPosY');
-
-        if (savedCursorX !== null && savedCursorY !== null) {
-            const transformStr = `translate3d(${savedCursorX}px, ${savedCursorY}px, 0) translate(-50%, -50%)`;
-            cursorDot.style.transform = transformStr;
-            cursorOutline.style.transform = transformStr;
-        }
+        let mouseX = winWidth / 2, mouseY = winHeight / 2;
+        let outlineX = mouseX, outlineY = mouseY;
 
         window.addEventListener('mousemove', e => {
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            cursorDot.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-            cursorOutline.animate({
-                transform: `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
-            }, { duration: 250, fill: 'forwards' });
-            
-            sessionStorage.setItem('cursorPosX', x);
-            sessionStorage.setItem('cursorPosY', y);
-        });
+            mouseX = e.clientX; 
+            mouseY = e.clientY;
+        }, { passive: true }); // Passive rende l'evento leggerissimo per lo scroll/mouse
 
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
         window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
@@ -363,7 +286,7 @@
         });
 
         // ==========================================
-        // MENU HACKER EFFECT
+        // MENU HACKER EFFECT (Invariato)
         // ==========================================
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
@@ -461,73 +384,71 @@
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
         // ==========================================
-        // OPTIMIZED STARS ENGINE (Batch Rendering)
+        // OTTIMIZZAZIONE 3: Motore Stelle Unificato
+        // Gestiamo tutti e 3 i livelli di parallasse su UN SINGOLO canvas con sfondo nero solido (alpha: false).
         // ==========================================
-        class Stars {
-            constructor(id, density, maxS, minS, maxSz, minSz) {
+        class UnifiedStarsEngine {
+            constructor(id) {
                 this.canvas = document.getElementById(id);
-                this.ctx = this.canvas.getContext('2d');
-                this.density = density; this.maxS = maxS; this.minS = minS;
-                this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
+                // alpha: false velocizza mostruosamente il rendering su hardware vecchio
+                this.ctx = this.canvas.getContext('2d', { alpha: false }); 
+                this.dots = [];
                 this.resize();
             }
+            
             resize() {
-                this.canvas.width = winWidth; this.canvas.height = winHeight;
-                this.lB = -winWidth; this.rB = winWidth * 2;
-                this.num = Math.floor((winWidth * winHeight / 10000) * this.density);
+                this.canvas.width = winWidth; 
+                this.canvas.height = winHeight;
+                this.lB = -winWidth; 
+                this.rB = winWidth * 2;
                 this.dots = [];
-                for (let i = 0; i < this.num; i++) this.addDot(Math.random() * (this.rB - this.lB) + this.lB, Math.random() * winHeight);
+                
+                // Popola i 3 layer in un solo array
+                this.addLayer(1.5, 1.4, 0.1, 1.5, 0.5); // Layer 1
+                this.addLayer(0.5, 0.25, 0.0, 1.0, 0.2); // Layer 2
+                this.addLayer(0.2, 0.001, 0.0, 0.5, 0.1); // Layer 3
             }
-            addDot(x, y) {
-                this.dots.push({ x, y, s: Math.random()*(this.maxSz-this.minSz)+this.minSz, v: Math.random()*(this.maxS-this.minS)+this.minS });
+
+            addLayer(density, maxS, minS, maxSz, minSz) {
+                let num = Math.floor((winWidth * winHeight / 10000) * density);
+                for (let i = 0; i < num; i++) {
+                    this.dots.push({
+                        x: Math.random() * (this.rB - this.lB) + this.lB,
+                        y: Math.random() * winHeight,
+                        s: Math.random() * (maxSz - minSz) + minSz,
+                        v: Math.random() * (maxS - minS) + minS
+                    });
+                }
             }
+
             draw(deltaX, deltaY) {
                 const ctx = this.ctx;
-                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                while (this.dots.length < this.num) {
-                    let startX = Math.random() * this.canvas.width;
-                    let startY = Math.random() * this.canvas.height;
-                    if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX !== 0) {
-                        startX = deltaX > 0 ? this.rB : this.lB;
-                    } else if (deltaY !== 0) {
-                        startY = deltaY > 0 ? this.canvas.height + 50 : -50;
-                    }
-                    this.addDot(startX, startY);
-                }
+                // Disegniamo lo sfondo nero solido anziché usare clearRect trasparente
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
                 ctx.fillStyle = 'white';
-                ctx.beginPath(); // INIZIO BATCH RENDER: Disegna tutto assieme!
+                ctx.beginPath(); 
                 
                 for (let i = this.dots.length - 1; i >= 0; i--) {
                     const dot = this.dots[i];
                     dot.x -= deltaX * dot.v * 0.4;
                     dot.y -= deltaY * dot.v * 0.4;
 
-                    if (dot.x < this.lB || dot.x > this.rB || dot.y < -100 || dot.y > this.canvas.height + 100) {
-                        this.dots.splice(i, 1);
-                    } else {
-                        // Disegna un rettangolo invece di una path complessa con stroke
-                        ctx.rect(dot.x, dot.y, dot.s, dot.s);
-                    }
+                    // Riciclo le stelle fuori schermo
+                    if (dot.x < this.lB) dot.x = this.rB;
+                    else if (dot.x > this.rB) dot.x = this.lB;
+                    
+                    if (dot.y < -100) dot.y = this.canvas.height + 100;
+                    else if (dot.y > this.canvas.height + 100) dot.y = -100;
+
+                    ctx.rect(dot.x, dot.y, dot.s, dot.s);
                 }
-                ctx.fill(); // DISEGNA! (Molto più leggero di migliaia di stroke)
-                
-                // Se ci muoviamo molto velocemente (scroll), aggiungiamo una scia leggera
-                if (Math.abs(deltaX) > 0.5) {
-                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                    ctx.beginPath();
-                    for (let i = 0; i < this.dots.length; i++) {
-                        const dot = this.dots[i];
-                        ctx.moveTo(dot.x + (deltaX * dot.v * 0.4), dot.y + dot.s/2);
-                        ctx.lineTo(dot.x, dot.y + dot.s/2);
-                    }
-                    ctx.stroke();
-                }
+                ctx.fill(); 
             }
         }
 
-        let s1, s2, s3;
+        let starEngine;
         let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
         let isTraveling = false, scrollTimeout; 
         let isEngineActive = false, zoomEnabled = false;
@@ -560,10 +481,6 @@
         let isPlaying = true, isApiLive = true;
         let lastApiFetchTime = null, needsOrbitUpdate = true, lastRenderedT = null;
 
-        // ==========================================
-        // UI LOGIC & ENGINE
-        // ==========================================
-
         function jumpToState(index) {
             if (index < 0 || index > 1) return;
             currentState = index; targetX = currentState * winWidth; isTraveling = true;
@@ -584,7 +501,13 @@
         window.addEventListener('wheel', (e) => {
             if (isTraveling || scrollTimeout) return;
             if (currentState === 0) {
-                if (e.deltaY > 0 || e.deltaX > 0) { jumpToState(1); scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); }
+                const isScrollingDown = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
+                const isScrollingRight = e.deltaX > 0 && Math.abs(e.deltaX) > Math.abs(e.deltaY);
+
+                if (isScrollingDown || isScrollingRight) { 
+                    jumpToState(1); 
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); 
+                }
             } else {
                 if (!zoomEnabled || !isEngineActive || e.target.closest('#time-controls-container') || e.target.closest('nav') || e.target.closest('#zoom-controls')) return;
                 
@@ -608,7 +531,13 @@
             let deltaX = touchStartX - e.changedTouches[0].clientX; let deltaY = touchStartY - e.changedTouches[0].clientY;
             
             if (currentState === 0) {
-                if((Math.abs(deltaX) > 50 && deltaX > 0) || (Math.abs(deltaY) > 50 && deltaY > 0)) { jumpToState(1); scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); }
+                const isSwipingUp = deltaY > 50 && Math.abs(deltaY) > Math.abs(deltaX);
+                const isSwipingLeft = deltaX > 50 && Math.abs(deltaX) > Math.abs(deltaY);
+
+                if(isSwipingUp || isSwipingLeft) { 
+                    jumpToState(1); 
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); 
+                }
             } else if (currentState === 1) {
                 if (deltaX < -250 || deltaY < -250) { jumpToState(0); scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200); }
             }
@@ -618,7 +547,7 @@
             winWidth = window.innerWidth; winHeight = window.innerHeight;
             targetX = currentState * winWidth;
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
-            if(s1 && s2 && s3) { s1.resize(); s2.resize(); s3.resize(); }
+            if(starEngine) starEngine.resize();
         });
 
         const navPosizioni = document.getElementById('nav-posizioni');
@@ -694,7 +623,9 @@
                 const pixel = document.createElement('div'); pixel.className = `pixel-dot ${p.id}-pixel`;
                 model.appendChild(hud); model.appendChild(pixel);
                 document.getElementById('scene').appendChild(orb); document.getElementById('scene').appendChild(model);
-                p.orbEl = orb; p.modelEl = model;
+                p.orbEl = orb; 
+                p.modelEl = model;
+                p.lastTransform = ""; // Proprietà usata per l'ottimizzazione DOM
             });
         }
 
@@ -726,7 +657,16 @@
                 
                 const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad); const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
                 
-                p.modelEl.style.transform = `translate3d(${abs_X * auToPx}px, ${abs_Y * auToPx}px, 0)`;
+                // OTTIMIZZAZIONE 4: Limitiamo gli aggiornamenti del DOM solo se i valori sono visualmente percettibili.
+                // Usiamo un arrotondamento ai centesimi di pixel per stoppare l'attività DOM inutile se impostato su Real Time.
+                const newX = Math.round((abs_X * auToPx) * 100) / 100;
+                const newY = Math.round((abs_Y * auToPx) * 100) / 100;
+                const newTransform = `translate3d(${newX}px, ${newY}px, 0)`;
+                
+                if (p.lastTransform !== newTransform) {
+                    p.modelEl.style.transform = newTransform;
+                    p.lastTransform = newTransform;
+                }
                 
                 if (orbitsNeedUpdate) {
                     const b = a * Math.sqrt(1 - e * e); const c = a * e; const orb = p.orbEl;
@@ -766,6 +706,12 @@
             const deltaTime = Math.min(time - lastTime, 32); 
             lastTime = time;
 
+            // Logica transizione mouse (fluida e senza trigger inutili)
+            outlineX += (mouseX - outlineX) * 0.2;
+            outlineY += (mouseY - outlineY) * 0.2;
+            cursorOutline.style.transform = `translate3d(${outlineX}px, ${outlineY}px, 0) translate(-50%, -50%)`;
+            cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+
             currentX += (targetX - currentX) * 0.04;
             if (Math.abs(currentX - lastX) > 0.01 && scrollWrapperEl) {
                 scrollWrapperEl.style.transform = `translate3d(-${currentX}px, 0, 0)`;
@@ -785,8 +731,8 @@
             if (time - lastUIUpdate > 200) { updateDateUI(); lastUIUpdate = time; }
             if (currentState === 1 || isTraveling) renderPlanets();
             
-            if(s1 && s2 && s3) {
-                s1.draw(deltaXSlide, 0); s2.draw(deltaXSlide, 0); s3.draw(deltaXSlide, 0);
+            if(starEngine) {
+                starEngine.draw(deltaXSlide, 0); 
             }
 
             requestAnimationFrame(animate);
@@ -794,9 +740,7 @@
         
         requestAnimationFrame(() => {
             setTimeout(() => {
-                s1 = new Stars('stars',  1.5, 1.4,   0.1,  1.5, 0.5);
-                s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
-                s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
+                starEngine = new UnifiedStarsEngine('stars-canvas');
                 initializeDOM(); updateZoomCSS(); updateDateUI(); fetchNasaApi(); renderPlanets();
                 requestAnimationFrame(animate);
             }, 0);
