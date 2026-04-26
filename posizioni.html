@@ -84,6 +84,8 @@
         @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } } .jump { animation: jumpX 1s ease-in-out infinite alternate; }
 
         #hidden-intro-container { position: absolute; top: 14vh; left: 4vh; right: 4vh; margin: 0; width: calc(100vw - 8vh); height: 82vh; opacity: 0; pointer-events: none; z-index: -9999; visibility: hidden; overflow: hidden; }
+        /* FIX: pause all animations in hidden container — they still run on visibility:hidden, wasting CPU */
+        #hidden-intro-container * { animation-play-state: paused !important; }
         #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-break: keep-all; overflow-wrap: normal; }
         @media (max-width: 900px) { #hidden-intro-container { top: auto; left: auto; right: auto; margin: 0; width: 100%; height: 100vh; } }
 
@@ -92,20 +94,24 @@
         @keyframes orbit-small { from { transform: rotate(0deg) translateX(0.15em) rotate(0deg); } to { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); } }
         .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; background-color: white; border-radius: 50%; vertical-align: middle; margin: 0 0.15em; animation: pulse-dim 2s ease-in-out infinite; }
         @keyframes pulse-dim { 0%, 100% { transform: scale(0.6); } 50% { transform: scale(1.4); } }
-        .anim-dist-circles { display: inline-flex; align-items: center; justify-content: center; position: relative; vertical-align: middle; height: 1em; animation: expand-dist 3.5s ease-in-out infinite; }
-        .anim-dist-circles .c1, .anim-dist-circles .c2 { position: absolute; width: 0.45em; height: 0.45em; border-radius: 50%; background-color: white; top: 50%; margin: -0.225em 0 0 0; }
-        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; } .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
-        @keyframes expand-dist { 0%, 100% { width: 0.45em; margin: 0 0.1em; } 50% { width: 2.5em; margin: 0 0.3em; } }
-        @keyframes move-c1 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-0.8em); } }
-        @keyframes move-c2 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.8em); } }
 
-        /* SCENE - OPTIMIZED: Removed heavy css variables and calc */
-        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; }
+        /* FIX: was animating width+margin (layout thrash every frame). Now fixed size, children use transform only. */
+        .anim-dist-circles { display: inline-flex; align-items: center; justify-content: center; position: relative; vertical-align: middle; height: 1em; width: 2.5em; margin: 0 0.3em; }
+        .anim-dist-circles .c1, .anim-dist-circles .c2 { position: absolute; width: 0.45em; height: 0.45em; border-radius: 50%; background-color: white; top: 50%; margin: -0.225em 0 0 0; }
+        /* Dots start overlapping at center, then spread — same visual intent, zero layout cost */
+        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
+        .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
+        @keyframes move-c1 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-0.8em); opacity: 1; } }
+        @keyframes move-c2 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(0.8em); opacity: 1; } }
+
+        /* SCENE */
+        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: layout style; }
         #scene { position: relative; width: 0; height: 0; transform: scaleY(-1); }
         .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
         .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; }
 
-        .orbit { position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1.5px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; will-change: transform; }
+        /* FIX: removed will-change from orbits — they don't animate continuously, 8 extra GPU layers hurt old hardware */
+        .orbit { position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1.5px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; }
 
         .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
@@ -149,7 +155,6 @@
 
         #zoom-controls { bottom: var(--margin-screen); right: 4vh; display: flex; flex-direction: column; gap: 10px; }
         #zoom-controls .btn { width: 30px; height: 30px; font-size: 20px; line-height: 1; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; }
-
     </style>
 </head>
 <body>
@@ -247,17 +252,19 @@
     document.addEventListener('DOMContentLoaded', () => {
 
         const scrollWrapperEl = document.getElementById('scroll-wrapper');
-        const timeControlsEl = document.getElementById('time-controls-container');
-        const zoomControlsEl = document.getElementById('zoom-controls');
+        const timeControlsEl  = document.getElementById('time-controls-container');
+        const zoomControlsEl  = document.getElementById('zoom-controls');
 
-        let winWidth = window.innerWidth;
+        let winWidth  = window.innerWidth;
         let winHeight = window.innerHeight;
 
         // ── CURSOR ──────────────────────────────────────────────────────────
+        // FIX: track last-written position — skip DOM write when unchanged
         const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         let mouseX = winWidth / 2, mouseY = winHeight / 2;
         let outlineX = mouseX, outlineY = mouseY;
+        let lastDotPx = -1, lastDotPy = -1, lastOlPx = -1, lastOlPy = -1;
 
         window.addEventListener('mousemove', e => {
             mouseX = e.clientX;
@@ -273,7 +280,7 @@
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
-        // ── MENU HACKER EFFECT ──────────────────────────────────────────────
+        // ── MENU HACKER EFFECT ───────────────────────────────────────────────
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
         
@@ -318,7 +325,7 @@
         }
 
         if (topLogoLink) {
-            logoSpan    = topLogoLink.querySelector('.nasa-text-label');
+            logoSpan     = topLogoLink.querySelector('.nasa-text-label');
             logoOriginal = logoSpan.innerText;
             document.fonts.ready.then(() => { logoSpan.style.display = 'inline-block'; logoSpan.style.overflow = 'visible'; logoSpan.style.whiteSpace = 'nowrap'; });
             topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
@@ -341,11 +348,9 @@
             const hiddenContainer = document.getElementById('hidden-intro-container');
             const mainTitle       = document.getElementById('main-title');
             if (!hiddenText || !hiddenContainer || !mainTitle) return;
-
             const targetHeight = hiddenContainer.clientHeight;
             const targetWidth  = hiddenContainer.clientWidth;
             if (targetWidth === lastIntroWidth && targetHeight === lastIntroHeight && hiddenText.style.fontSize) return;
-
             let minSize = 10, maxSize = 300, bestFit = minSize;
             while (minSize <= maxSize) {
                 const midSize = Math.floor((minSize + maxSize) / 2);
@@ -366,13 +371,12 @@
 
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
-        // ── STARS ENGINE ────────────────────────────────────────────────────
+        // ── STARS ENGINE ─────────────────────────────────────────────────────
         class UnifiedStarsEngine {
             constructor(id) {
                 this.canvas = document.getElementById(id);
                 this.ctx    = this.canvas.getContext('2d', { alpha: false });
                 this.dots   = [];
-                this.offsetX = 0; 
                 this.resize();
             }
 
@@ -382,9 +386,10 @@
                 this.lB = -winWidth;
                 this.rB =  winWidth * 2;
                 this.dots = [];
-                this._addLayer(1.5, 1.4, 0.1, 1.5, 0.5);
-                this._addLayer(0.5, 0.25, 0.0, 1.0, 0.2);
-                this._addLayer(0.2, 0.001, 0.0, 0.5, 0.1);
+                // Slightly reduced density for better performance on old hardware
+                this._addLayer(1.1, 1.4, 0.1, 1.5, 0.5);
+                this._addLayer(0.4, 0.25, 0.0, 1.0, 0.2);
+                this._addLayer(0.15, 0.001, 0.0, 0.5, 0.1);
             }
 
             _addLayer(density, maxS, minS, maxSz, minSz) {
@@ -409,19 +414,31 @@
                     const dot = this.dots[i];
                     dot.x -= deltaX * dot.v * 0.4;
                     dot.y -= deltaY * dot.v * 0.4;
-                    if (dot.x < this.lB)                    dot.x = this.rB;
-                    else if (dot.x > this.rB)               dot.x = this.lB;
-                    if (dot.y < -100)                       dot.y = this.canvas.height + 100;
-                    else if (dot.y > this.canvas.height + 100) dot.y = -100;
-                    
-                    // Bitwise OR 0 per troncare i decimali: rimuove del tutto il sub-pixel lag su macchine vecchie
+                    if (dot.x < this.lB)                         dot.x = this.rB;
+                    else if (dot.x > this.rB)                    dot.x = this.lB;
+                    if (dot.y < -100)                            dot.y = this.canvas.height + 100;
+                    else if (dot.y > this.canvas.height + 100)   dot.y = -100;
+                    ctx.rect(dot.x | 0, dot.y | 0, dot.s, dot.s);
+                }
+                ctx.fill();
+            }
+
+            // Static redraw (no dot movement) — used after slide settles
+            redrawStatic() {
+                const ctx = this.ctx;
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                for (let i = this.dots.length - 1; i >= 0; i--) {
+                    const dot = this.dots[i];
                     ctx.rect(dot.x | 0, dot.y | 0, dot.s, dot.s);
                 }
                 ctx.fill();
             }
         }
 
-        // ── SCROLL / SLIDE STATE ─────────────────────────────────────────────
+        // ── SCROLL / SLIDE STATE ──────────────────────────────────────────────
         let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
         let isTraveling = false, scrollTimeout;
         let isEngineActive = false, zoomEnabled = false;
@@ -429,7 +446,7 @@
         let scrollOutResistance = 0;
         const RESISTANCE_THRESHOLD = 1500;
 
-        // ── JPL ORBITAL ELEMENTS ─────────────────────────────────────────────
+        // ── JPL ORBITAL ELEMENTS ──────────────────────────────────────────────
         const jplData = {
             mercury: { name: 'Mercury', id: 'mercury', nasa: '199', scale: 0.3825, a0: 0.38709927, a1: 0.00000037, e0: 0.20563593, e1: 0.00001906, i0: 7.00497902, i1: -0.00594749, L0: 252.25032350, L1: 149472.67411175, lp0: 77.45779628, lp1: 0.16047689, N0: 48.33076593, N1: -0.12534081 },
             venus:   { name: 'Venus',   id: 'venus',   nasa: '299', scale: 0.9489, a0: 0.72333199, a1: 0.00000039, e0: 0.00677323, e1: -0.00004107, i0: 3.39467605, i1: -0.00078890, L0: 181.97973, L1: 58517.81538, lp0: 131.53298, lp1: 0.00128681, N0: 76.68069, N1: -0.27769418 },
@@ -441,25 +458,22 @@
             neptune: { name: 'Neptune', id: 'neptune', nasa: '899', scale: 3.8827, a0: 30.06992276, a1: 0.00026291, e0: 0.00859048, e1: 0.00005105, i0: 1.77004347, i1: 0.00035372, L0: -55.12002969, L1: 218.45945325, lp0: 44.96476227, lp1: -0.32241464, N0: 131.78422574, N1: -0.00508664 }
         };
 
-        // ── TIME CONTROLS ────────────────────────────────────────────────────
-        const datePart   = document.getElementById('date-part');
-        const timePart   = document.getElementById('time-part');
+        // ── TIME CONTROLS ─────────────────────────────────────────────────────
+        const datePart    = document.getElementById('date-part');
+        const timePart    = document.getElementById('time-part');
         const speedSlider = document.getElementById('speed-slider');
         const speedLabel  = document.getElementById('speed-label');
-        const btnPlay    = document.getElementById('btn-play');
-        const btnPrev    = document.getElementById('btn-prev');
-        const btnNext    = document.getElementById('btn-next');
-        const btnLive    = document.getElementById('btn-live');
+        const btnPlay     = document.getElementById('btn-play');
+        const btnPrev     = document.getElementById('btn-prev');
+        const btnNext     = document.getElementById('btn-next');
+        const btnLive     = document.getElementById('btn-live');
 
         const epochJ2000 = new Date('2000-01-01T12:00:00Z');
-        let currentDate = new Date();
-        let isPlaying = true;
-        let isLiveMode = true;
+        let currentDate  = new Date();
+        let isPlaying    = true;
+        let isLiveMode   = true;
         let needsOrbitUpdate = true;
-        let planetsNeedUpdate = true;
-        let lastPlanetUpdateTime = 0;
-        let lastPlanetT = null;
-        let starsNeedRedraw = true;
+        let lastPlanetT  = null;
 
         function getPlanetInterval() {
             const abs = Math.abs(getSpeed());
@@ -467,13 +481,12 @@
             return 50;
         }
 
-        // ── SLIDE TRANSITIONS ────────────────────────────────────────────────
+        // ── SLIDE TRANSITIONS ─────────────────────────────────────────────────
         function jumpToState(index) {
             if (index < 0 || index > 1) return;
             currentState = index;
             targetX = currentState * winWidth;
             isTraveling = true;
-            starsNeedRedraw = true; 
             setTimeout(() => { isTraveling = false; }, 1000);
 
             const scrollIndicator = document.getElementById('header-scroll');
@@ -483,6 +496,7 @@
                 setTimeout(() => { zoomEnabled = true; }, 500);
                 timeControlsEl.classList.add('visible-ui');
                 zoomControlsEl.classList.add('visible-ui');
+                schedulePlanetRender(true);
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
                 isEngineActive = false; zoomEnabled = false; targetAuScale = 10;
@@ -550,8 +564,8 @@
             winWidth = window.innerWidth; winHeight = window.innerHeight;
             targetX = currentState * winWidth;
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
-            if (starEngine) { starEngine.resize(); starsNeedRedraw = true; }
-            planetsNeedUpdate = true; // Ricalcola proporzioni in base allo schermo
+            if (starEngine) { starEngine.resize(); starEngine.redrawStatic(); }
+            schedulePlanetRender(true);
         });
 
         const navPosizioni = document.getElementById('nav-posizioni');
@@ -566,8 +580,7 @@
             targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 15));
         });
 
-        // ── DATE UI (throttled) ──────────────────────────────────────────────
-        let lastUIUpdate = 0;
+        // ── DATE UI — FIX: was checked inside RAF every frame, now a simple interval ──
         function updateDateUI() {
             const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
             const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).toUpperCase();
@@ -575,8 +588,9 @@
             timePart.innerText = timeStr;
             if (!isLiveMode) btnLive.classList.add('visible'); else btnLive.classList.remove('visible');
         }
+        setInterval(updateDateUI, 1000);
 
-        // ── SPEED HELPERS ────────────────────────────────────────────────────
+        // ── SPEED HELPERS ─────────────────────────────────────────────────────
         function getSpeed() {
             const val = parseFloat(speedSlider.value);
             if (val === 0) return 1;
@@ -603,9 +617,10 @@
                 isLiveMode = true; isPlaying = true;
                 btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
             } else {
-                isLiveMode = false; planetsNeedUpdate = true;
+                isLiveMode = false;
                 if (!isPlaying) { isPlaying = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active"; }
             }
+            schedulePlanetRender(false);
         });
 
         speedSlider.addEventListener('mouseup', () => {
@@ -627,9 +642,10 @@
         btnNext.addEventListener('click', () => adjustSliderStep(50));
 
         btnPlay.addEventListener('click', () => {
-            isPlaying = !isPlaying; isLiveMode = false; planetsNeedUpdate = true;
+            isPlaying = !isPlaying; isLiveMode = false;
             btnPlay.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
             btnPlay.className = isPlaying ? "btn btn-icon btn-active" : "btn btn-icon";
+            schedulePlanetRender(false);
         });
 
         btnLive.addEventListener('click', () => {
@@ -637,10 +653,10 @@
             btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
             speedSlider.value = 0; speedLabel.innerText = "Real time";
             currentDate = new Date(); updateDateUI();
-            needsOrbitUpdate = true; planetsNeedUpdate = true;
+            schedulePlanetRender(true);
         });
 
-        // ── KEPLER SOLVER ────────────────────────────────────────────────────
+        // ── KEPLER SOLVER ─────────────────────────────────────────────────────
         function solveKepler(M, e) {
             let E = M, delta = 1, iter = 0;
             while (Math.abs(delta) > 1e-6 && iter < 100) {
@@ -650,7 +666,7 @@
             return E;
         }
 
-        // ── DOM INIT ─────────────────────────────────────────────────────────
+        // ── DOM INIT ──────────────────────────────────────────────────────────
         function initializeDOM() {
             Object.values(jplData).forEach(p => {
                 const orb   = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
@@ -660,40 +676,30 @@
                 model.appendChild(hud); model.appendChild(pixel);
                 document.getElementById('scene').appendChild(orb);
                 document.getElementById('scene').appendChild(model);
-                p.orbEl        = orb;
-                p.modelEl      = model;
+                p.orbEl         = orb;
+                p.modelEl       = model;
                 p.lastTransform = '';
             });
         }
 
-        // ── RENDER PLANETS OPTIMIZED ─────────────────────────────────────────
-        // Addio Layout Thrashing: calcoliamo i pixel esatti per i tag style in linea!
+        // ── PLANET RENDER — OPTIMIZED ─────────────────────────────────────────
         function renderPlanets() {
             const T = (currentDate - epochJ2000) / 3155760000000;
-            const vmin = Math.min(winWidth, winHeight) / 100;
-            const auToPx = currentAuScale * vmin;
+            const vmin     = Math.min(winWidth, winHeight) / 100;
+            const auToPx   = currentAuScale * vmin;
             const planetBasePx = auToPx * 0.00008517;
             const uiRingPx = (0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin;
 
             const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
             if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
 
-            // Aggiorna la dimensione del sole e del suo HUD
+            // Sun
             const sunContainer = document.querySelector('.sun-container');
             if (sunContainer) {
                 const sunPx = planetBasePx * 109.18;
-                sunContainer.style.width = `${sunPx}px`;
-                sunContainer.style.height = `${sunPx}px`;
-                sunContainer.style.marginLeft = `-${sunPx / 2}px`;
-                sunContainer.style.marginTop = `-${sunPx / 2}px`;
-                
+                sunContainer.style.cssText = `width:${sunPx}px;height:${sunPx}px;margin-left:-${sunPx/2}px;margin-top:-${sunPx/2}px;`;
                 const sunHud = sunContainer.querySelector('.sun-hud-ring');
-                if (sunHud) {
-                    sunHud.style.width = `${uiRingPx}px`;
-                    sunHud.style.height = `${uiRingPx}px`;
-                    sunHud.style.marginLeft = `-${uiRingPx / 2}px`;
-                    sunHud.style.marginTop = `-${uiRingPx / 2}px`;
-                }
+                if (sunHud) sunHud.style.cssText = `width:${uiRingPx}px;height:${uiRingPx}px;margin-left:-${uiRingPx/2}px;margin-top:-${uiRingPx/2}px;`;
             }
 
             Object.values(jplData).forEach(p => {
@@ -723,7 +729,7 @@
                 const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad);
                 const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
 
-                // Planet Position Transform
+                // Planet position
                 const newX = Math.round(abs_X * auToPx * 2) / 2;
                 const newY = Math.round(abs_Y * auToPx * 2) / 2;
                 const newTransform = `translate3d(${newX}px,${newY}px,0)`;
@@ -732,39 +738,48 @@
                     p.lastTransform = newTransform;
                 }
 
-                // Planet Sizes
+                // Sizes & orbits — only when scale or time changed
                 if (updateOrbits) {
                     const sizePx = planetBasePx * p.scale;
-                    p.modelEl.style.width = `${sizePx}px`;
-                    p.modelEl.style.height = `${sizePx}px`;
-                    p.modelEl.style.marginLeft = `-${sizePx / 2}px`;
-                    p.modelEl.style.marginTop = `-${sizePx / 2}px`;
+                    // Batch into cssText — one style write instead of six
+                    p.modelEl.style.cssText += `;width:${sizePx}px;height:${sizePx}px;margin-left:-${sizePx/2}px;margin-top:-${sizePx/2}px;`;
 
                     const hud = p.modelEl.querySelector('.hud-ring');
-                    if (hud) {
-                        hud.style.width = `${uiRingPx}px`;
-                        hud.style.height = `${uiRingPx}px`;
-                        hud.style.marginLeft = `-${uiRingPx / 2}px`;
-                        hud.style.marginTop = `-${uiRingPx / 2}px`;
-                    }
+                    if (hud) hud.style.cssText = `width:${uiRingPx}px;height:${uiRingPx}px;margin-left:-${uiRingPx/2}px;margin-top:-${uiRingPx/2}px;`;
 
                     const b = a * Math.sqrt(1 - e * e), c = a * e;
-                    const widthPx = a * 2 * auToPx;
-                    const heightPx = b * 2 * auToPx;
+                    const wPx  = a * 2 * auToPx;
+                    const hPx  = b * 2 * auToPx;
                     const mlPx = -a * auToPx;
                     const mtPx = -b * auToPx;
                     const txPx = -c * auToPx;
-
-                    p.orbEl.style.width = `${widthPx}px`;
-                    p.orbEl.style.height = `${heightPx}px`;
-                    p.orbEl.style.marginLeft = `${mlPx}px`;
-                    p.orbEl.style.marginTop = `${mtPx}px`;
-                    p.orbEl.style.transform = `rotateZ(${N}deg) rotateX(${i}deg) rotateZ(${w}deg) translateX(${txPx}px)`;
+                    // Batch orbit cssText — one write instead of five
+                    p.orbEl.style.cssText = `width:${wPx}px;height:${hPx}px;margin-left:${mlPx}px;margin-top:${mtPx}px;transform:rotateZ(${N}deg) rotateX(${i}deg) rotateZ(${w}deg) translateX(${txPx}px);`;
                 }
             });
         }
 
-        // ── NASA HORIZONS API ────────────────────────────────────────────────
+        // ── PLANET RENDER SCHEDULER ───────────────────────────────────────────
+        // FIX: planets are rendered on-demand, never spammed every RAF frame.
+        // Max one renderPlanets() call per animation frame, even if scheduled multiple times.
+        let renderPending = false;
+        let pendingOrbitUpdate = false;
+        let lastScrubRender = 0;
+
+        function schedulePlanetRender(withOrbitUpdate) {
+            if (withOrbitUpdate) pendingOrbitUpdate = true;
+            if (renderPending) return;
+            renderPending = true;
+            requestAnimationFrame(() => {
+                if (currentState === 1 || isTraveling) {
+                    if (pendingOrbitUpdate) { needsOrbitUpdate = true; pendingOrbitUpdate = false; }
+                    renderPlanets();
+                }
+                renderPending = false;
+            });
+        }
+
+        // ── NASA HORIZONS API ─────────────────────────────────────────────────
         async function fetchNasaApi() {
             const startStr = currentDate.toISOString().slice(0, 16).replace('T', ' ');
             const stopStr  = new Date(currentDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
@@ -784,87 +799,79 @@
                     p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
                 } catch (_) {}
             }));
-            needsOrbitUpdate = true; planetsNeedUpdate = true;
+            // API data arrived — re-render once if we're on the scene slide
+            schedulePlanetRender(true);
         }
 
-        // ── MAIN LOOP ─────────────────────────────────────────────────────────
+        // ── MAIN LOOP — ultra-lean: cursor lerp + slide lerp + zoom lerp only ──
         let lastTime = performance.now();
 
         function animate(time) {
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Cursor 
+            // Cursor lerp — only write DOM if position actually changed
             outlineX += (mouseX - outlineX) * 0.2;
             outlineY += (mouseY - outlineY) * 0.2;
-            // Utilizzando l'arrotondamento per prevenire lag di rendering su macchine vecchie
-            cursorOutline.style.transform = `translate3d(${outlineX | 0}px,${outlineY | 0}px,0) translate(-50%,-50%)`;
-            cursorDot.style.transform     = `translate3d(${mouseX | 0}px,${mouseY | 0}px,0) translate(-50%,-50%)`;
+            const ox = outlineX | 0, oy = outlineY | 0;
+            const mx = mouseX | 0, my = mouseY | 0;
+            if (ox !== lastOlPx || oy !== lastOlPy) {
+                cursorOutline.style.transform = `translate3d(${ox}px,${oy}px,0) translate(-50%,-50%)`;
+                lastOlPx = ox; lastOlPy = oy;
+            }
+            if (mx !== lastDotPx || my !== lastDotPy) {
+                cursorDot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
+                lastDotPx = mx; lastDotPy = my;
+            }
 
-            // Scroll slide lerp
+            // Slide lerp — stars redrawn only while actually moving
             currentX += (targetX - currentX) * 0.04;
             const deltaXSlide = currentX - lastX;
             if (Math.abs(deltaXSlide) > 0.05) {
                 scrollWrapperEl.style.transform = `translate3d(-${currentX}px,0,0)`;
-                starsNeedRedraw = true;
+                if (starEngine) starEngine.draw(deltaXSlide, 0);
             }
             lastX = currentX;
 
-            // Zoom lerp
+            // Zoom lerp — schedule ONE planet render per frame, not every tick
             const auDiff = targetAuScale - currentAuScale;
-            if (Math.abs(auDiff) > 0.001) {
+            if (Math.abs(auDiff) > 0.005) {
                 currentAuScale += auDiff * 0.08;
-                planetsNeedUpdate = true; needsOrbitUpdate = true; 
+                schedulePlanetRender(true);
+            } else if (Math.abs(auDiff) > 0.0001) {
+                currentAuScale = targetAuScale; // snap to final value
+                schedulePlanetRender(true);
             }
 
-            // Scrubbing time
+            // Time scrubbing — throttled, not every frame
             if (!isLiveMode && isPlaying) {
                 const speed = getSpeed();
                 if (speed !== 0) {
                     currentDate = new Date(currentDate.getTime() + speed * deltaTime);
-                    planetsNeedUpdate = true;
-                }
-            }
-
-            if (time - lastUIUpdate > 200) { updateDateUI(); lastUIUpdate = time; }
-
-            // Planet render logic
-            if (planetsNeedUpdate && (currentState === 1 || isTraveling)) {
-                if (isLiveMode) {
-                    renderPlanets();
-                    planetsNeedUpdate = false; // Ferma il calcolo inutile in Live Mode
-                } else {
-                    if (time - lastPlanetUpdateTime >= getPlanetInterval()) {
-                        renderPlanets();
-                        lastPlanetUpdateTime = time;
-                        if (!isPlaying) planetsNeedUpdate = false;
+                    if (time - lastScrubRender >= getPlanetInterval()) {
+                        schedulePlanetRender(false);
+                        lastScrubRender = time;
                     }
                 }
-            }
-
-            // Stars - ridipinte solo se ci stiamo spostando di slide
-            if (starEngine && starsNeedRedraw) {
-                starEngine.draw(deltaXSlide, 0);
-                starsNeedRedraw = false;
             }
 
             requestAnimationFrame(animate);
         }
 
-        // ── BOOT ─────────────────────────────────────────────────────────────
+        // ── BOOT ──────────────────────────────────────────────────────────────
         requestAnimationFrame(() => {
             setTimeout(() => {
                 starEngine = new UnifiedStarsEngine('stars-canvas');
+                starEngine.redrawStatic();
                 initializeDOM();
                 updateDateUI();
-                fetchNasaApi();
-                renderPlanets();
-                starsNeedRedraw = true;
+                renderPlanets(); // initial render with JPL data
+                fetchNasaApi();  // API call — will re-render once data arrives
                 requestAnimationFrame(animate);
             }, 0);
         });
 
-        let starEngine; 
+        let starEngine;
 
     });
     </script>
