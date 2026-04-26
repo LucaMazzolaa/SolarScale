@@ -258,13 +258,11 @@
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
         }
 
-        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
         .nasa-text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        /* Altre voci del menu mantengono il comportamento standard */
         .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
@@ -346,7 +344,7 @@
             flex-shrink: 0; position: relative; min-width: 320px; 
         }
         
-        /* ─── PLANET TEXTS / INFO TEXT (Updated for Data Brackets) ─── */
+        /* ─── PLANET TEXTS / INFO TEXT ─── */
         .info {
             font-family: 'Neue Montreal', sans-serif;
             font-size: var(--font-14); 
@@ -400,10 +398,9 @@
         #div-Jupiter .planet-cell .info { top: calc(50% + 90px); }
         #div-Saturn .planet-cell .info { top: calc(50% + 85px); } 
 
-        /* MODIFICATO: Utilizzo di un SVG vettoriale per replicare esattamente la resa del Canvas su ogni schermo */
         .perihelion, .aphelion { 
             flex-shrink: 0; 
-            height: 10px; /* Spazio contenitore maggiorato per non tagliare l'anti-aliasing */
+            height: 10px; 
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='10'%3E%3Cline x1='0' y1='5' x2='8' y2='5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-dasharray='4,4'/%3E%3C/svg%3E"); 
             background-repeat: repeat-x; 
             background-position: left center;
@@ -628,7 +625,7 @@
     
     <div class="space" style="width:46000px;" id="space-Sun">
         <p></p>
-        <p class="infoAphPer" style="opacity: 0.4;">Mercury's Perihelion: 46,000,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mercury’s Perihelion: 46,000,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mercury">
@@ -647,8 +644,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:37655px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Mercury's Aphelion: 69,820,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Venus's Perihelion: 107,480,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mercury’s Aphelion: 69,820,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Venus’s Perihelion: 107,480,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Venus">
@@ -667,8 +664,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:38138px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Venus's Aphelion: 108,940,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Earth's Perihelion: 147,090,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Venus’s Aphelion: 108,940,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Earth’s Perihelion: 147,090,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Earth">
@@ -687,8 +684,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:54507px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Earth's Aphelion: 152,100,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Mars's Perihelion: 206,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Earth’s Aphelion: 152,100,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mars’s Perihelion: 206,620,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Mars">
@@ -707,8 +704,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:491283px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Mars's Aphelion: 249,230,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Jupiter's Perihelion: 740,520,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Mars’s Aphelion: 249,230,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Jupiter’s Perihelion: 740,520,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Jupiter">
@@ -727,8 +724,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:535790px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Jupiter's Aphelion: 816,620,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Saturn's Perihelion: 1,352,550,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Jupiter’s Aphelion: 816,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Saturn’s Perihelion: 1,352,550,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Saturn">
@@ -747,8 +744,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1226568px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Saturn's Aphelion: 1,514,500,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Uranus's Perihelion: 2,741,300,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Saturn’s Aphelion: 1,514,500,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Uranus’s Perihelion: 2,741,300,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Uranus">
@@ -767,8 +764,8 @@
         <div class="aphelion"><div></div></div>
     </div>
     <div class="space" style="width:1440779px;">
-        <p class="infoAphPer" style="opacity: 0.4;">Uranus's Aphelion: 3,003,620,000 km</p>
-        <p class="infoAphPer" style="opacity: 0.4;">Neptune's Perihelion: 4,444,450,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Uranus’s Aphelion: 3,003,620,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Neptune’s Perihelion: 4,444,450,000 km</p>
     </div>
 
     <div class="planetdiv" id="div-Neptune">
@@ -788,7 +785,7 @@
     </div>
 
     <div class="space" style="width:100vw; justify-content: flex-start;">
-        <p class="infoAphPer" style="opacity: 0.4;">Neptune's Aphelion: 4,545,670,000 km</p>
+        <p class="infoAphPer" style="opacity: 0.4;">Neptune’s Aphelion: 4,545,670,000 km</p>
     </div>
 
 </div>
@@ -800,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
 
-    /* ─── VISUAL CURSOR (Exactly as in index.html) ─── */
+    /* ─── VISUAL CURSOR ─── */
     const cursorDot     = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');
     
@@ -1326,9 +1323,17 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < n; i++) {
             const px = periEls[i].getBoundingClientRect().left + scrollX;
             const ax = apheEls[i].getBoundingClientRect().right + scrollX;
-            const cx0 = LINE_X0 + (px - sunOrigin) / shrinkerFactor;
-            const cx1 = LINE_X0 + (ax - sunOrigin) / shrinkerFactor;
-            if (cx1 > cx0) cachedSegments.push({ x0: cx0, x1: cx1 });
+            let cx0 = LINE_X0 + (px - sunOrigin) / shrinkerFactor;
+            let cx1 = LINE_X0 + (ax - sunOrigin) / shrinkerFactor;
+            if (cx1 > cx0) {
+                let dashLen = cx1 - cx0;
+                if (dashLen > 15) {
+                    // Forziamo matematicamente la lunghezza per finire sempre con un multiplo esatto del tratteggio (8px + 4px per chiudere)
+                    dashLen = Math.max(0, Math.round((dashLen - 4) / 8) * 8 + 4);
+                    cx1 = cx0 + dashLen;
+                }
+                cachedSegments.push({ x0: cx0, x1: cx1 });
+            }
         }
     }
     requestAnimationFrame(() => requestAnimationFrame(cacheSidebarSegments));
@@ -1392,7 +1397,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     sCtx.lineTo(mid + 1.5, LINE_Y);
                     sCtx.stroke();
                 }
-                // Altrimenti (Venere e Terra, len < 5): non disegniamo nulla, resta solo il buco vuoto.
             });
             
             sCtx.setLineDash([]); 
