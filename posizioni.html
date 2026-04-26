@@ -107,8 +107,8 @@
         .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
         .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; }
 
-        /* FIX: changed from dashed to solid with opacity. Dashed borders on massive CSS circles kill GPU performance. */
-        .orbit { position: absolute; border-style: solid; opacity: 0.35; border-color: var(--color-dashed); border-width: 1px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; }
+        /* ORBITE: Linea continua, spessore Molto fine (0.8px), colore grigio/trasparente come il menu */
+        .orbit { position: absolute; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; }
 
         .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
@@ -367,7 +367,7 @@
 
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
-        // ── STARS ENGINE ─────────────────────────────────────────────────────
+        // ── STARS ENGINE — RIPRISTINATO COME ALL'INIZIO (ALTA DENSITÀ) ───────
         class UnifiedStarsEngine {
             constructor(id) {
                 this.canvas = document.getElementById(id);
@@ -382,14 +382,15 @@
                 this.lB = -winWidth;
                 this.rB =  winWidth * 2;
                 this.dots = [];
-                // Ridotta ulteriormente la densità per maggiore fluidità
-                this._addLayer(0.8, 1.4, 0.1, 1.5, 0.5);
-                this._addLayer(0.3, 0.25, 0.0, 1.0, 0.2);
-                this._addLayer(0.1, 0.001, 0.0, 0.5, 0.1);
+                // Ripristinati i valori originali ad alta densità
+                this._addLayer(1.1, 1.4, 0.1, 1.5, 0.5);
+                this._addLayer(0.4, 0.25, 0.0, 1.0, 0.2);
+                this._addLayer(0.15, 0.001, 0.0, 0.5, 0.1);
             }
 
             _addLayer(density, maxS, minS, maxSz, minSz) {
-                const num = Math.floor((winWidth * winHeight / 20000) * density); // Dimezzato peso su CPU
+                // Ripristinato il divisore originale (10000) per più stelle
+                const num = Math.floor((winWidth * winHeight / 10000) * density); 
                 for (let i = 0; i < num; i++) {
                     this.dots.push({
                         x: Math.random() * (this.rB - this.lB) + this.lB,
@@ -470,7 +471,7 @@
         let needsOrbitUpdate = true;
         let lastPlanetT  = null;
 
-        let globalSunContainer, globalSunHud; // Cache globals
+        let globalSunContainer, globalSunHud; 
 
         function getPlanetInterval() {
             const abs = Math.abs(getSpeed());
@@ -655,7 +656,6 @@
         // ── KEPLER SOLVER ─────────────────────────────────────────────────────
         function solveKepler(M, e) {
             let E = M, delta = 1, iter = 0;
-            // Ottimizzato: i pianeti convergono in pochissime iterazioni. 15 è il limite sicuro.
             while (Math.abs(delta) > 1e-6 && iter < 15) {
                 delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
                 E -= delta; iter++;
@@ -676,7 +676,7 @@
                 
                 p.orbEl         = orb;
                 p.modelEl       = model;
-                p.hudEl         = hud; // DOM CACHED! Fix vitale per le prestazioni
+                p.hudEl         = hud;
                 p.lastTransform = '';
             });
 
@@ -695,10 +695,9 @@
             const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
             if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
 
-            // Sun - Usiamo gli elementi in Cache (Niente querySelector nel loop!)
+            // Sun
             if (updateOrbits && globalSunContainer) {
                 const sunPx = planetBasePx * 109.18;
-                // Assegnazioni dirette, niente cssText += (Evita il Memory Leak)
                 globalSunContainer.style.width = `${sunPx}px`;
                 globalSunContainer.style.height = `${sunPx}px`;
                 globalSunContainer.style.marginLeft = `-${sunPx/2}px`;
@@ -747,7 +746,6 @@
                     p.lastTransform = newTransform;
                 }
 
-                // Sizes & orbits — Assegnazioni dirette delle property, RISOLTO IL MEMORY LEAK.
                 if (updateOrbits) {
                     const sizePx = planetBasePx * p.scale;
                     p.modelEl.style.width = `${sizePx}px`;
@@ -826,7 +824,7 @@
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Cursor lerp — Ignora calcoli extra se il mouse è fermo
+            // Cursor lerp
             if (Math.abs(mouseX - outlineX) > 0.1 || Math.abs(mouseY - outlineY) > 0.1) {
                 outlineX += (mouseX - outlineX) * 0.2;
                 outlineY += (mouseY - outlineY) * 0.2;
