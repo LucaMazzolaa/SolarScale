@@ -146,7 +146,7 @@
             position: absolute;
             top: 3px;    
             bottom: 3px; 
-            width: 2px; /* <-- Modificato per accorciare i margini orizzontali */
+            width: 2px;
             border: 2px solid white; 
         }
 
@@ -222,13 +222,11 @@
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
         }
 
-        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
         .nasa-text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        /* Altre voci del menu mantengono il comportamento standard */
         .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
@@ -293,10 +291,9 @@
         .scrollWrapper { 
             position: absolute; bottom: 4vh; right: 4vh;
             cursor: none; pointer-events: auto; 
-            transition: opacity 0.2s, transform 0.2s; /* Aggiunto transform per la fluidità */
+            transition: opacity 0.2s, transform 0.2s; 
         }
         
-        /* Hover e Active con ingrandimento leggermente ridotto (1.03 invece di 1.05) */
         .scrollWrapper:hover {
             transform: scale(1.03);
         }
@@ -485,7 +482,7 @@
 <div class="time" id="time-clock"></div>
 
 <div id="hidden-intro-container">
-    <div id="hidden-dynamic-text">On the occasion of NASA’s 70th anniversary, this project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading visual representations of our Solar System. Drawing from the agency’s immense archive of official scientific data, this interactive platform offers a simplified, clear, and rigorous visualization of true cosmic proportions in an immediate and intuitive way, allowing you to understand the true physical sizes&nbsp;<span class="anim-dim-circle"></span> of the planets, their changing orbital positions&nbsp;<span class="anim-pos-orbit"></span> and the immense empty distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span> that separate them.</div>
+    <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA’s&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency’s&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
 </div>
 
 <nav class="navbar">
@@ -609,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.fonts.ready.then(() => {
             logoSpan.style.display = 'inline-block';
-            logoSpan.style.overflow = 'visible'; // BUG FIX
+            logoSpan.style.overflow = 'visible'; 
             logoSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -629,7 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.fonts.ready.then(() => {
             textSpan.style.display = 'inline-block';
-            textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
+            textSpan.style.overflow = 'hidden'; 
             textSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -814,7 +811,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    // Ottimizzazione mantenuta: Capping del Pixel Ratio per schermi ad altissima risoluzione
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     canvasContainer.appendChild(renderer.domElement);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.15); 
@@ -869,7 +867,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             model.traverse((child) => {
                 if (child.isMesh && child.material) {
-                    child.material.side = THREE.DoubleSide;
+                    // Ottimizzazione mantenuta: Evitare il calcolo della faccia interna del pianeta
+                    child.material.side = THREE.FrontSide;
                     child.castShadow = false; 
                     child.receiveShadow = false;
                     
@@ -895,7 +894,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedCount++;
             if (loadedCount === celestialData.length) {
                 renderer.compile(scene, camera); 
-                // CRITICAL EDIT: Removed jumpToState(-1, true) so it never forces return to home screen if you are already scrolling
             }
         });
     });
@@ -1155,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.clearRect(0, 0, 2600, 10);
         sCtx.beginPath();
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(2570 + LINE_X0, LINE_Y);
-        sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; /* Modificato qui: opacità passata a 0.4 per matchare gli altri componenti dim/gray */
+        sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; 
         sCtx.lineWidth = 1.5; 
         sCtx.stroke();
         
@@ -1244,6 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const screenX = (projVector.x * 0.5 + 0.5) * window.innerWidth;
                 const screenY = -(projVector.y * 0.5 - 0.5) * window.innerHeight;
                 
+                // Ripristinata la logica fluida originale delle coordinate
                 data.infoEl.style.left = screenX + 'px';
                 data.infoEl.style.top = (screenY + 15) + 'px';
 
@@ -1269,7 +1268,6 @@ document.addEventListener('DOMContentLoaded', () => {
         syncTitleFontSize();
     });
 
-    // CRITICAL EDIT: Immediately initialize the UI to state -1 even before the render loop and 3D loads begin.
     jumpToState(-1, true);
     animate();
 });
