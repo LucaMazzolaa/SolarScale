@@ -84,7 +84,6 @@
         @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } } .jump { animation: jumpX 1s ease-in-out infinite alternate; }
 
         #hidden-intro-container { position: absolute; top: 14vh; left: 4vh; right: 4vh; margin: 0; width: calc(100vw - 8vh); height: 82vh; opacity: 0; pointer-events: none; z-index: -9999; visibility: hidden; overflow: hidden; }
-        /* FIX: pause all animations in hidden container — they still run on visibility:hidden, wasting CPU */
         #hidden-intro-container * { animation-play-state: paused !important; }
         #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-break: keep-all; overflow-wrap: normal; }
         @media (max-width: 900px) { #hidden-intro-container { top: auto; left: auto; right: auto; margin: 0; width: 100%; height: 100vh; } }
@@ -95,10 +94,8 @@
         .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; background-color: white; border-radius: 50%; vertical-align: middle; margin: 0 0.15em; animation: pulse-dim 2s ease-in-out infinite; }
         @keyframes pulse-dim { 0%, 100% { transform: scale(0.6); } 50% { transform: scale(1.4); } }
 
-        /* FIX: was animating width+margin (layout thrash every frame). Now fixed size, children use transform only. */
         .anim-dist-circles { display: inline-flex; align-items: center; justify-content: center; position: relative; vertical-align: middle; height: 1em; width: 2.5em; margin: 0 0.3em; }
         .anim-dist-circles .c1, .anim-dist-circles .c2 { position: absolute; width: 0.45em; height: 0.45em; border-radius: 50%; background-color: white; top: 50%; margin: -0.225em 0 0 0; }
-        /* Dots start overlapping at center, then spread — same visual intent, zero layout cost */
         .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
         .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
         @keyframes move-c1 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-0.8em); opacity: 1; } }
@@ -110,8 +107,8 @@
         .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
         .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; }
 
-        /* FIX: removed will-change from orbits — they don't animate continuously, 8 extra GPU layers hurt old hardware */
-        .orbit { position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1.5px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; }
+        /* FIX: changed from dashed to solid with opacity. Dashed borders on massive CSS circles kill GPU performance. */
+        .orbit { position: absolute; border-style: solid; opacity: 0.35; border-color: var(--color-dashed); border-width: 1px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; }
 
         .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
@@ -259,7 +256,6 @@
         let winHeight = window.innerHeight;
 
         // ── CURSOR ──────────────────────────────────────────────────────────
-        // FIX: track last-written position — skip DOM write when unchanged
         const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         let mouseX = winWidth / 2, mouseY = winHeight / 2;
@@ -386,14 +382,14 @@
                 this.lB = -winWidth;
                 this.rB =  winWidth * 2;
                 this.dots = [];
-                // Slightly reduced density for better performance on old hardware
-                this._addLayer(1.1, 1.4, 0.1, 1.5, 0.5);
-                this._addLayer(0.4, 0.25, 0.0, 1.0, 0.2);
-                this._addLayer(0.15, 0.001, 0.0, 0.5, 0.1);
+                // Ridotta ulteriormente la densità per maggiore fluidità
+                this._addLayer(0.8, 1.4, 0.1, 1.5, 0.5);
+                this._addLayer(0.3, 0.25, 0.0, 1.0, 0.2);
+                this._addLayer(0.1, 0.001, 0.0, 0.5, 0.1);
             }
 
             _addLayer(density, maxS, minS, maxSz, minSz) {
-                const num = Math.floor((winWidth * winHeight / 10000) * density);
+                const num = Math.floor((winWidth * winHeight / 20000) * density); // Dimezzato peso su CPU
                 for (let i = 0; i < num; i++) {
                     this.dots.push({
                         x: Math.random() * (this.rB - this.lB) + this.lB,
@@ -423,7 +419,6 @@
                 ctx.fill();
             }
 
-            // Static redraw (no dot movement) — used after slide settles
             redrawStatic() {
                 const ctx = this.ctx;
                 ctx.fillStyle = '#000000';
@@ -474,6 +469,8 @@
         let isLiveMode   = true;
         let needsOrbitUpdate = true;
         let lastPlanetT  = null;
+
+        let globalSunContainer, globalSunHud; // Cache globals
 
         function getPlanetInterval() {
             const abs = Math.abs(getSpeed());
@@ -580,7 +577,6 @@
             targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 15));
         });
 
-        // ── DATE UI — FIX: was checked inside RAF every frame, now a simple interval ──
         function updateDateUI() {
             const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
             const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).toUpperCase();
@@ -659,7 +655,8 @@
         // ── KEPLER SOLVER ─────────────────────────────────────────────────────
         function solveKepler(M, e) {
             let E = M, delta = 1, iter = 0;
-            while (Math.abs(delta) > 1e-6 && iter < 100) {
+            // Ottimizzato: i pianeti convergono in pochissime iterazioni. 15 è il limite sicuro.
+            while (Math.abs(delta) > 1e-6 && iter < 15) {
                 delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
                 E -= delta; iter++;
             }
@@ -676,10 +673,15 @@
                 model.appendChild(hud); model.appendChild(pixel);
                 document.getElementById('scene').appendChild(orb);
                 document.getElementById('scene').appendChild(model);
+                
                 p.orbEl         = orb;
                 p.modelEl       = model;
+                p.hudEl         = hud; // DOM CACHED! Fix vitale per le prestazioni
                 p.lastTransform = '';
             });
+
+            globalSunContainer = document.querySelector('.sun-container');
+            globalSunHud = document.querySelector('.sun-hud-ring');
         }
 
         // ── PLANET RENDER — OPTIMIZED ─────────────────────────────────────────
@@ -693,13 +695,21 @@
             const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
             if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
 
-            // Sun
-            const sunContainer = document.querySelector('.sun-container');
-            if (sunContainer) {
+            // Sun - Usiamo gli elementi in Cache (Niente querySelector nel loop!)
+            if (updateOrbits && globalSunContainer) {
                 const sunPx = planetBasePx * 109.18;
-                sunContainer.style.cssText = `width:${sunPx}px;height:${sunPx}px;margin-left:-${sunPx/2}px;margin-top:-${sunPx/2}px;`;
-                const sunHud = sunContainer.querySelector('.sun-hud-ring');
-                if (sunHud) sunHud.style.cssText = `width:${uiRingPx}px;height:${uiRingPx}px;margin-left:-${uiRingPx/2}px;margin-top:-${uiRingPx/2}px;`;
+                // Assegnazioni dirette, niente cssText += (Evita il Memory Leak)
+                globalSunContainer.style.width = `${sunPx}px`;
+                globalSunContainer.style.height = `${sunPx}px`;
+                globalSunContainer.style.marginLeft = `-${sunPx/2}px`;
+                globalSunContainer.style.marginTop = `-${sunPx/2}px`;
+                
+                if (globalSunHud) {
+                    globalSunHud.style.width = `${uiRingPx}px`;
+                    globalSunHud.style.height = `${uiRingPx}px`;
+                    globalSunHud.style.marginLeft = `-${uiRingPx/2}px`;
+                    globalSunHud.style.marginTop = `-${uiRingPx/2}px`;
+                }
             }
 
             Object.values(jplData).forEach(p => {
@@ -729,23 +739,28 @@
                 const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad);
                 const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
 
-                // Planet position
-                const newX = Math.round(abs_X * auToPx * 2) / 2;
-                const newY = Math.round(abs_Y * auToPx * 2) / 2;
-                const newTransform = `translate3d(${newX}px,${newY}px,0)`;
+                const newX = abs_X * auToPx;
+                const newY = abs_Y * auToPx;
+                const newTransform = `translate3d(${newX.toFixed(1)}px,${newY.toFixed(1)}px,0)`;
                 if (p.lastTransform !== newTransform) {
                     p.modelEl.style.transform = newTransform;
                     p.lastTransform = newTransform;
                 }
 
-                // Sizes & orbits — only when scale or time changed
+                // Sizes & orbits — Assegnazioni dirette delle property, RISOLTO IL MEMORY LEAK.
                 if (updateOrbits) {
                     const sizePx = planetBasePx * p.scale;
-                    // Batch into cssText — one style write instead of six
-                    p.modelEl.style.cssText += `;width:${sizePx}px;height:${sizePx}px;margin-left:-${sizePx/2}px;margin-top:-${sizePx/2}px;`;
+                    p.modelEl.style.width = `${sizePx}px`;
+                    p.modelEl.style.height = `${sizePx}px`;
+                    p.modelEl.style.marginLeft = `-${sizePx/2}px`;
+                    p.modelEl.style.marginTop = `-${sizePx/2}px`;
 
-                    const hud = p.modelEl.querySelector('.hud-ring');
-                    if (hud) hud.style.cssText = `width:${uiRingPx}px;height:${uiRingPx}px;margin-left:-${uiRingPx/2}px;margin-top:-${uiRingPx/2}px;`;
+                    if (p.hudEl) {
+                        p.hudEl.style.width = `${uiRingPx}px`;
+                        p.hudEl.style.height = `${uiRingPx}px`;
+                        p.hudEl.style.marginLeft = `-${uiRingPx/2}px`;
+                        p.hudEl.style.marginTop = `-${uiRingPx/2}px`;
+                    }
 
                     const b = a * Math.sqrt(1 - e * e), c = a * e;
                     const wPx  = a * 2 * auToPx;
@@ -753,15 +768,17 @@
                     const mlPx = -a * auToPx;
                     const mtPx = -b * auToPx;
                     const txPx = -c * auToPx;
-                    // Batch orbit cssText — one write instead of five
-                    p.orbEl.style.cssText = `width:${wPx}px;height:${hPx}px;margin-left:${mlPx}px;margin-top:${mtPx}px;transform:rotateZ(${N}deg) rotateX(${i}deg) rotateZ(${w}deg) translateX(${txPx}px);`;
+                    
+                    p.orbEl.style.width = `${wPx}px`;
+                    p.orbEl.style.height = `${hPx}px`;
+                    p.orbEl.style.marginLeft = `${mlPx}px`;
+                    p.orbEl.style.marginTop = `${mtPx}px`;
+                    p.orbEl.style.transform = `rotateZ(${N}deg) rotateX(${i}deg) rotateZ(${w}deg) translateX(${txPx}px)`;
                 }
             });
         }
 
         // ── PLANET RENDER SCHEDULER ───────────────────────────────────────────
-        // FIX: planets are rendered on-demand, never spammed every RAF frame.
-        // Max one renderPlanets() call per animation frame, even if scheduled multiple times.
         let renderPending = false;
         let pendingOrbitUpdate = false;
         let lastScrubRender = 0;
@@ -799,32 +816,32 @@
                     p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
                 } catch (_) {}
             }));
-            // API data arrived — re-render once if we're on the scene slide
             schedulePlanetRender(true);
         }
 
-        // ── MAIN LOOP — ultra-lean: cursor lerp + slide lerp + zoom lerp only ──
+        // ── MAIN LOOP — ultra-lean ────────────────────────────────────────────
         let lastTime = performance.now();
 
         function animate(time) {
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Cursor lerp — only write DOM if position actually changed
-            outlineX += (mouseX - outlineX) * 0.2;
-            outlineY += (mouseY - outlineY) * 0.2;
-            const ox = outlineX | 0, oy = outlineY | 0;
-            const mx = mouseX | 0, my = mouseY | 0;
-            if (ox !== lastOlPx || oy !== lastOlPy) {
-                cursorOutline.style.transform = `translate3d(${ox}px,${oy}px,0) translate(-50%,-50%)`;
-                lastOlPx = ox; lastOlPy = oy;
+            // Cursor lerp — Ignora calcoli extra se il mouse è fermo
+            if (Math.abs(mouseX - outlineX) > 0.1 || Math.abs(mouseY - outlineY) > 0.1) {
+                outlineX += (mouseX - outlineX) * 0.2;
+                outlineY += (mouseY - outlineY) * 0.2;
+                const ox = Math.round(outlineX), oy = Math.round(outlineY);
+                if (ox !== lastOlPx || oy !== lastOlPy) {
+                    cursorOutline.style.transform = `translate3d(${ox}px,${oy}px,0) translate(-50%,-50%)`;
+                    lastOlPx = ox; lastOlPy = oy;
+                }
             }
-            if (mx !== lastDotPx || my !== lastDotPy) {
-                cursorDot.style.transform = `translate3d(${mx}px,${my}px,0) translate(-50%,-50%)`;
-                lastDotPx = mx; lastDotPy = my;
+            if (mouseX !== lastDotPx || mouseY !== lastDotPy) {
+                cursorDot.style.transform = `translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+                lastDotPx = mouseX; lastDotPy = mouseY;
             }
 
-            // Slide lerp — stars redrawn only while actually moving
+            // Slide lerp
             currentX += (targetX - currentX) * 0.04;
             const deltaXSlide = currentX - lastX;
             if (Math.abs(deltaXSlide) > 0.05) {
@@ -833,17 +850,17 @@
             }
             lastX = currentX;
 
-            // Zoom lerp — schedule ONE planet render per frame, not every tick
+            // Zoom lerp
             const auDiff = targetAuScale - currentAuScale;
             if (Math.abs(auDiff) > 0.005) {
                 currentAuScale += auDiff * 0.08;
                 schedulePlanetRender(true);
             } else if (Math.abs(auDiff) > 0.0001) {
-                currentAuScale = targetAuScale; // snap to final value
+                currentAuScale = targetAuScale; 
                 schedulePlanetRender(true);
             }
 
-            // Time scrubbing — throttled, not every frame
+            // Time scrubbing
             if (!isLiveMode && isPlaying) {
                 const speed = getSpeed();
                 if (speed !== 0) {
@@ -865,8 +882,8 @@
                 starEngine.redrawStatic();
                 initializeDOM();
                 updateDateUI();
-                renderPlanets(); // initial render with JPL data
-                fetchNasaApi();  // API call — will re-render once data arrives
+                renderPlanets(); 
+                fetchNasaApi(); 
                 requestAnimationFrame(animate);
             }, 0);
         });
