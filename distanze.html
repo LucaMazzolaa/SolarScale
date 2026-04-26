@@ -485,14 +485,6 @@
         }
         .sidebaritem:hover .itemname { opacity: 1 !important; }
 
-        .footer {
-            flex-shrink: 0; width: 100vw; height: 100vh;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            gap: 20px; position: relative; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-        .credits { opacity: 0.4; font-size: var(--font-14); font-weight: 500; }
-        .credits a { color: white; border-bottom: 1px solid white; }
-
         @media (max-width: 900px) {
             .menu { 
                 position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
@@ -795,9 +787,8 @@
         <div class="aphelion"><div></div></div>
     </div>
 
-    <div class="footer">
+    <div class="space" style="width:100vw; justify-content: flex-start;">
         <p class="infoAphPer" style="opacity: 0.4;">Neptune's Aphelion: 4,545,670,000 km</p>
-        <h3 class="title credits">The Solar System to Scale — 1 px = 1,000 km</h3>
     </div>
 
 </div>
@@ -1348,7 +1339,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Disegna la linea continua di base
         sCtx.beginPath();
-        sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(2570 + LINE_X0, LINE_Y);
+        let endX = 2570 + LINE_X0; // Default di sicurezza
+        if (cachedSegments && cachedSegments.length > 0) {
+            endX = cachedSegments[cachedSegments.length - 1].x1; // Interrompe la linea esattamente alla fine dell'ultimo trattino
+        }
+        sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(endX, LINE_Y);
         sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; 
         sCtx.lineWidth = 1.5; 
         sCtx.stroke();
