@@ -23,13 +23,6 @@
             --margin-screen: 4vh;
         }
 
-        #universe {
-            --au-to-vmin: 12vmin; 
-            --ui-ring-size: 0.85vmin; 
-            --planet-base: calc(var(--au-to-vmin) * 0.00008517);  
-            --scale-sun: 109.18; 
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html {
@@ -106,16 +99,15 @@
         @keyframes move-c1 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-0.8em); } }
         @keyframes move-c2 { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.8em); } }
 
-        /* SCENE */
+        /* SCENE - OPTIMIZED: Removed heavy css variables and calc */
         #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; }
         #scene { position: relative; width: 0; height: 0; transform: scaleY(-1); }
-        .planet-model { position: absolute; left: 50%; top: 50%; width: calc(var(--planet-base) * var(--scale)); height: calc(var(--planet-base) * var(--scale)); margin-left: calc(var(--planet-base) * var(--scale) * -0.5); margin-top: calc(var(--planet-base) * var(--scale) * -0.5); display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
-        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; margin-left: calc(var(--planet-base) * var(--scale-sun) * -0.5); margin-top: calc(var(--planet-base) * var(--scale-sun) * -0.5); width: calc(var(--planet-base) * var(--scale-sun)); height: calc(var(--planet-base) * var(--scale-sun)); }
+        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
+        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; }
 
-        /* MODIFIED HERE: border-style from dashed to solid */
-        .orbit { position: absolute; border-style: solid; border-color: var(--color-dashed); border-width: 1.5px; border-radius: 50%; left: 50%; top: 50%; width: calc(var(--semi-a) * 2 * var(--au-to-vmin)); height: calc(var(--semi-b) * 2 * var(--au-to-vmin)); margin-left: calc(var(--semi-a) * var(--au-to-vmin) * -1); margin-top: calc(var(--semi-b) * var(--au-to-vmin) * -1); transform: rotateZ(calc(var(--N) * 1deg)) rotateX(calc(var(--i) * 1deg)) rotateZ(calc(var(--w) * 1deg)) translateX(calc(var(--c) * var(--au-to-vmin) * -1)); transform-style: flat; will-change: transform; }
+        .orbit { position: absolute; border-style: dashed; border-color: var(--color-dashed); border-width: 1.5px; border-radius: 50%; left: 50%; top: 50%; transform-style: flat; will-change: transform; }
 
-        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; margin-left: calc(var(--ui-ring-size) * -0.5); margin-top: calc(var(--ui-ring-size) * -0.5); border-radius: 50%; width: var(--ui-ring-size); height: var(--ui-ring-size); border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
+        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: scaleY(-1) translateZ(0); backface-visibility: hidden; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
         
         .sun-hud-ring::after { content: "Sun"; right: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: right;}
@@ -254,7 +246,6 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        const universeEl = document.getElementById('universe');
         const scrollWrapperEl = document.getElementById('scroll-wrapper');
         const timeControlsEl = document.getElementById('time-controls-container');
         const zoomControlsEl = document.getElementById('zoom-controls');
@@ -262,7 +253,7 @@
         let winWidth = window.innerWidth;
         let winHeight = window.innerHeight;
 
-        // ── CURSOR (every frame, cheap) ──────────────────────────────────────
+        // ── CURSOR ──────────────────────────────────────────────────────────
         const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         let mouseX = winWidth / 2, mouseY = winHeight / 2;
@@ -282,7 +273,7 @@
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
-        // ── MENU HACKER EFFECT ───────────────────────────────────────────────
+        // ── MENU HACKER EFFECT ──────────────────────────────────────────────
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
         
@@ -375,16 +366,13 @@
 
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
-        // ── STARS ENGINE ─────────────────────────────────────────────────────
-        // KEY OPTIMISATION: canvas is drawn with alpha:false (solid black backing).
-        // We only call draw() when the scroll position actually changes.
-        // Once the slide is settled the canvas pixels persist — zero cost at rest.
+        // ── STARS ENGINE ────────────────────────────────────────────────────
         class UnifiedStarsEngine {
             constructor(id) {
                 this.canvas = document.getElementById(id);
                 this.ctx    = this.canvas.getContext('2d', { alpha: false });
                 this.dots   = [];
-                this.offsetX = 0; // cumulative parallax offset
+                this.offsetX = 0; 
                 this.resize();
             }
 
@@ -411,7 +399,6 @@
                 }
             }
 
-            // Called only when deltaX !== 0, or once on init/resize.
             draw(deltaX, deltaY) {
                 const ctx = this.ctx;
                 ctx.fillStyle = '#000000';
@@ -426,7 +413,9 @@
                     else if (dot.x > this.rB)               dot.x = this.lB;
                     if (dot.y < -100)                       dot.y = this.canvas.height + 100;
                     else if (dot.y > this.canvas.height + 100) dot.y = -100;
-                    ctx.rect(dot.x, dot.y, dot.s, dot.s);
+                    
+                    // Bitwise OR 0 per troncare i decimali: rimuove del tutto il sub-pixel lag su macchine vecchie
+                    ctx.rect(dot.x | 0, dot.y | 0, dot.s, dot.s);
                 }
                 ctx.fill();
             }
@@ -436,7 +425,7 @@
         let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
         let isTraveling = false, scrollTimeout;
         let isEngineActive = false, zoomEnabled = false;
-        let currentAuScale = 12, targetAuScale = 12;
+        let currentAuScale = 10, targetAuScale = 10;
         let scrollOutResistance = 0;
         const RESISTANCE_THRESHOLD = 1500;
 
@@ -465,11 +454,8 @@
         const epochJ2000 = new Date('2000-01-01T12:00:00Z');
         let currentDate = new Date();
         let isPlaying = true;
-        // isLiveMode=true → planets frozen at API snapshot, zero per-frame computation
-        // isLiveMode=false → user scrubbing time, formula + throttled re-render
         let isLiveMode = true;
         let needsOrbitUpdate = true;
-        // dirty flag — set only when something visually changed
         let planetsNeedUpdate = true;
         let lastPlanetUpdateTime = 0;
         let lastPlanetT = null;
@@ -487,7 +473,7 @@
             currentState = index;
             targetX = currentState * winWidth;
             isTraveling = true;
-            starsNeedRedraw = true; // ensure stars repaint during transition
+            starsNeedRedraw = true; 
             setTimeout(() => { isTraveling = false; }, 1000);
 
             const scrollIndicator = document.getElementById('header-scroll');
@@ -499,7 +485,7 @@
                 zoomControlsEl.classList.add('visible-ui');
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
-                isEngineActive = false; zoomEnabled = false; targetAuScale = 12;
+                isEngineActive = false; zoomEnabled = false; targetAuScale = 10;
                 timeControlsEl.classList.remove('visible-ui');
                 zoomControlsEl.classList.remove('visible-ui');
             }
@@ -530,7 +516,7 @@
                 } else {
                     if (e.deltaY < 0 || targetAuScale > 1.51) scrollOutResistance = 0;
                     targetAuScale += e.deltaY * -0.02;
-                    targetAuScale = Math.max(1.5, Math.min(targetAuScale, 35));
+                    targetAuScale = Math.max(1.5, Math.min(targetAuScale, 15));
                 }
             }
         }, { passive: true });
@@ -565,6 +551,7 @@
             targetX = currentState * winWidth;
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
             if (starEngine) { starEngine.resize(); starsNeedRedraw = true; }
+            planetsNeedUpdate = true; // Ricalcola proporzioni in base allo schermo
         });
 
         const navPosizioni = document.getElementById('nav-posizioni');
@@ -572,14 +559,14 @@
 
         document.getElementById('btn-zoom-in').addEventListener('click', () => {
             if (!isEngineActive) return;
-            targetAuScale = Math.max(1.5, Math.min(targetAuScale + 1.5, 35));
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale + 1.5, 15));
         });
         document.getElementById('btn-zoom-out').addEventListener('click', () => {
             if (!isEngineActive) return;
-            targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 35));
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 15));
         });
 
-        // ── DATE UI (throttled to 200 ms in main loop) ───────────────────────
+        // ── DATE UI (throttled) ──────────────────────────────────────────────
         let lastUIUpdate = 0;
         function updateDateUI() {
             const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
@@ -650,7 +637,6 @@
             btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
             speedSlider.value = 0; speedLabel.innerText = "Real time";
             currentDate = new Date(); updateDateUI();
-            // Instant re-render using cached API snapshot (no fetch, no wait)
             needsOrbitUpdate = true; planetsNeedUpdate = true;
         });
 
@@ -668,7 +654,7 @@
         function initializeDOM() {
             Object.values(jplData).forEach(p => {
                 const orb   = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
-                const model = document.createElement('div'); model.className = `planet-model pl-${p.id}`; model.style.setProperty('--scale', p.scale);
+                const model = document.createElement('div'); model.className = `planet-model pl-${p.id}`; 
                 const hud   = document.createElement('div'); hud.className = `hud-ring ${['jupiter','saturn','uranus','neptune'].includes(p.id) ? 'hud-default' : ''}`; hud.setAttribute('data-name', p.name);
                 const pixel = document.createElement('div'); pixel.className = `pixel-dot ${p.id}-pixel`;
                 model.appendChild(hud); model.appendChild(pixel);
@@ -680,19 +666,38 @@
             });
         }
 
-        // ── RENDER PLANETS ───────────────────────────────────────────────────
-        // Single code path: always JPL polynomial formula.
-        // Live mode uses api snapshot elements if available (accurate for "now"),
-        // otherwise formula. No per-frame drift extrapolation.
+        // ── RENDER PLANETS OPTIMIZED ─────────────────────────────────────────
+        // Addio Layout Thrashing: calcoliamo i pixel esatti per i tag style in linea!
         function renderPlanets() {
             const T = (currentDate - epochJ2000) / 3155760000000;
-            const auToPx = currentAuScale * (Math.min(winWidth, winHeight) / 100);
+            const vmin = Math.min(winWidth, winHeight) / 100;
+            const auToPx = currentAuScale * vmin;
+            const planetBasePx = auToPx * 0.00008517;
+            const uiRingPx = (0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin;
+
             const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
             if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
 
+            // Aggiorna la dimensione del sole e del suo HUD
+            const sunContainer = document.querySelector('.sun-container');
+            if (sunContainer) {
+                const sunPx = planetBasePx * 109.18;
+                sunContainer.style.width = `${sunPx}px`;
+                sunContainer.style.height = `${sunPx}px`;
+                sunContainer.style.marginLeft = `-${sunPx / 2}px`;
+                sunContainer.style.marginTop = `-${sunPx / 2}px`;
+                
+                const sunHud = sunContainer.querySelector('.sun-hud-ring');
+                if (sunHud) {
+                    sunHud.style.width = `${uiRingPx}px`;
+                    sunHud.style.height = `${uiRingPx}px`;
+                    sunHud.style.marginLeft = `-${uiRingPx / 2}px`;
+                    sunHud.style.marginTop = `-${uiRingPx / 2}px`;
+                }
+            }
+
             Object.values(jplData).forEach(p => {
                 let a, e, i, N, w, M_rad;
-                // Use accurate API snapshot when in live mode and data is loaded
                 if (isLiveMode && p.api_a !== undefined) {
                     a = p.api_a; e = p.api_e; i = p.api_i; N = p.api_N; w = p.api_w;
                     M_rad = p.api_MA * Math.PI / 180;
@@ -718,6 +723,7 @@
                 const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad);
                 const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
 
+                // Planet Position Transform
                 const newX = Math.round(abs_X * auToPx * 2) / 2;
                 const newY = Math.round(abs_Y * auToPx * 2) / 2;
                 const newTransform = `translate3d(${newX}px,${newY}px,0)`;
@@ -726,19 +732,39 @@
                     p.lastTransform = newTransform;
                 }
 
+                // Planet Sizes
                 if (updateOrbits) {
+                    const sizePx = planetBasePx * p.scale;
+                    p.modelEl.style.width = `${sizePx}px`;
+                    p.modelEl.style.height = `${sizePx}px`;
+                    p.modelEl.style.marginLeft = `-${sizePx / 2}px`;
+                    p.modelEl.style.marginTop = `-${sizePx / 2}px`;
+
+                    const hud = p.modelEl.querySelector('.hud-ring');
+                    if (hud) {
+                        hud.style.width = `${uiRingPx}px`;
+                        hud.style.height = `${uiRingPx}px`;
+                        hud.style.marginLeft = `-${uiRingPx / 2}px`;
+                        hud.style.marginTop = `-${uiRingPx / 2}px`;
+                    }
+
                     const b = a * Math.sqrt(1 - e * e), c = a * e;
-                    p.orbEl.style.setProperty('--semi-a', a);
-                    p.orbEl.style.setProperty('--semi-b', b);
-                    p.orbEl.style.setProperty('--c', c);
-                    p.orbEl.style.setProperty('--i', i);
-                    p.orbEl.style.setProperty('--N', N);
-                    p.orbEl.style.setProperty('--w', w);
+                    const widthPx = a * 2 * auToPx;
+                    const heightPx = b * 2 * auToPx;
+                    const mlPx = -a * auToPx;
+                    const mtPx = -b * auToPx;
+                    const txPx = -c * auToPx;
+
+                    p.orbEl.style.width = `${widthPx}px`;
+                    p.orbEl.style.height = `${heightPx}px`;
+                    p.orbEl.style.marginLeft = `${mlPx}px`;
+                    p.orbEl.style.marginTop = `${mtPx}px`;
+                    p.orbEl.style.transform = `rotateZ(${N}deg) rotateX(${i}deg) rotateZ(${w}deg) translateX(${txPx}px)`;
                 }
             });
         }
 
-        // ── NASA HORIZONS API — called ONCE at boot only ─────────────────────
+        // ── NASA HORIZONS API ────────────────────────────────────────────────
         async function fetchNasaApi() {
             const startStr = currentDate.toISOString().slice(0, 16).replace('T', ' ');
             const stopStr  = new Date(currentDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
@@ -758,34 +784,22 @@
                     p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
                 } catch (_) {}
             }));
-            // One render with fresh accurate positions, then planets stay frozen in live mode
             needsOrbitUpdate = true; planetsNeedUpdate = true;
         }
 
-        // ── ZOOM CSS ─────────────────────────────────────────────────────────
-        function updateZoomCSS() {
-            if (!universeEl) return;
-            const uiSize = 0.6 + ((currentAuScale - 1.5) / (35 - 1.5)) * (2.0 - 0.6);
-            universeEl.style.setProperty('--au-to-vmin', `${currentAuScale}vmin`);
-            universeEl.style.setProperty('--ui-ring-size', `${uiSize}vmin`);
-        }
-
         // ── MAIN LOOP ─────────────────────────────────────────────────────────
-        // This is the heart of the optimisation.  Three tiers of work:
-        //   1. Every frame  : cursor, scroll lerp, zoom lerp  (cheap transforms)
-        //   2. Every 50–2000 ms : planet Kepler solve + DOM write  (throttled)
-        //   3. Only when scroll moves : star canvas redraw  (dirty flag)
         let lastTime = performance.now();
 
         function animate(time) {
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // 1a. Cursor
+            // Cursor 
             outlineX += (mouseX - outlineX) * 0.2;
             outlineY += (mouseY - outlineY) * 0.2;
-            cursorOutline.style.transform = `translate3d(${outlineX}px,${outlineY}px,0) translate(-50%,-50%)`;
-            cursorDot.style.transform     = `translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+            // Utilizzando l'arrotondamento per prevenire lag di rendering su macchine vecchie
+            cursorOutline.style.transform = `translate3d(${outlineX | 0}px,${outlineY | 0}px,0) translate(-50%,-50%)`;
+            cursorDot.style.transform     = `translate3d(${mouseX | 0}px,${mouseY | 0}px,0) translate(-50%,-50%)`;
 
             // Scroll slide lerp
             currentX += (targetX - currentX) * 0.04;
@@ -800,11 +814,10 @@
             const auDiff = targetAuScale - currentAuScale;
             if (Math.abs(auDiff) > 0.001) {
                 currentAuScale += auDiff * 0.08;
-                updateZoomCSS();
-                planetsNeedUpdate = true; // zoom changed → reposition planets
+                planetsNeedUpdate = true; needsOrbitUpdate = true; 
             }
 
-            // Advance simulated time (only when scrubbing, not in live mode)
+            // Scrubbing time
             if (!isLiveMode && isPlaying) {
                 const speed = getSpeed();
                 if (speed !== 0) {
@@ -813,17 +826,14 @@
                 }
             }
 
-            // Date label (throttled)
             if (time - lastUIUpdate > 200) { updateDateUI(); lastUIUpdate = time; }
 
-            // Planet positions — only when something actually changed
+            // Planet render logic
             if (planetsNeedUpdate && (currentState === 1 || isTraveling)) {
                 if (isLiveMode) {
-                    // Live mode: render once, then freeze — zero work until next explicit trigger
                     renderPlanets();
-                    planetsNeedUpdate = false;
+                    planetsNeedUpdate = false; // Ferma il calcolo inutile in Live Mode
                 } else {
-                    // Scrubbing: throttled re-render
                     if (time - lastPlanetUpdateTime >= getPlanetInterval()) {
                         renderPlanets();
                         lastPlanetUpdateTime = time;
@@ -832,7 +842,7 @@
                 }
             }
 
-            // Stars — only on scroll transition
+            // Stars - ridipinte solo se ci stiamo spostando di slide
             if (starEngine && starsNeedRedraw) {
                 starEngine.draw(deltaXSlide, 0);
                 starsNeedRedraw = false;
@@ -846,16 +856,15 @@
             setTimeout(() => {
                 starEngine = new UnifiedStarsEngine('stars-canvas');
                 initializeDOM();
-                updateZoomCSS();
                 updateDateUI();
                 fetchNasaApi();
                 renderPlanets();
-                starsNeedRedraw = true; // paint stars on first frame
+                starsNeedRedraw = true;
                 requestAnimationFrame(animate);
             }, 0);
         });
 
-        let starEngine; // declared here so resize handler can reach it
+        let starEngine; 
 
     });
     </script>
