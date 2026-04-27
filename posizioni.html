@@ -16,7 +16,6 @@
             --color-white: #ffffff;
             --ui-color: rgba(255, 255, 255, 0.4);
             --color-dashed: rgba(255, 255, 255, 0.25);
-            --orbit-color: var(--color-dashed);
             --font-62: clamp(32px, 2.5vw + 26px, 90px);   
             --font-16: clamp(14px, 0.3vw + 11.68px, 22px); 
             --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
@@ -70,7 +69,7 @@
 
         .horizontal-scroll-wrapper { display: flex; flex-direction: row; height: 100vh; width: 200vw; will-change: transform; }
         .slide { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; z-index: 150; }
-        .header-slide { display: block; } .content-slide { display: block; position: relative; overflow: hidden; }
+        .header-slide { display: block; } .content-slide { display: block; position: relative; overflow: visible; }
 
         .titles { position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; }
         h1 { font-size: var(--font-62); line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
@@ -101,16 +100,16 @@
         @keyframes move-c1 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-0.8em); opacity: 1; } }
         @keyframes move-c2 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(0.8em); opacity: 1; } }
 
-        /* SCENE (Isolata per evitare Layout Thrashing - CONTAIN STRICT) */
-        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: strict; }
+        /* SCENE */
+        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: layout style; }
         #scene { position: relative; width: 0; height: 0; transform: scaleY(-1); }
         
-        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; contain: layout size style; }
-        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; will-change: transform; contain: layout size style; }
+        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; contain: layout style; }
+        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; will-change: transform; contain: layout style; }
 
-        .orbit { position: absolute; left: 50%; top: 50%; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; transform-style: flat; will-change: width, height, transform; contain: strict; }
+        .orbit { position: absolute; left: 50%; top: 50%; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; transform-style: flat; will-change: width, height, transform; contain: layout style; }
 
-        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: translate(-50%, -50%) scaleY(-1) translateZ(0); backface-visibility: hidden; will-change: width, height; contain: layout size style; }
+        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: translate(-50%, -50%) scaleY(-1) translateZ(0); backface-visibility: hidden; will-change: width, height; contain: layout style; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
         
         .sun-hud-ring::after { content: "Sun"; right: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: right;}
@@ -120,7 +119,7 @@
         .pl-venus .hud-ring::after { left: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: left; }
         .hud-default::after { left: calc(100% + 0.5vmin); top: 50%; transform: translateY(-50%) translateZ(0); text-align: left; }
 
-        .pixel-dot { width: 100%; height: 100%; border-radius: 50%; z-index: 12; transform: scaleY(-1); display: none; contain: strict; }
+        .pixel-dot { width: 100%; height: 100%; border-radius: 50%; z-index: 12; transform: scaleY(-1); display: none; contain: layout style; }
         .sun-pixel { display: block; background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffea00 20%, #ff8c00 60%, #b33c00 100%); box-shadow: 0 0 40px rgba(255, 170, 0, 0.7), inset -4px -4px 12px rgba(0, 0, 0, 0.4); }
 
         .fixed-ui { position: fixed; z-index: 999999; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; contain: layout style; transform: translateZ(0); backface-visibility: hidden; }
@@ -256,7 +255,7 @@
         let winWidth  = window.innerWidth;
         let winHeight = window.innerHeight;
 
-        // ── CURSOR (Ottimizzato) ─────────────────────────────────────────────
+        // ── CURSOR ───────────────────────────────────────────────────────────
         const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         
@@ -452,7 +451,7 @@
             }
         }
 
-        // ── DOM CACHE UTILS (Blocco Rigido Layout Thrashing) ──────────────────
+        // ── DOM CACHE UTILS ──────────────────────────────────────────────────
         function setCss(el, w, h, t) {
             if (!el._cs) el._cs = { w: '', h: '', t: '' };
             if (w !== undefined && el._cs.w !== w) { el.style.width = w; el._cs.w = w; }
@@ -468,6 +467,10 @@
         let scrollOutResistance = 0;
         const RESISTANCE_THRESHOLD = 1500;
 
+        let wheelEndTimeout;
+        let waitForScrollEnd = false;
+        let uiFadeTimeout; // Variabile per gestire il ritardo dei pannelli UI
+
         // ── JPL ORBITAL ELEMENTS ──────────────────────────────────────────────
         const jplData = {
             mercury: { name: 'Mercury', id: 'mercury', nasa: '199', scale: 0.3825, a0: 0.38709927, a1: 0.00000037, e0: 0.20563593, e1: 0.00001906, i0: 7.00497902, i1: -0.00594749, L0: 252.25032350, L1: 149472.67411175, lp0: 77.45779628, lp1: 0.16047689, N0: 48.33076593, N1: -0.12534081 },
@@ -479,6 +482,8 @@
             uranus:  { name: 'Uranus',  id: 'uranus',  nasa: '799', scale: 4.0074, a0: 19.18916464, a1: -0.00196176, e0: 0.04725744, e1: -0.00004397, i0: 0.77263783, i1: -0.00242939, L0: 313.23818410, L1: 428.48202785, lp0: 170.95427630, lp1: 0.40805281, N0: 74.01692503, N1: 0.04240589 },
             neptune: { name: 'Neptune', id: 'neptune', nasa: '899', scale: 3.8827, a0: 30.06992276, a1: 0.00026291, e0: 0.00859048, e1: 0.00005105, i0: 1.77004347, i1: 0.00035372, L0: -55.12002969, L1: 218.45945325, lp0: 44.96476227, lp1: -0.32241464, N0: 131.78422574, N1: -0.00508664 }
         };
+
+        const planetsArray = Object.values(jplData);
 
         // ── TIME CONTROLS ─────────────────────────────────────────────────────
         const datePart    = document.getElementById('date-part');
@@ -497,12 +502,16 @@
         
         let globalSunContainer, globalSunHud; 
 
-        // ── SLIDE TRANSITIONS ─────────────────────────────────────────────────
+        // ── SLIDE TRANSITIONS E SCROLL LOGIC ──────────────────────────────────
         function jumpToState(index) {
             if (index < 0 || index > 1) return;
             currentState = index;
             targetX = currentState * winWidth;
             isTraveling = true;
+            
+            // Pulisce l'eventuale timeout di apparizione per evitare popup indesiderati
+            clearTimeout(uiFadeTimeout);
+
             setTimeout(() => { isTraveling = false; }, 1000);
 
             const scrollIndicator = document.getElementById('header-scroll');
@@ -510,19 +519,31 @@
                 scrollIndicator.style.opacity = '0'; scrollIndicator.style.pointerEvents = 'none';
                 isEngineActive = true;
                 setTimeout(() => { zoomEnabled = true; }, 500);
-                timeControlsEl.classList.add('visible-ui');
-                zoomControlsEl.classList.add('visible-ui');
+                
+                // Ritarda l'apparizione dell'interfaccia a DOPO il completamento dell'animazione di scorrimento
+                uiFadeTimeout = setTimeout(() => {
+                    timeControlsEl.classList.add('visible-ui');
+                    zoomControlsEl.classList.add('visible-ui');
+                }, 1000); 
+
+                targetAuScale = 10;
                 needsForceUpdate = true;
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
-                isEngineActive = false; zoomEnabled = false; targetAuScale = 10;
+                isEngineActive = false; zoomEnabled = false; 
+                
+                // Quando si torna alla schermata 0, svaniscono istantaneamente
                 timeControlsEl.classList.remove('visible-ui');
                 zoomControlsEl.classList.remove('visible-ui');
             }
         }
 
         window.addEventListener('wheel', (e) => {
-            if (isTraveling || scrollTimeout) return;
+            clearTimeout(wheelEndTimeout);
+            wheelEndTimeout = setTimeout(() => { waitForScrollEnd = false; }, 250);
+
+            if (isTraveling || scrollTimeout || waitForScrollEnd) return;
+
             if (currentState === 0) {
                 const isScrollingDown  = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
                 const isScrollingRight = e.deltaX > 0 && Math.abs(e.deltaX) > Math.abs(e.deltaY);
@@ -542,6 +563,7 @@
                         jumpToState(0);
                         scrollOutResistance = 0;
                         scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                        waitForScrollEnd = true; 
                     }
                 } else {
                     if (e.deltaY < 0 || targetAuScale > 1.51) scrollOutResistance = 0;
@@ -579,6 +601,9 @@
         window.addEventListener('resize', () => {
             winWidth = window.innerWidth; winHeight = window.innerHeight;
             targetX = currentState * winWidth;
+            currentX = targetX; 
+            scrollWrapperEl.style.transform = `translate3d(-${currentX}px,0,0)`;
+            
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
             if (starEngine) { starEngine.resize(); starEngine.redrawStatic(); }
             needsForceUpdate = true;
@@ -605,7 +630,6 @@
         }
         setInterval(updateDateUI, 1000);
 
-        // ── SPEED HELPERS ─────────────────────────────────────────────────────
         function getSpeed() {
             const val = parseFloat(speedSlider.value);
             if (val === 0) return 1;
@@ -669,9 +693,8 @@
             needsForceUpdate = true;
         });
 
-        // ── DOM INIT ──────────────────────────────────────────────────────────
         function initializeDOM() {
-            Object.values(jplData).forEach(p => {
+            planetsArray.forEach(p => {
                 const orb   = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
                 const model = document.createElement('div'); model.className = `planet-model pl-${p.id}`; 
                 const hud   = document.createElement('div'); hud.className = `hud-ring ${['jupiter','saturn','uranus','neptune'].includes(p.id) ? 'hud-default' : ''}`; hud.setAttribute('data-name', p.name);
@@ -689,11 +712,10 @@
             globalSunHud = document.querySelector('.sun-hud-ring');
         }
 
-        // ── NASA HORIZONS API ─────────────────────────────────────────────────
         async function fetchNasaApi() {
             const startStr = currentDate.toISOString().slice(0, 16).replace('T', ' ');
             const stopStr  = new Date(currentDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
-            await Promise.all(Object.values(jplData).map(async (p) => {
+            await Promise.all(planetsArray.map(async (p) => {
                 const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
                     `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='@10'&START_TIME='${startStr}'&STOP_TIME='${stopStr}'&STEP_SIZE='1m'&OUT_UNITS='AU-D'&_t=${Date.now()}`
                 )}`;
@@ -712,7 +734,6 @@
             needsForceUpdate = true;
         }
 
-        // ── MAIN LOOP — Ultra-Leggero ─────────────────────────────────────────
         let lastTime = performance.now();
         let lastPlanetCalcT = null;
         let needsForceUpdate = true;
@@ -724,31 +745,28 @@
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Cursor lerp (Intero rapido)
             if (Math.abs(mouseX - outlineX) > 0.1 || Math.abs(mouseY - outlineY) > 0.1) {
                 outlineX += (mouseX - outlineX) * 0.2;
                 outlineY += (mouseY - outlineY) * 0.2;
-                const ox = outlineX | 0, oy = outlineY | 0;
+                const ox = Math.round(outlineX), oy = Math.round(outlineY);
                 if (ox !== lastOlPx || oy !== lastOlPy) {
                     cursorOutline.style.transform = `translate3d(${ox}px,${oy}px,0) translate(-50%,-50%)`;
                     lastOlPx = ox; lastOlPy = oy;
                 }
             }
             if (mouseX !== lastDotPx || mouseY !== lastDotPy) {
-                cursorDot.style.transform = `translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+                cursorDot.style.transform = `translate3d(${Math.round(mouseX)}px,${Math.round(mouseY)}px,0) translate(-50%,-50%)`;
                 lastDotPx = mouseX; lastDotPy = mouseY;
             }
 
-            // Slide lerp
             currentX += (targetX - currentX) * 0.04;
             const deltaXSlide = currentX - lastX;
             if (Math.abs(deltaXSlide) > 0.05) {
-                scrollWrapperEl.style.transform = `translate3d(-${currentX}px,0,0)`;
+                scrollWrapperEl.style.transform = `translate3d(-${Math.round(currentX)}px,0,0)`;
                 if (starEngine) starEngine.draw(deltaXSlide, 0);
             }
             lastX = currentX;
 
-            // Zoom lerp
             const auDiff = targetAuScale - currentAuScale;
             if (Math.abs(auDiff) > 0.001) {
                 currentAuScale += auDiff * 0.08;
@@ -756,7 +774,6 @@
                 currentAuScale = targetAuScale; 
             }
 
-            // Time scrubbing
             if (!isLiveMode && isPlaying) {
                 const speed = getSpeed();
                 if (speed !== 0) {
@@ -764,7 +781,6 @@
                 }
             }
 
-            // ── RENDER ENGINE (Isolato e Caching) ──
             if (currentState === 1 || isTraveling) {
                 const vmin = Math.min(winWidth, winHeight) / 100;
                 const currentAuToPx = currentAuScale * vmin;
@@ -775,7 +791,6 @@
                 const T = (currentDate - epochJ2000) / 3155760000000;
                 let timeChanged = false;
                 
-                // Ricalcola la matematica SOLO se il tempo è passato davvero (evita sovraccarico in zoom)
                 if (lastPlanetCalcT === null || Math.abs(T - lastPlanetCalcT) > 1e-7) {
                     timeChanged = true;
                     lastPlanetCalcT = T;
@@ -785,25 +800,25 @@
                     needsForceUpdate = false;
                     
                     const planetBasePx = currentAuToPx * 0.00008517;
-                    const uiRingPx = (0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin;
-                    const uiRingStr = uiRingPx.toFixed(1) + 'px';
+                    const uiRingPx = Math.round((0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin);
+                    const uiRingStr = uiRingPx + 'px';
 
                     if (globalSunContainer) {
-                        const sunPxStr = (planetBasePx * 109.18).toFixed(1) + 'px';
+                        const sunPxStr = Math.round(planetBasePx * 109.18) + 'px';
                         setCss(globalSunContainer, sunPxStr, sunPxStr, 'translate(-50%, -50%) translateZ(0)');
                         if (globalSunHud) setCss(globalSunHud, uiRingStr, uiRingStr);
                     }
 
-                    Object.values(jplData).forEach(p => {
+                    for (let i = 0; i < planetsArray.length; i++) {
+                        const p = planetsArray[i];
                         
-                        // 1. CALCOLO MATEMATICO SEPARATO (Eseguito solo all'avanzare del tempo)
                         if (timeChanged) {
-                            let a, e, i, N, w, M_rad;
+                            let a, e, i_deg, N, w, M_rad;
                             if (isLiveMode && p.api_a !== undefined) {
-                                a = p.api_a; e = p.api_e; i = p.api_i; N = p.api_N; w = p.api_w;
+                                a = p.api_a; e = p.api_e; i_deg = p.api_i; N = p.api_N; w = p.api_w;
                                 M_rad = p.api_MA * PI_180;
                             } else {
-                                a = p.a0 + p.a1 * T; e = p.e0 + p.e1 * T; i = p.i0 + p.i1 * T;
+                                a = p.a0 + p.a1 * T; e = p.e0 + p.e1 * T; i_deg = p.i0 + p.i1 * T;
                                 const L  = p.L0 + p.L1 * T;
                                 const lp = p.lp0 + p.lp1 * T;
                                 N = p.N0 + p.N1 * T; w = lp - N;
@@ -811,7 +826,6 @@
                             }
                             if (M_rad < 0) M_rad += TWO_PI;
 
-                            // Keplero semplificato e ultrarapido
                             let E_rad = M_rad, delta = 1;
                             for (let k = 0; k < 5; k++) {
                                 delta = (E_rad - e * Math.sin(E_rad) - M_rad) / (1 - e * Math.cos(E_rad));
@@ -821,7 +835,7 @@
                             
                             const lx = a * (Math.cos(E_rad) - e);
                             const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
-                            const N_rad = N * PI_180, i_rad = i * PI_180, w_rad = w * PI_180;
+                            const N_rad = N * PI_180, i_rad = i_deg * PI_180, w_rad = w * PI_180;
                             const sin_w = Math.sin(w_rad), cos_w = Math.cos(w_rad);
                             const sin_N = Math.sin(N_rad), cos_N = Math.cos(N_rad);
                             const cos_i = Math.cos(i_rad);
@@ -834,32 +848,31 @@
                             p.abs_Y = x1 * sin_N + y2 * cos_N;
                             
                             p.curr_a = a; p.curr_b = a * Math.sqrt(1 - e * e); p.curr_c = a * e;
-                            p.curr_N = N; p.curr_i = i; p.curr_w = w;
+                            p.curr_N = N; p.curr_i = i_deg; p.curr_w = w;
                         }
 
-                        // 2. AGGIORNAMENTO DOM OTTIMIZZATO AL DECIMALE (.toFixed)
-                        const newX = p.abs_X * currentAuToPx;
-                        const newY = p.abs_Y * currentAuToPx;
-                        const tStr = `translate3d(${newX.toFixed(1)}px,${newY.toFixed(1)}px,0) translate(-50%, -50%)`;
+                        const newX = Math.round(p.abs_X * currentAuToPx);
+                        const newY = Math.round(p.abs_Y * currentAuToPx);
+                        const tStr = `translate3d(${newX}px,${newY}px,0) translate(-50%, -50%)`;
 
-                        const sizePxStr = (planetBasePx * p.scale).toFixed(1) + 'px';
+                        const sizePxStr = Math.round(planetBasePx * p.scale) + 'px';
                         setCss(p.modelEl, sizePxStr, sizePxStr, tStr);
                         if (p.hudEl) setCss(p.hudEl, uiRingStr, uiRingStr);
 
-                        const wPxStr = (p.curr_a * 2 * currentAuToPx).toFixed(1) + 'px';
-                        const hPxStr = (p.curr_b * 2 * currentAuToPx).toFixed(1) + 'px';
-                        const txPx = -p.curr_c * currentAuToPx;
-                        const orbTStr = `translate(-50%, -50%) rotateZ(${p.curr_N.toFixed(3)}deg) rotateX(${p.curr_i.toFixed(3)}deg) rotateZ(${p.curr_w.toFixed(3)}deg) translateX(${txPx.toFixed(1)}px)`;
+                        const wPxStr = Math.round(p.curr_a * 2 * currentAuToPx) + 'px';
+                        const hPxStr = Math.round(p.curr_b * 2 * currentAuToPx) + 'px';
+                        const txPx = Math.round(-p.curr_c * currentAuToPx);
+                        
+                        const orbTStr = `translate(-50%, -50%) rotateZ(${p.curr_N.toFixed(2)}deg) rotateX(${p.curr_i.toFixed(2)}deg) rotateZ(${p.curr_w.toFixed(2)}deg) translateX(${txPx}px)`;
                         
                         setCss(p.orbEl, wPxStr, hPxStr, orbTStr);
-                    });
+                    }
                 }
             }
 
             requestAnimationFrame(animate);
         }
 
-        // ── BOOT ──────────────────────────────────────────────────────────────
         requestAnimationFrame(() => {
             setTimeout(() => {
                 starEngine = new UnifiedStarsEngine('stars-canvas');
