@@ -101,15 +101,16 @@
         @keyframes move-c1 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-0.8em); opacity: 1; } }
         @keyframes move-c2 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(0.8em); opacity: 1; } }
 
-        /* SCENE (Refactored for Layout Thrashing Prevention) */
-        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: layout style; }
+        /* SCENE (Isolata per evitare Layout Thrashing - CONTAIN STRICT) */
+        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: strict; }
         #scene { position: relative; width: 0; height: 0; transform: scaleY(-1); }
-        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; }
-        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; will-change: transform; }
+        
+        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; contain: layout size style; }
+        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; will-change: transform; contain: layout size style; }
 
-        .orbit { position: absolute; left: 50%; top: 50%; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; transform-style: flat; will-change: transform; }
+        .orbit { position: absolute; left: 50%; top: 50%; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; transform-style: flat; will-change: width, height, transform; contain: strict; }
 
-        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: translate(-50%, -50%) scaleY(-1) translateZ(0); backface-visibility: hidden; will-change: width, height; }
+        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: translate(-50%, -50%) scaleY(-1) translateZ(0); backface-visibility: hidden; will-change: width, height; contain: layout size style; }
         .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
         
         .sun-hud-ring::after { content: "Sun"; right: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: right;}
@@ -119,7 +120,7 @@
         .pl-venus .hud-ring::after { left: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: left; }
         .hud-default::after { left: calc(100% + 0.5vmin); top: 50%; transform: translateY(-50%) translateZ(0); text-align: left; }
 
-        .pixel-dot { width: 100%; height: 100%; border-radius: 50%; z-index: 12; transform: scaleY(-1); display: none; }
+        .pixel-dot { width: 100%; height: 100%; border-radius: 50%; z-index: 12; transform: scaleY(-1); display: none; contain: strict; }
         .sun-pixel { display: block; background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffea00 20%, #ff8c00 60%, #b33c00 100%); box-shadow: 0 0 40px rgba(255, 170, 0, 0.7), inset -4px -4px 12px rgba(0, 0, 0, 0.4); }
 
         .fixed-ui { position: fixed; z-index: 999999; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; contain: layout style; transform: translateZ(0); backface-visibility: hidden; }
@@ -255,7 +256,7 @@
         let winWidth  = window.innerWidth;
         let winHeight = window.innerHeight;
 
-        // ── CURSOR (Ottimizzato: rimozione lag MouseMove/Storage) ───────────
+        // ── CURSOR (Ottimizzato) ─────────────────────────────────────────────
         const cursorDot     = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
         
@@ -274,12 +275,8 @@
 
         let lastDotPx = -1, lastDotPy = -1, lastOlPx = -1, lastOlPy = -1;
 
-        window.addEventListener('mousemove', e => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        }, { passive: true });
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
 
-        // Storage throttler (evita blocchi nel thread principale)
         setInterval(() => {
             if (mouseX !== lastSavedX || mouseY !== lastSavedY) {
                 sessionStorage.setItem('cursorPosX', mouseX);
@@ -455,9 +452,9 @@
             }
         }
 
-        // ── DOM CACHE UTILS (Azzera Layout Thrashing) ─────────────────────────
+        // ── DOM CACHE UTILS (Blocco Rigido Layout Thrashing) ──────────────────
         function setCss(el, w, h, t) {
-            if (!el._cs) el._cs = {};
+            if (!el._cs) el._cs = { w: '', h: '', t: '' };
             if (w !== undefined && el._cs.w !== w) { el.style.width = w; el._cs.w = w; }
             if (h !== undefined && el._cs.h !== h) { el.style.height = h; el._cs.h = h; }
             if (t !== undefined && el._cs.t !== t) { el.style.transform = t; el._cs.t = t; }
@@ -467,7 +464,7 @@
         let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
         let isTraveling = false, scrollTimeout;
         let isEngineActive = false, zoomEnabled = false;
-        let currentAuScale = 10, targetAuScale = 10, lastAuScaleForRender = -1;
+        let currentAuScale = 10, targetAuScale = 10, lastAuToPxForRender = -1;
         let scrollOutResistance = 0;
         const RESISTANCE_THRESHOLD = 1500;
 
@@ -497,9 +494,7 @@
         let currentDate  = new Date();
         let isPlaying    = true;
         let isLiveMode   = true;
-        let needsOrbitUpdate = true;
-        let lastPlanetT  = null;
-
+        
         let globalSunContainer, globalSunHud; 
 
         // ── SLIDE TRANSITIONS ─────────────────────────────────────────────────
@@ -517,7 +512,7 @@
                 setTimeout(() => { zoomEnabled = true; }, 500);
                 timeControlsEl.classList.add('visible-ui');
                 zoomControlsEl.classList.add('visible-ui');
-                needsOrbitUpdate = true;
+                needsForceUpdate = true;
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
                 isEngineActive = false; zoomEnabled = false; targetAuScale = 10;
@@ -586,7 +581,7 @@
             targetX = currentState * winWidth;
             updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
             if (starEngine) { starEngine.resize(); starEngine.redrawStatic(); }
-            needsOrbitUpdate = true;
+            needsForceUpdate = true;
         });
 
         const navPosizioni = document.getElementById('nav-posizioni');
@@ -671,18 +666,8 @@
             btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
             speedSlider.value = 0; speedLabel.innerText = "Real time";
             currentDate = new Date(); updateDateUI();
-            needsOrbitUpdate = true;
+            needsForceUpdate = true;
         });
-
-        // ── KEPLER SOLVER ─────────────────────────────────────────────────────
-        function solveKepler(M, e) {
-            let E = M, delta = 1, iter = 0;
-            while (Math.abs(delta) > 1e-6 && iter < 15) {
-                delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
-                E -= delta; iter++;
-            }
-            return E;
-        }
 
         // ── DOM INIT ──────────────────────────────────────────────────────────
         function initializeDOM() {
@@ -702,75 +687,6 @@
 
             globalSunContainer = document.querySelector('.sun-container');
             globalSunHud = document.querySelector('.sun-hud-ring');
-        }
-
-        // ── PLANET RENDER (Ottimizzato: no Margin, Layout Cache) ──────────────
-        function renderPlanets() {
-            const T = (currentDate - epochJ2000) / 3155760000000;
-            const vmin     = Math.min(winWidth, winHeight) / 100;
-            const auToPx   = currentAuScale * vmin;
-            const planetBasePx = auToPx * 0.00008517;
-            const uiRingPx = (0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin;
-
-            const updateOrbits = needsOrbitUpdate || (lastPlanetT === null || Math.abs(T - lastPlanetT) > 0.001);
-            if (updateOrbits) { lastPlanetT = T; needsOrbitUpdate = false; }
-
-            const uiRingStr = uiRingPx.toFixed(1) + 'px';
-
-            // Sun
-            if (updateOrbits && globalSunContainer) {
-                const sunPxStr = (planetBasePx * 109.18).toFixed(1) + 'px';
-                setCss(globalSunContainer, sunPxStr, sunPxStr, 'translate(-50%, -50%) translateZ(0)');
-                if (globalSunHud) setCss(globalSunHud, uiRingStr, uiRingStr);
-            }
-
-            Object.values(jplData).forEach(p => {
-                let a, e, i, N, w, M_rad;
-                if (isLiveMode && p.api_a !== undefined) {
-                    a = p.api_a; e = p.api_e; i = p.api_i; N = p.api_N; w = p.api_w;
-                    M_rad = p.api_MA * Math.PI / 180;
-                } else {
-                    a = p.a0 + p.a1 * T;
-                    e = p.e0 + p.e1 * T;
-                    i = p.i0 + p.i1 * T;
-                    const L  = p.L0 + p.L1 * T;
-                    const lp = p.lp0 + p.lp1 * T;
-                    N = p.N0 + p.N1 * T;
-                    w = lp - N;
-                    M_rad = ((L - lp) % 360) * Math.PI / 180;
-                }
-
-                if (M_rad < 0) M_rad += 2 * Math.PI;
-                const E_rad = solveKepler(M_rad, e);
-                const lx = a * (Math.cos(E_rad) - e);
-                const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
-                const N_rad = N * Math.PI / 180, i_rad = i * Math.PI / 180, w_rad = w * Math.PI / 180;
-                const x1 = lx * Math.cos(w_rad) - ly * Math.sin(w_rad);
-                const y1 = lx * Math.sin(w_rad) + ly * Math.cos(w_rad);
-                const y2 = y1 * Math.cos(i_rad);
-                const abs_X = x1 * Math.cos(N_rad) - y2 * Math.sin(N_rad);
-                const abs_Y = x1 * Math.sin(N_rad) + y2 * Math.cos(N_rad);
-
-                const newX = abs_X * auToPx;
-                const newY = abs_Y * auToPx;
-                const tStr = `translate3d(${newX.toFixed(1)}px,${newY.toFixed(1)}px,0) translate(-50%, -50%)`;
-
-                if (updateOrbits) {
-                    const sizePxStr = (planetBasePx * p.scale).toFixed(1) + 'px';
-                    setCss(p.modelEl, sizePxStr, sizePxStr, tStr);
-                    if (p.hudEl) setCss(p.hudEl, uiRingStr, uiRingStr);
-
-                    const b = a * Math.sqrt(1 - e * e), c = a * e;
-                    const wPxStr = (a * 2 * auToPx).toFixed(1) + 'px';
-                    const hPxStr = (b * 2 * auToPx).toFixed(1) + 'px';
-                    const txPx = -c * auToPx;
-                    
-                    const orbTStr = `translate(-50%, -50%) rotateZ(${N.toFixed(3)}deg) rotateX(${i.toFixed(3)}deg) rotateZ(${w.toFixed(3)}deg) translateX(${txPx.toFixed(1)}px)`;
-                    setCss(p.orbEl, wPxStr, hPxStr, orbTStr);
-                } else {
-                    setCss(p.modelEl, undefined, undefined, tStr);
-                }
-            });
         }
 
         // ── NASA HORIZONS API ─────────────────────────────────────────────────
@@ -793,17 +709,22 @@
                     p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
                 } catch (_) {}
             }));
-            needsOrbitUpdate = true;
+            needsForceUpdate = true;
         }
 
-        // ── MAIN LOOP — Ultra-Lean ────────────────────────────────────────────
+        // ── MAIN LOOP — Ultra-Leggero ─────────────────────────────────────────
         let lastTime = performance.now();
+        let lastPlanetCalcT = null;
+        let needsForceUpdate = true;
+
+        const PI_180 = 0.017453292519943295;
+        const TWO_PI = 6.283185307179586;
 
         function animate(time) {
             const deltaTime = Math.min(time - lastTime, 32);
             lastTime = time;
 
-            // Cursor lerp
+            // Cursor lerp (Intero rapido)
             if (Math.abs(mouseX - outlineX) > 0.1 || Math.abs(mouseY - outlineY) > 0.1) {
                 outlineX += (mouseX - outlineX) * 0.2;
                 outlineY += (mouseY - outlineY) * 0.2;
@@ -843,13 +764,96 @@
                 }
             }
 
-            // Renderizza i pianeti solo se la vista è attiva
+            // ── RENDER ENGINE (Isolato e Caching) ──
             if (currentState === 1 || isTraveling) {
-                if (Math.abs(currentAuScale - lastAuScaleForRender) > 0.001) {
-                    needsOrbitUpdate = true;
-                    lastAuScaleForRender = currentAuScale;
+                const vmin = Math.min(winWidth, winHeight) / 100;
+                const currentAuToPx = currentAuScale * vmin;
+
+                let zoomChanged = Math.abs(currentAuToPx - lastAuToPxForRender) > 0.05;
+                if (zoomChanged) lastAuToPxForRender = currentAuToPx;
+
+                const T = (currentDate - epochJ2000) / 3155760000000;
+                let timeChanged = false;
+                
+                // Ricalcola la matematica SOLO se il tempo è passato davvero (evita sovraccarico in zoom)
+                if (lastPlanetCalcT === null || Math.abs(T - lastPlanetCalcT) > 1e-7) {
+                    timeChanged = true;
+                    lastPlanetCalcT = T;
                 }
-                renderPlanets();
+
+                if (timeChanged || zoomChanged || needsForceUpdate) {
+                    needsForceUpdate = false;
+                    
+                    const planetBasePx = currentAuToPx * 0.00008517;
+                    const uiRingPx = (0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin;
+                    const uiRingStr = uiRingPx.toFixed(1) + 'px';
+
+                    if (globalSunContainer) {
+                        const sunPxStr = (planetBasePx * 109.18).toFixed(1) + 'px';
+                        setCss(globalSunContainer, sunPxStr, sunPxStr, 'translate(-50%, -50%) translateZ(0)');
+                        if (globalSunHud) setCss(globalSunHud, uiRingStr, uiRingStr);
+                    }
+
+                    Object.values(jplData).forEach(p => {
+                        
+                        // 1. CALCOLO MATEMATICO SEPARATO (Eseguito solo all'avanzare del tempo)
+                        if (timeChanged) {
+                            let a, e, i, N, w, M_rad;
+                            if (isLiveMode && p.api_a !== undefined) {
+                                a = p.api_a; e = p.api_e; i = p.api_i; N = p.api_N; w = p.api_w;
+                                M_rad = p.api_MA * PI_180;
+                            } else {
+                                a = p.a0 + p.a1 * T; e = p.e0 + p.e1 * T; i = p.i0 + p.i1 * T;
+                                const L  = p.L0 + p.L1 * T;
+                                const lp = p.lp0 + p.lp1 * T;
+                                N = p.N0 + p.N1 * T; w = lp - N;
+                                M_rad = ((L - lp) % 360) * PI_180;
+                            }
+                            if (M_rad < 0) M_rad += TWO_PI;
+
+                            // Keplero semplificato e ultrarapido
+                            let E_rad = M_rad, delta = 1;
+                            for (let k = 0; k < 5; k++) {
+                                delta = (E_rad - e * Math.sin(E_rad) - M_rad) / (1 - e * Math.cos(E_rad));
+                                E_rad -= delta;
+                                if (Math.abs(delta) < 1e-4) break; 
+                            }
+                            
+                            const lx = a * (Math.cos(E_rad) - e);
+                            const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
+                            const N_rad = N * PI_180, i_rad = i * PI_180, w_rad = w * PI_180;
+                            const sin_w = Math.sin(w_rad), cos_w = Math.cos(w_rad);
+                            const sin_N = Math.sin(N_rad), cos_N = Math.cos(N_rad);
+                            const cos_i = Math.cos(i_rad);
+
+                            const x1 = lx * cos_w - ly * sin_w;
+                            const y1 = lx * sin_w + ly * cos_w;
+                            const y2 = y1 * cos_i;
+                            
+                            p.abs_X = x1 * cos_N - y2 * sin_N;
+                            p.abs_Y = x1 * sin_N + y2 * cos_N;
+                            
+                            p.curr_a = a; p.curr_b = a * Math.sqrt(1 - e * e); p.curr_c = a * e;
+                            p.curr_N = N; p.curr_i = i; p.curr_w = w;
+                        }
+
+                        // 2. AGGIORNAMENTO DOM OTTIMIZZATO AL DECIMALE (.toFixed)
+                        const newX = p.abs_X * currentAuToPx;
+                        const newY = p.abs_Y * currentAuToPx;
+                        const tStr = `translate3d(${newX.toFixed(1)}px,${newY.toFixed(1)}px,0) translate(-50%, -50%)`;
+
+                        const sizePxStr = (planetBasePx * p.scale).toFixed(1) + 'px';
+                        setCss(p.modelEl, sizePxStr, sizePxStr, tStr);
+                        if (p.hudEl) setCss(p.hudEl, uiRingStr, uiRingStr);
+
+                        const wPxStr = (p.curr_a * 2 * currentAuToPx).toFixed(1) + 'px';
+                        const hPxStr = (p.curr_b * 2 * currentAuToPx).toFixed(1) + 'px';
+                        const txPx = -p.curr_c * currentAuToPx;
+                        const orbTStr = `translate(-50%, -50%) rotateZ(${p.curr_N.toFixed(3)}deg) rotateX(${p.curr_i.toFixed(3)}deg) rotateZ(${p.curr_w.toFixed(3)}deg) translateX(${txPx.toFixed(1)}px)`;
+                        
+                        setCss(p.orbEl, wPxStr, hPxStr, orbTStr);
+                    });
+                }
             }
 
             requestAnimationFrame(animate);
@@ -862,7 +866,7 @@
                 starEngine.redrawStatic();
                 initializeDOM();
                 updateDateUI();
-                needsOrbitUpdate = true;
+                needsForceUpdate = true;
                 fetchNasaApi(); 
                 requestAnimationFrame(animate);
             }, 0);
