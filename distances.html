@@ -835,6 +835,17 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ─── THREE.JS INITIALIZATION FOR MAJOR PLANETS ─── */
     const threePlanetsElements = document.querySelectorAll('.three-planet');
     const renderersThree = [];
+    
+    // Intersection Observer previene il ricalcolo continuo del layout
+    let planetObserver = null;
+    if (window.IntersectionObserver) {
+        planetObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const r = renderersThree.find(obj => obj.container.id === entry.target.id);
+                if (r) r.isVisible = entry.isIntersecting;
+            });
+        }, { rootMargin: '100% 0px 100% 0px' });
+    }
 
     if(threePlanetsElements.length > 0) {
         const loader = new THREE.GLTFLoader();
@@ -918,14 +929,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderer.render(scene, camera);
             });
 
-            renderersThree.push({ renderer, scene, camera, getMesh: () => modelMesh });
+            const renderObj = { renderer, scene, camera, getMesh: () => modelMesh, container, isVisible: false };
+            renderersThree.push(renderObj);
+            
+            if (planetObserver) {
+                planetObserver.observe(container);
+            } else {
+                renderObj.isVisible = true; // Fallback se observer non supportato
+            }
         });
 
         function animateThree() {
             requestAnimationFrame(animateThree);
             renderersThree.forEach(r => {
-                const rect = r.renderer.domElement.getBoundingClientRect();
-                if (rect.right > 0 && rect.left < window.innerWidth) {
+                if (r.isVisible || !planetObserver) {
                     const mesh = r.getMesh();
                     if (mesh) {
                         mesh.children[0].rotation.y += 0.001;
@@ -1203,29 +1220,32 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(syncWithNasa, 600000);
 
     setInterval(() => {
-        let layoutChanged = false;
-        planetsData.forEach((p, i) => {
-            if (p.id !== 'Sun' && p.domDisKm) {
-                p.baseDis += p.inc;
-                
-                let centerToCenterKm = p.baseDis * 1000;
-                p.domDisKm.textContent = fmt(Math.round(centerToCenterKm));
+        // Avvolto in rAF per evitare di forzare un ricalcolo layout fuori sincronia
+        requestAnimationFrame(() => {
+            let layoutChanged = false;
+            planetsData.forEach((p, i) => {
+                if (p.id !== 'Sun' && p.domDisKm) {
+                    p.baseDis += p.inc;
+                    
+                    let centerToCenterKm = p.baseDis * 1000;
+                    p.domDisKm.textContent = fmt(Math.round(centerToCenterKm));
 
-                if (p.periEl && p.aphEl && p.totalFlex > 0) {
-                    let progress = (p.baseDis - p.peri) / (p.aph - p.peri);
-                    if (progress < 0) progress = 0; if (progress > 1) progress = 1;
-                    
-                    let periW = p.totalFlex * progress;
-                    p.periEl.style.width = periW + "px";
-                    p.aphEl.style.width = (p.totalFlex - periW) + "px";
-                    
-                    layoutChanged = true;
+                    if (p.periEl && p.aphEl && p.totalFlex > 0) {
+                        let progress = (p.baseDis - p.peri) / (p.aph - p.peri);
+                        if (progress < 0) progress = 0; if (progress > 1) progress = 1;
+                        
+                        let periW = p.totalFlex * progress;
+                        p.periEl.style.width = periW + "px";
+                        p.aphEl.style.width = (p.totalFlex - periW) + "px";
+                        
+                        layoutChanged = true;
+                    }
+                    if (p.sidebarItemDiv && p.id !== 'Sun') p.sidebarItemDiv.style.left = (p.baseDis / shrinkerFactor) + "px";
                 }
-                if (p.sidebarItemDiv && p.id !== 'Sun') p.sidebarItemDiv.style.left = (p.baseDis / shrinkerFactor) + "px";
-            }
+            });
+            updatePlanetStates();
+            if(layoutChanged) cacheSidebarSegments();
         });
-        updatePlanetStates();
-        if(layoutChanged) cacheSidebarSegments();
     }, 1000);
 
     const traduciNome = (nome) => {
@@ -1251,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebarWrapper.style.pointerEvents = 'none'; 
             headerScroll.style.opacity = '1';
             headerScroll.style.pointerEvents = 'auto';
-            scrollSign.style.opacity = ''; // reset inline style per abilitare hover CSS
+            scrollSign.style.opacity = ''; 
         }
     }
 
@@ -1335,7 +1355,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    requestAnimationFrame(() => requestAnimationFrame(cacheSidebarSegments));
+    // Rimosso l'anello infinito distruggi-performance: era il colpevole principale del thrashing.
+    // L'aggiornamento viene già chiamato durante le modifiche di layout necessarie.
+    requestAnimationFrame(cacheSidebarSegments);
 
     function drawSidebarLine() {
         sCtx.globalCompositeOperation = 'source-over';
@@ -1343,9 +1365,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Disegna la linea continua di base
         sCtx.beginPath();
-        let endX = 2570 + LINE_X0; // Default di sicurezza
+        let endX = 2570 + LINE_X0; 
         if (cachedSegments && cachedSegments.length > 0) {
-            endX = cachedSegments[cachedSegments.length - 1].x1; // Interrompe la linea esattamente alla fine dell'ultimo segmento
+            endX = cachedSegments[cachedSegments.length - 1].x1; 
         }
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(endX, LINE_Y);
         sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; 
@@ -1353,10 +1375,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.stroke();
         
         if (cachedSegments && cachedSegments.length > 0) {
-            // Disegna i segmenti continui bianchi (anteprime afelio/perielio) sovrapposti alla linea base
+            // Disegna i segmenti continui bianchi (anteprime afelio/perielio)
             sCtx.strokeStyle = '#ffffff';
             sCtx.lineWidth = 1.5; 
-            sCtx.setLineDash([]); // Continua
+            sCtx.setLineDash([]); 
             
             sCtx.beginPath();
             cachedSegments.forEach(({ x0, x1 }) => {
@@ -1468,7 +1490,19 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animateStars);
     })();
 
-    window.addEventListener('scroll', () => { updateUIVisibility(); updatePlanetStates(); updateSidebarUI(); });
+    // Throttled scroll listener per impedire jank
+    let isScrolling = false;
+    window.addEventListener('scroll', () => { 
+        if (!isScrolling) {
+            window.requestAnimationFrame(() => {
+                updateUIVisibility(); 
+                updatePlanetStates(); 
+                updateSidebarUI(); 
+                isScrolling = false;
+            });
+            isScrolling = true;
+        }
+    });
 
     updateUIVisibility(); updatePlanetStates(); updateSidebarUI();
 
@@ -1538,6 +1572,10 @@ document.addEventListener('DOMContentLoaded', () => {
     headerScroll.addEventListener('click', triggerIntroOnce);
     scrollSign.addEventListener('click', triggerIntroOnce);
 
+    // Sistema batched per il wheel scroll
+    let wheelPending = 0;
+    let wheelAF = null;
+
     window.addEventListener('wheel', e => {
         e.preventDefault();
         
@@ -1563,13 +1601,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (scrollUpResistance > 150) {
                 scrollUpResistance = 0;
                 returnToHome();
-            } else {
-                window.scrollBy({ left: delta * enabledSpeed, behavior: 'auto' });
+                return; // Evita di accodare scroll
             }
         } else {
             scrollUpResistance = 0; 
-            window.scrollBy({ left: delta * enabledSpeed, behavior: 'auto' });
         }
+
+        // Impacchettiamo le letture della rotellina ed elaboriamole alla velocità del monitor
+        wheelPending += delta * enabledSpeed;
+
+        if (!wheelAF) {
+            wheelAF = requestAnimationFrame(() => {
+                window.scrollBy({ left: wheelPending, behavior: 'auto' });
+                wheelPending = 0;
+                wheelAF = null;
+            });
+        }
+
     }, { passive: false });
 
     function forwardWheelFromModelViewers() {
