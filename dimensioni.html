@@ -184,7 +184,8 @@
         .cursor-outline {
             width: 15px; height: 15px;
             border: 2px solid white; mix-blend-mode: difference;
-            transition: width .3s, height .3s;
+            /* Modifica 1: Aggiunto l'hardware acceleration per la scia tramite CSS */
+            transition: width .3s, height .3s, transform 0.15s ease-out;
         }
         .mouse-down { width: 20px !important; height: 20px !important; }
         .hover      { width: 30px !important; height: 30px !important; }
@@ -534,14 +535,19 @@ document.addEventListener('DOMContentLoaded', () => {
         cursorOutline.style.transform = trans;
     }
     
+    // Modifica 2: Utilizzo di requestAnimationFrame per evitare l'ingorgo di eventi mousemove
+    let cursorRAF;
     window.addEventListener('mousemove', e => {
-        const trans = `translate3d(calc(-50% + ${e.clientX}px), calc(-50% + ${e.clientY}px), 0)`;
-        cursorDot.style.transform = trans;
-        cursorOutline.animate({ transform: trans }, { duration:250, fill:'forwards' });
-        
-        sessionStorage.setItem('cursorPosX', e.clientX);
-        sessionStorage.setItem('cursorPosY', e.clientY);
-    });
+        if (cursorRAF) cancelAnimationFrame(cursorRAF);
+        cursorRAF = requestAnimationFrame(() => {
+            const trans = `translate3d(calc(-50% + ${e.clientX}px), calc(-50% + ${e.clientY}px), 0)`;
+            cursorDot.style.transform = trans;
+            cursorOutline.style.transform = trans; // Niente più .animate(), l'effetto è gestito dal CSS
+            
+            sessionStorage.setItem('cursorPosX', e.clientX);
+            sessionStorage.setItem('cursorPosY', e.clientY);
+        });
+    }, { passive: true });
 
     window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
     window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
@@ -811,7 +817,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    // Ottimizzazione Fluidità: Cap pixel ratio a 1.5. Perfetto per Retina, alleggerisce i carichi GPU enormemente senza perdite visive.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     canvasContainer.appendChild(renderer.domElement);
 
@@ -841,17 +846,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const gltfLoader = new THREE.GLTFLoader();
     let loadedCount = 0;
-
     const targetPlanets = ['neptune', 'uranus', 'saturn', 'jupiter'];
 
-    celestialData.forEach((data) => {
+    // MODIFICA PRINCIPALE: Funzione dedicata per caricare un singolo pianeta
+    function loadPlanet(data, callback) {
         gltfLoader.load(`assets/${data.id}.glb`, (gltf) => {
             const model = gltf.scene;
             const box = new THREE.Box3().setFromObject(model);
             const size = box.getSize(new THREE.Vector3());
             const center = box.getCenter(new THREE.Vector3());
 
-            // Ottimizzazione CPU (Evita ricalcoli matrice per i nodi statici caricati)
             model.position.set(-center.x, -center.y, -center.z);
             if (data.id === 'saturn') { model.rotation.z = 0.46; model.rotation.x = 0.20; }
             model.updateMatrix();
@@ -861,6 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (child.isMesh) {
                     child.matrixAutoUpdate = false; 
                     child.updateMatrix();
+                    child.frustumCulled = false;
 
                     if (child.material) {
                         child.material.side = THREE.FrontSide;
@@ -882,6 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const wrapper = new THREE.Group();
             wrapper.add(model);
+            wrapper.frustumCulled = false; 
             
             const maxDim = Math.max(size.x, size.y, size.z);
             const targetDiameter = data.scale * 2; 
@@ -890,18 +896,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
             wrapper.position.set(data.x, data.y, 0);
-            // La wrapper rimane updateMatrix = true perché ruota su Y durante l'animazione
 
             scene.add(wrapper);
             data.mesh = wrapper; 
             
             loadedCount++;
-            if (loadedCount === celestialData.length) {
-                // Forza pre-compilazione sicura di tutto senza bloccare bruscamente
-                renderer.compile(scene, camera); 
+            if (callback) callback();
+        });
+    }
+
+    // MODIFICA PRINCIPALE: Gestore del caricamento scaglionato (i primi 3 subito, poi pian piano)
+    let initialLoadTarget = Math.min(3, celestialData.length);
+    let initialLoaded = 0;
+
+    // Carichiamo i primi 3 pianeti in parallelo
+    for (let i = 0; i < initialLoadTarget; i++) {
+        loadPlanet(celestialData[i], () => {
+            initialLoaded++;
+            // Quando i primi 3 hanno finito, avviamo il caricamento ritardato per gli altri
+            if (initialLoaded === initialLoadTarget) {
+                loadRemaining(initialLoadTarget);
             }
         });
-    });
+    }
+
+    // Funzione ricorsiva che carica i restanti con un intervallo per liberare il Main Thread
+    function loadRemaining(index) {
+        if (index >= celestialData.length) {
+            // Tutti i modelli sono stati caricati e aggiunti alla scena
+            renderer.compile(scene, camera); 
+            return;
+        }
+        
+        // Aspetta 150ms prima di scaricare/processare il prossimo GLB. 
+        // Questo dà tempo al JS di renderizzare e far muovere il mouse fluido.
+        setTimeout(() => {
+            loadPlanet(celestialData[index], () => {
+                loadRemaining(index + 1);
+            });
+        }, 150);
+    }
 
     /* ─── 5. UI LOGIC & NAVIGATION ─── */
     const headerScrollWrapper = document.getElementById('header-scroll');
@@ -964,7 +998,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const sidebarWrapper = document.getElementById('sidebarWrapper');
             const stepWidth = 2570 / (celestialData.length - 1);
             const targetLeft = (window.innerWidth / 2) - 25 - (currentState * stepWidth);
-            // Sostituito left con translate3d per accelerazione hardware pura
             sidebarWrapper.style.transform = `translate3d(${targetLeft}px, 0, 0)`;
         }
     }
@@ -1203,10 +1236,14 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = this.dots.length - 1; i >= 0; i--) {
                 const dot = this.dots[i], oldX = dot.x;
                 dot.x -= delta * dot.v;
-                ctx.beginPath(); ctx.moveTo(oldX, dot.y + dot.s/2); ctx.lineTo(dot.x, dot.y + dot.s/2);
-                ctx.lineWidth = dot.s; ctx.stroke();
-                if (dot.x < this.lB || dot.x > this.rB) this.dots.splice(i, 1);
-                else { ctx.fillRect(dot.x, dot.y, dot.s, dot.s); }
+                
+                if (dot.x < this.lB || dot.x > this.rB) {
+                    this.dots.splice(i, 1);
+                } else {
+                    let rectX = Math.min(oldX, dot.x);
+                    let rectW = Math.abs(oldX - dot.x) + dot.s;
+                    ctx.fillRect(rectX, dot.y, rectW, dot.s);
+                }
             }
         }
     }
@@ -1225,8 +1262,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function animate() {
         requestAnimationFrame(animate);
 
-        currentTitleX += (targetTitleX - currentTitleX) * 0.04;
-        titlesEl.style.transform = `translateX(${currentTitleX}px)`;
+        if (Math.abs(targetTitleX - currentTitleX) > 0.01) {
+            currentTitleX += (targetTitleX - currentTitleX) * 0.04;
+            titlesEl.style.transform = `translate3d(${currentTitleX}px, 0, 0)`;
+        }
 
         camera.position.x += (targetCamX - camera.position.x) * 0.04; 
         camera.position.y += (targetCamY - camera.position.y) * 0.04;
@@ -1239,9 +1278,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaCam = (camera.position.x - lastCamX) * 15; 
         lastCamX = camera.position.x;
         
-        // Disegno stelle ottimizzato a un unico Canvas
         starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-        starsCtx.strokeStyle = 'white'; starsCtx.fillStyle = 'white';
+        starsCtx.fillStyle = 'white';
         s1.draw(starsCtx, deltaCam, starsCanvas.height); 
         s2.draw(starsCtx, deltaCam, starsCanvas.height); 
         s3.draw(starsCtx, deltaCam, starsCanvas.height);
@@ -1255,19 +1293,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 let visualRadius = data.scale;
                 if (data.id === 'saturn') visualRadius *= 1.4; 
                 
-                projVector.set(data.x, data.y - visualRadius, 0);
-                projVector.project(camera);
-                
-                const screenX = (projVector.x * 0.5 + 0.5) * window.innerWidth;
-                const screenY = -(projVector.y * 0.5 - 0.5) * window.innerHeight;
-                
-                // Rimossi left/top dal DOM Render: Utilizzato translate3d (Accel. Hardware GPU)
-                data.infoEl.style.transform = `translate3d(calc(-50% + ${screenX}px), ${screenY + 15}px, 0)`;
+                let isActive = (currentState === i && !isTraveling);
 
-                if (currentState === i && !isTraveling && projVector.z < 1) {
-                    data.infoEl.style.opacity = '0.4'; 
+                if (isActive) {
+                    projVector.set(data.x, data.y - visualRadius, 0);
+                    projVector.project(camera);
+                    
+                    if (projVector.z < 1) {
+                        const screenX = (projVector.x * 0.5 + 0.5) * window.innerWidth;
+                        const screenY = -(projVector.y * 0.5 - 0.5) * window.innerHeight;
+                        
+                        data.infoEl.style.transform = `translate3d(calc(-50% + ${screenX}px), ${screenY + 15}px, 0)`;
+
+                        if (data.infoEl.style.opacity !== '0.4') data.infoEl.style.opacity = '0.4';
+                    } else {
+                        if (data.infoEl.style.opacity !== '0') data.infoEl.style.opacity = '0';
+                    }
                 } else {
-                    data.infoEl.style.opacity = '0';
+                    if (data.infoEl.style.opacity !== '0') data.infoEl.style.opacity = '0';
                 }
             }
         });
