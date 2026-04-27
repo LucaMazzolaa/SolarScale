@@ -401,7 +401,7 @@
         .perihelion, .aphelion { 
             flex-shrink: 0; 
             height: 10px; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='10'%3E%3Cline x1='0' y1='5' x2='8' y2='5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' stroke-dasharray='4,4'/%3E%3C/svg%3E"); 
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cline x1='0' y1='5' x2='10' y2='5' stroke='rgba(255,255,255,0.4)' stroke-width='0.8'/%3E%3C/svg%3E"); 
             background-repeat: repeat-x; 
             background-position: left center;
             align-self: center; 
@@ -1328,7 +1328,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cx1 > cx0) {
                 let dashLen = cx1 - cx0;
                 if (dashLen > 15) {
-                    // Forziamo matematicamente la lunghezza per finire sempre con un multiplo esatto del tratteggio (8px + 4px per chiudere)
                     dashLen = Math.max(0, Math.round((dashLen - 4) / 8) * 8 + 4);
                     cx1 = cx0 + dashLen;
                 }
@@ -1346,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.beginPath();
         let endX = 2570 + LINE_X0; // Default di sicurezza
         if (cachedSegments && cachedSegments.length > 0) {
-            endX = cachedSegments[cachedSegments.length - 1].x1; // Interrompe la linea esattamente alla fine dell'ultimo trattino
+            endX = cachedSegments[cachedSegments.length - 1].x1; // Interrompe la linea esattamente alla fine dell'ultimo segmento
         }
         sCtx.moveTo(LINE_X0, LINE_Y); sCtx.lineTo(endX, LINE_Y);
         sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; 
@@ -1354,52 +1353,17 @@ document.addEventListener('DOMContentLoaded', () => {
         sCtx.stroke();
         
         if (cachedSegments && cachedSegments.length > 0) {
-            // 1. CANCELLA FISICAMENTE la linea continua
-            sCtx.globalCompositeOperation = 'destination-out';
-            sCtx.lineWidth = 4; // Più largo per assicurare una cancellazione totale netta
-            sCtx.strokeStyle = 'rgba(0,0,0,1)';
+            // Disegna i segmenti continui bianchi (anteprime afelio/perielio) sovrapposti alla linea base
+            sCtx.strokeStyle = '#ffffff';
+            sCtx.lineWidth = 1.5; 
+            sCtx.setLineDash([]); // Continua
+            
             sCtx.beginPath();
             cachedSegments.forEach(({ x0, x1 }) => {
-                // Per Venere e Terra, l'escursione è molto piccola (1-3px).
-                // Per rendere il buco minimamente visibile, assicuriamo una larghezza minima di 4px
-                let drawX0 = x0;
-                let drawX1 = x1;
-                if (x1 - x0 < 4) {
-                    const mid = (x0 + x1) / 2;
-                    drawX0 = mid - 2;
-                    drawX1 = mid + 2;
-                }
-                sCtx.moveTo(drawX0, LINE_Y); sCtx.lineTo(drawX1, LINE_Y);
+                sCtx.moveTo(x0, LINE_Y); 
+                sCtx.lineTo(x1, LINE_Y);
             });
             sCtx.stroke();
-            
-            // 2. Disegna i trattini
-            sCtx.globalCompositeOperation = 'source-over';
-            sCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-            sCtx.lineWidth = 1.5; 
-            
-            cachedSegments.forEach(({ x0, x1 }) => {
-                const len = x1 - x0;
-                
-                if (len > 15) {
-                    // Da Marte in poi: tratteggio standard ripetuto.
-                    sCtx.setLineDash([4, 4]); 
-                    sCtx.beginPath();
-                    sCtx.moveTo(x0, LINE_Y); 
-                    sCtx.lineTo(x1, LINE_Y);
-                    sCtx.stroke();
-                } else if (len > 5) {
-                    // Mercurio (~13px): un solo trattino al centro del buco
-                    sCtx.setLineDash([]); 
-                    const mid = (x0 + x1) / 2;
-                    sCtx.beginPath();
-                    sCtx.moveTo(mid - 1.5, LINE_Y); 
-                    sCtx.lineTo(mid + 1.5, LINE_Y);
-                    sCtx.stroke();
-                }
-            });
-            
-            sCtx.setLineDash([]); 
         }
     }
 
