@@ -514,9 +514,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTraveling = false;
     let scrollTimeout;
 
-    // --- NEW VARIABLES FOR RESISTANCE ---
+    // --- VARIABLES FOR RESISTANCE ---
     let scrollUpResistance = 0; 
-    const RESISTANCE_THRESHOLD = 530; // Increase or decrease this value to calibrate the scroll
+    const RESISTANCE_THRESHOLD = 150; 
+    
+    let lastWheelTime = 0;
+    let gestureStartedAtTop = true;
 
     const scrollIndicator = document.getElementById('header-scroll');
     const contentDiv = document.getElementById('vertical-content');
@@ -528,19 +531,43 @@ document.addEventListener('DOMContentLoaded', () => {
         targetX = currentState * window.innerWidth;
         
         isTraveling = true;
-        setTimeout(() => { isTraveling = false; }, 1000);
 
         if (currentState === 1) {
             scrollIndicator.style.opacity = '0';
             scrollIndicator.style.pointerEvents = 'none';
+            
+            // 🛑 BLOCCA L'INERZIA DEL TRACKPAD
+            // Nascondiamo l'overflow per impedire lo scroll nativo involontario
+            contentDiv.style.overflowY = 'hidden';
+            contentDiv.scrollTop = 0; // Assicuriamoci che parta esattamente dalla cima
+            
+            setTimeout(() => { 
+                isTraveling = false; 
+                // Riabilita lo scroll nativo solo dopo che l'inerzia è "morta"
+                contentDiv.style.overflowY = 'auto'; 
+            }, 1200);
+            
         } else {
             scrollIndicator.style.opacity = '1';
             scrollIndicator.style.pointerEvents = 'auto';
+            
+            // Quando si torna alla pagina iniziale, blocca la discesa accidentale dell'articolo sotto
+            contentDiv.style.overflowY = 'hidden';
+            
+            setTimeout(() => { isTraveling = false; }, 1200);
         }
     }
 
     // Global mouse wheel listener
     window.addEventListener('wheel', (e) => {
+        let now = Date.now();
+        // Se è passato abbastanza tempo dall'ultimo scroll (200ms), è un nuovo movimento
+        if (now - lastWheelTime > 200) {
+            gestureStartedAtTop = (contentDiv.scrollTop <= 5);
+            scrollUpResistance = 0;
+        }
+        lastWheelTime = now;
+
         if (isTraveling || scrollTimeout) return;
         
         if (currentState === 0) {
@@ -549,19 +576,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
             }
         } else if (currentState === 1) {
-            // If we are at the top and the user tries to scroll up
+            // Se siamo in cima e l'utente prova a scorrere in alto
             if (contentDiv.scrollTop <= 5 && (e.deltaY < 0 || e.deltaX < 0)) {
-                // Accumulate resistance
-                scrollUpResistance += Math.abs(e.deltaY || e.deltaX);
-                
-                // If resistance exceeds the threshold, we go back
-                if (scrollUpResistance > RESISTANCE_THRESHOLD) {
-                    jumpToState(0);
-                    scrollUpResistance = 0; // reset for next time
-                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                // Selezioniamo la resistenza SOLO se lo scroll è iniziato dalla cima
+                // Questo blocca il "momentum" se arriviamo in cima da un punto più basso
+                if (gestureStartedAtTop) {
+                    scrollUpResistance += Math.abs(e.deltaY || e.deltaX);
+                    
+                    if (scrollUpResistance > RESISTANCE_THRESHOLD) {
+                        jumpToState(0);
+                        scrollUpResistance = 0; 
+                        scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                    }
                 }
             } else {
-                // If we scroll down or are not at the top, reset the accumulator
+                // Se scendiamo o non siamo in cima, resettiamo la resistenza
                 if (e.deltaY > 0 || e.deltaX > 0 || contentDiv.scrollTop > 5) {
                     scrollUpResistance = 0;
                 }
@@ -598,7 +627,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
             }
         } else if (currentState === 1) {
-            // On mobile we increase the required "pull" distance (long downward swipe)
             if (contentDiv.scrollTop <= 5 && (deltaY < -180 || deltaX < -180)) {
                 jumpToState(0);
                 scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
@@ -615,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursorDot     = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');
     
-    // --- NEW CODE: Restore saved cursor position ---
+    // Restore saved cursor position
     const savedCursorX = sessionStorage.getItem('cursorPosX');
     const savedCursorY = sessionStorage.getItem('cursorPosY');
 
@@ -625,23 +653,19 @@ document.addEventListener('DOMContentLoaded', () => {
         cursorOutline.style.left = savedCursorX + 'px';
         cursorOutline.style.top  = savedCursorY + 'px';
     }
-    // -----------------------------------------------------------------
     
     window.addEventListener('mousemove', e => {
         cursorDot.style.left = e.clientX + 'px';
         cursorDot.style.top  = e.clientY + 'px';
         cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:250, fill:'forwards' });
         
-        // --- NEW CODE: Save current cursor position ---
+        // Save current cursor position
         sessionStorage.setItem('cursorPosX', e.clientX);
         sessionStorage.setItem('cursorPosY', e.clientY);
-        // ------------------------------------------------------------
     });
 
-    // --- NEW CODE: Additional click effect ---
     window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
     window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
-    // ----------------------------------------------
     
     function attachHoverEvents(el) {
         el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
