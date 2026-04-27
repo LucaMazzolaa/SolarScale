@@ -184,7 +184,6 @@
         .cursor-outline {
             width: 15px; height: 15px;
             border: 2px solid white; mix-blend-mode: difference;
-            /* Modifica 1: Aggiunto l'hardware acceleration per la scia tramite CSS */
             transition: width .3s, height .3s, transform 0.15s ease-out;
         }
         .mouse-down { width: 20px !important; height: 20px !important; }
@@ -535,14 +534,13 @@ document.addEventListener('DOMContentLoaded', () => {
         cursorOutline.style.transform = trans;
     }
     
-    // Modifica 2: Utilizzo di requestAnimationFrame per evitare l'ingorgo di eventi mousemove
     let cursorRAF;
     window.addEventListener('mousemove', e => {
         if (cursorRAF) cancelAnimationFrame(cursorRAF);
         cursorRAF = requestAnimationFrame(() => {
             const trans = `translate3d(calc(-50% + ${e.clientX}px), calc(-50% + ${e.clientY}px), 0)`;
             cursorDot.style.transform = trans;
-            cursorOutline.style.transform = trans; // Niente più .animate(), l'effetto è gestito dal CSS
+            cursorOutline.style.transform = trans; 
             
             sessionStorage.setItem('cursorPosX', e.clientX);
             sessionStorage.setItem('cursorPosY', e.clientY);
@@ -848,7 +846,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let loadedCount = 0;
     const targetPlanets = ['neptune', 'uranus', 'saturn', 'jupiter'];
 
-    // MODIFICA PRINCIPALE: Funzione dedicata per caricare un singolo pianeta
     function loadPlanet(data, callback) {
         gltfLoader.load(`assets/${data.id}.glb`, (gltf) => {
             const model = gltf.scene;
@@ -905,31 +902,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // MODIFICA PRINCIPALE: Gestore del caricamento scaglionato (i primi 3 subito, poi pian piano)
     let initialLoadTarget = Math.min(3, celestialData.length);
     let initialLoaded = 0;
 
-    // Carichiamo i primi 3 pianeti in parallelo
     for (let i = 0; i < initialLoadTarget; i++) {
         loadPlanet(celestialData[i], () => {
             initialLoaded++;
-            // Quando i primi 3 hanno finito, avviamo il caricamento ritardato per gli altri
             if (initialLoaded === initialLoadTarget) {
                 loadRemaining(initialLoadTarget);
             }
         });
     }
 
-    // Funzione ricorsiva che carica i restanti con un intervallo per liberare il Main Thread
     function loadRemaining(index) {
         if (index >= celestialData.length) {
-            // Tutti i modelli sono stati caricati e aggiunti alla scena
             renderer.compile(scene, camera); 
             return;
         }
         
-        // Aspetta 150ms prima di scaricare/processare il prossimo GLB. 
-        // Questo dà tempo al JS di renderizzare e far muovere il mouse fluido.
         setTimeout(() => {
             loadPlanet(celestialData[index], () => {
                 loadRemaining(index + 1);
@@ -952,7 +942,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const botNam = document.getElementById('botNam');
     const botDis = document.getElementById('botDis');
 
-    function updateUIStates() {
+    let uiFadeTimeout;
+
+    // Funzione che aggiorna i testi e visibilità in base al fatto se veniamo o no dalla schermata iniziale
+    function updateUIImmediate(comingFromHome) {
         if (currentState === -1) {
             headerScrollWrapper.style.opacity = '1';
             headerScrollWrapper.style.pointerEvents = 'auto';
@@ -964,26 +957,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             headerScrollWrapper.style.opacity = '0';
             headerScrollWrapper.style.pointerEvents = 'none';
-            
-            sidebarNav.style.opacity = '1';
-            sidebarNav.style.pointerEvents = 'auto';
 
+            // Aggiorniamo subito i testi dei pulsanti
             if (currentState > 0) {
-                btnTop.style.visibility = 'visible'; btnTop.style.opacity = '1';
                 topNam.textContent = celestialData[currentState - 1].name;
                 topDis.textContent = celestialData[currentState - 1].dia;
-            } else {
-                btnTop.style.visibility = 'hidden'; btnTop.style.opacity = '0';
             }
-
             if (currentState < celestialData.length - 1) {
-                btnBot.style.visibility = 'visible'; btnBot.style.opacity = '1';
                 botNam.textContent = celestialData[currentState + 1].name;
                 botDis.textContent = celestialData[currentState + 1].dia;
-            } else {
-                btnBot.style.visibility = 'hidden'; btnBot.style.opacity = '0';
             }
 
+            // Aggiorniamo lo stato delle icone sulla timeline
             celestialData.forEach((p, i) => {
                 p.sidebarIcon.classList.remove('icon-active','icon-half','icon-dim');
                 if (i === currentState) {
@@ -995,18 +980,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // Trasliamo la timeline nella posizione corretta
             const sidebarWrapper = document.getElementById('sidebarWrapper');
             const stepWidth = 2570 / (celestialData.length - 1);
             const targetLeft = (window.innerWidth / 2) - 25 - (currentState * stepWidth);
             sidebarWrapper.style.transform = `translate3d(${targetLeft}px, 0, 0)`;
+
+            // Se stiamo già viaggiando tra i pianeti, le frecce restano sempre fisse.
+            // Altrimenti, se veniamo dalla schermata intro, le nascondiamo per farle apparire col delay.
+            if (!comingFromHome) {
+                sidebarNav.style.opacity = '1';
+                sidebarNav.style.pointerEvents = 'auto';
+                
+                if (currentState > 0) {
+                    btnTop.style.visibility = 'visible'; btnTop.style.opacity = '1';
+                } else {
+                    btnTop.style.visibility = 'hidden'; btnTop.style.opacity = '0';
+                }
+                
+                if (currentState < celestialData.length - 1) {
+                    btnBot.style.visibility = 'visible'; btnBot.style.opacity = '1';
+                } else {
+                    btnBot.style.visibility = 'hidden'; btnBot.style.opacity = '0';
+                }
+            } else {
+                btnTop.style.visibility = 'hidden'; btnTop.style.opacity = '0';
+                btnBot.style.visibility = 'hidden'; btnBot.style.opacity = '0';
+            }
+        }
+    }
+
+    // Usato ESCLUSIVAMENTE per il primo caricamento dalla home
+    function updateUIDelayed() {
+        if (currentState > -1) {
+            sidebarNav.style.opacity = '1';
+            sidebarNav.style.pointerEvents = 'auto';
+
+            if (currentState > 0) {
+                btnTop.style.visibility = 'visible'; 
+                btnTop.style.opacity = '1';
+            } else {
+                btnTop.style.visibility = 'hidden'; 
+                btnTop.style.opacity = '0';
+            }
+            
+            if (currentState < celestialData.length - 1) {
+                btnBot.style.visibility = 'visible'; 
+                btnBot.style.opacity = '1';
+            } else {
+                btnBot.style.visibility = 'hidden'; 
+                btnBot.style.opacity = '0';
+            }
         }
     }
 
     let isTraveling = false;
     function jumpToState(index, init = false) {
         if(index < -1 || index >= celestialData.length) return;
+        
+        const comingFromHome = (currentState === -1);
         currentState = index;
         
+        clearTimeout(uiFadeTimeout);
+
         if(!init) {
             isTraveling = true;
             setTimeout(() => { 
@@ -1019,15 +1055,23 @@ document.addEventListener('DOMContentLoaded', () => {
             targetCamX = headerCamX;
             targetCamY = headerCamY;
             targetCamZ = headerCamZ;
+            updateUIImmediate(comingFromHome);
         } else {
             targetTitleX = -window.innerWidth; 
             const data = celestialData[currentState];
             targetCamX = data.x;
             targetCamY = data.targetCamY; 
             targetCamZ = data.targetZ;
-        }
+            
+            updateUIImmediate(comingFromHome);
 
-        updateUIStates();
+            // Ritardiamo l'apparizione solo ed esclusivamente se stiamo entrando dalla Intro
+            if (comingFromHome) {
+                uiFadeTimeout = setTimeout(() => {
+                    updateUIDelayed();
+                }, init ? 0 : 1000);
+            }
+        }
     }
 
     btnTop.addEventListener('click', () => jumpToState(currentState - 1));
@@ -1323,7 +1367,12 @@ document.addEventListener('DOMContentLoaded', () => {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
         if (currentState !== -1) targetTitleX = -window.innerWidth; 
-        if (currentState >= 0) updateUIStates();
+        
+        // Applica l'aggiornamento UI sul resize senza attivare i delay (passando false come "comingFromHome")
+        if (currentState >= 0) {
+            updateUIImmediate(false);
+        }
+
         updateMenuWidths();
         lastIntroWidth = 0; 
         syncTitleFontSize();
