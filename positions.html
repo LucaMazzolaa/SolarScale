@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>SolarScale - Positions</title>
+    <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
+    
+    <style>
+        @font-face { font-family: 'Neue Montreal'; src: url('assets/ppneuemontreal-book.otf') format('opentype'); font-weight: 400; font-display: swap; }
+        @font-face { font-family: 'Neue Montreal'; src: url('assets/ppneuemontreal-medium.otf') format('opentype'); font-weight: 500; font-display: swap; }
+
+        :root {
+            --color-black: #000000;
+            --color-white: #ffffff;
+            --ui-color: rgba(255, 255, 255, 0.4);
+            --color-dashed: rgba(255, 255, 255, 0.25);
+            --font-62: clamp(32px, 2.5vw + 26px, 90px);   
+            --font-16: clamp(14px, 0.3vw + 11.68px, 22px); 
+            --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
+            --margin-screen: 4vh;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html {
+            background-color: var(--color-black); color: var(--color-white);
+            font-family: 'Neue Montreal', sans-serif; font-weight: 400; 
+            height: 100vh; width: 100vw; overflow: hidden;
+            cursor: none; user-select: none;
+        }
+
+        h1, h2, h3, p, a, button, input { color: var(--color-white); margin: 0; font-family: 'Neue Montreal', sans-serif; font-weight: 500; z-index: 10; cursor: none; }
+
+        /* CURSOR */
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0; border-radius: 50%; z-index: 9999999; pointer-events: none; box-sizing: content-box; will-change: transform; 
+        }
+        .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .2s, height .2s; }
+        .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .2s, height .2s; }
+        .mouse-down { width: 20px !important; height: 20px !important; }
+        .hover      { width: 30px !important; height: 30px !important; }
+
+        canvas.stars-canvas { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; }
+
+        /* MENU */
+        .menu, .right-menu {
+            position: fixed; top: 4vh; width: auto; font-family: 'Neue Montreal', sans-serif; font-size: var(--font-16); font-weight: 500; z-index: 999999; display: flex; flex-direction: row; align-items: center; gap: 3vw; contain: layout paint; transform: translateZ(0); backface-visibility: hidden;
+        }
+        .menu { left: 4vh; }
+        .right-menu { right: 4vh; }
+        
+        .nasa-title { font-weight: 700; font-size: clamp(22px, 2vw, 32px); color: white; line-height: 1; pointer-events: all; cursor: none; margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none; }
+        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
+        .nav-link { font-family: 'Neue Montreal', sans-serif; color: white; text-decoration: none; transition: opacity 0.2s; cursor: none; opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto; }
+        .nasa-text-label, .text-label { display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap; pointer-events: none; }
+        .nasa-text-label { overflow: visible; } .text-label { overflow: hidden; }
+
+        .nav-link::before { content: "["; margin-right: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
+        .nav-link::after { content: "]"; margin-left: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
+        .nav-link:hover, .nav-link.active { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before, .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+
+        @media (max-width: 900px) {
+            .menu { position: relative; top: auto; left: auto; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh; }
+            .right-menu { position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh; display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start; }
+        }
+
+        .horizontal-scroll-wrapper { display: flex; flex-direction: row; height: 100vh; width: 200vw; will-change: transform; }
+        .slide { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; z-index: 150; }
+        .header-slide { display: block; } .content-slide { display: block; position: relative; overflow: visible; }
+
+        .titles { position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; }
+        h1 { font-size: var(--font-62); line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
+        .title { font-size: var(--font-16); opacity: 0.4; transition: opacity 0.3s; }
+        
+        .scrollWrapper { position: fixed; bottom: var(--margin-screen); right: var(--margin-screen); cursor: none; pointer-events: auto; z-index: 500; transition: opacity 0.2s, transform 0.2s; }
+        .scrollWrapper:hover { transform: scale(1.03); } .scrollWrapper:active { transform: scale(0.97); }
+        .scroll-sign { display: flex; flex-direction: row; align-items: center; gap: 8px; opacity: 0.4; transition: opacity 0.2s; }
+        .scrollWrapper:hover .scroll-sign { opacity: 1; } .scroll-sign p { font-size: var(--font-16); }
+        .scroll-arrow { font-size: var(--font-16); font-weight: 500; display: inline-block; transform: translateY(1px); }
+        @keyframes jumpX { from { transform: translateX(0); } to { transform: translateX(6px); } } .jump { animation: jumpX 1s ease-in-out infinite alternate; }
+
+        #hidden-intro-container { position: absolute; top: 14vh; left: 4vh; right: 4vh; margin: 0; width: calc(100vw - 8vh); height: 82vh; opacity: 0; pointer-events: none; z-index: -9999; visibility: hidden; overflow: hidden; }
+        #hidden-intro-container * { animation-play-state: paused !important; }
+        #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-break: keep-all; overflow-wrap: normal; }
+        @media (max-width: 900px) { #hidden-intro-container { top: auto; left: auto; right: auto; margin: 0; width: 100%; height: 100vh; } }
+
+        /* ANIMATIONS */
+        .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; background-color: white; border-radius: 50%; vertical-align: middle; position: relative; top: -0.05em; margin: 0 0.45em; animation: orbit-small 1.5s linear infinite; }
+        @keyframes orbit-small { from { transform: rotate(0deg) translateX(0.15em) rotate(0deg); } to { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); } }
+        .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; background-color: white; border-radius: 50%; vertical-align: middle; margin: 0 0.15em; animation: pulse-dim 2s ease-in-out infinite; }
+        @keyframes pulse-dim { 0%, 100% { transform: scale(0.6); } 50% { transform: scale(1.4); } }
+
+        .anim-dist-circles { display: inline-flex; align-items: center; justify-content: center; position: relative; vertical-align: middle; height: 1em; width: 2.5em; margin: 0 0.3em; }
+        .anim-dist-circles .c1, .anim-dist-circles .c2 { position: absolute; width: 0.45em; height: 0.45em; border-radius: 50%; background-color: white; top: 50%; margin: -0.225em 0 0 0; }
+        .anim-dist-circles .c1 { animation: move-c1 3.5s ease-in-out infinite; }
+        .anim-dist-circles .c2 { animation: move-c2 3.5s ease-in-out infinite; }
+        @keyframes move-c1 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-0.8em); opacity: 1; } }
+        @keyframes move-c2 { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(0.8em); opacity: 1; } }
+
+        /* SCENE */
+        #universe { position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 10; contain: layout style; }
+        #scene { position: relative; width: 0; height: 0; transform: scaleY(-1); }
+        
+        .planet-model { position: absolute; left: 50%; top: 50%; display: flex; align-items: center; justify-content: center; z-index: 20; will-change: transform; contain: layout style; }
+        .sun-container { position: absolute; left: 50%; top: 50%; z-index: 50; display: flex; align-items: center; justify-content: center; will-change: transform; contain: layout style; }
+
+        .orbit { position: absolute; left: 50%; top: 50%; border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; transform-style: flat; will-change: width, height, transform; contain: layout style; }
+
+        .hud-ring, .sun-hud-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; border: 1.2px solid var(--ui-color); pointer-events: none; transform: translate(-50%, -50%) scaleY(-1) translateZ(0); backface-visibility: hidden; will-change: width, height; contain: layout style; }
+        .hud-ring::after, .sun-hud-ring::after { content: attr(data-name); position: absolute; font-size: max(11px, 1.4vmin); color: var(--ui-color); letter-spacing: 1px; white-space: nowrap; font-family: 'Neue Montreal', sans-serif; font-weight: 500; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; backface-visibility: hidden; }
+        
+        .sun-hud-ring::after { content: "Sun"; right: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: right;}
+        .pl-earth .hud-ring::after { right: calc(100% + 0.5vmin); top: 50%; transform: translateY(-50%) translateZ(0); text-align: right; }
+        .pl-mercury .hud-ring::after { right: calc(100% + 0.5vmin); top: calc(100% + 0.5vmin); text-align: right; }
+        .pl-mars .hud-ring::after { left: calc(100% + 0.5vmin); top: calc(100% + 0.5vmin); text-align: left; }
+        .pl-venus .hud-ring::after { left: calc(100% + 0.5vmin); bottom: calc(100% + 0.5vmin); text-align: left; }
+        .hud-default::after { left: calc(100% + 0.5vmin); top: 50%; transform: translateY(-50%) translateZ(0); text-align: left; }
+
+        .pixel-dot { width: 100%; height: 100%; border-radius: 50%; z-index: 12; transform: scaleY(-1); display: none; contain: layout style; }
+        .sun-pixel { display: block; background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffea00 20%, #ff8c00 60%, #b33c00 100%); box-shadow: 0 0 40px rgba(255, 170, 0, 0.7), inset -4px -4px 12px rgba(0, 0, 0, 0.4); }
+
+        .fixed-ui { position: fixed; z-index: 999999; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; contain: layout style; transform: translateZ(0); backface-visibility: hidden; }
+        .fixed-ui.visible-ui { opacity: 1; pointer-events: auto; }
+
+        #time-controls-container { bottom: var(--margin-screen); left: 50%; transform: translateX(-50%) translateZ(0); display: flex; flex-direction: column; align-items: center; gap: 8px; width: 50vw; min-width: 350px; max-width: 800px; }
+        .time-row { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; position: relative; }
+        .date-display-left { font-size: var(--font-16); color: #fff; font-weight: 500; letter-spacing: 1px; flex: 1; text-align: left; position: relative; top: 22px; }
+        .time-display-right { font-size: var(--font-16); color: #fff; font-weight: 500; letter-spacing: 1px; flex: 1; text-align: right; position: relative; top: 22px; }
+        
+        .live-wrapper-center { position: absolute; left: 50%; transform: translateX(-50%); height: 30px; display: flex; align-items: center; }
+        #btn-live { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        #btn-live.visible { opacity: 1; pointer-events: auto; }
+
+        .speed-control { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        #speed-label { color: var(--ui-color); font-size: 13px; letter-spacing: 1px; font-weight: 500; } 
+        .slider-wrapper { position: relative; width: 100%; display: flex; align-items: center; height: 10px; }
+        .slider-wrapper::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 100%; height: 1px; background: var(--ui-color); z-index: 0; pointer-events: none; }
+        .center-dot { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 4px; height: 4px; background: white; border-radius: 50%; z-index: 1; pointer-events: none; }
+        
+        input[type=range] { position: relative; width: 100%; cursor: none; pointer-events: auto; z-index: 2; height: 10px; background: transparent; outline: none; -webkit-appearance: none; margin: 0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; background: #fff; border-radius: 50%; }
+        
+        .btn-row { display: flex; gap: 10px; width: 100%; justify-content: center; align-items: center; margin-top: 5px; }
+        .btn { background: transparent; border: 1px solid var(--ui-color); color: var(--ui-color); cursor: none; font-family: 'Neue Montreal', sans-serif; font-size: 12px; border-radius: 0; transition: 0.3s; pointer-events: auto; font-weight: 500; text-transform: uppercase; display: flex; align-items: center; justify-content: center; height: 30px; }
+        .btn-icon { width: 40px; font-size: 10px; letter-spacing: 1px; }
+        .btn-text { width: 80px; padding: 0 10px; }
+        .btn:hover { background: #fff; color: #000; border-color: #fff; }
+        .btn-active { background: #fff !important; color: #000 !important; border-color: #fff !important; }
+
+        #zoom-controls { bottom: var(--margin-screen); right: 4vh; display: flex; flex-direction: column; gap: 10px; }
+        #zoom-controls .btn { width: 30px; height: 30px; font-size: 20px; line-height: 1; display: flex; align-items: center; justify-content: center; padding-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <canvas id="stars-canvas" class="stars-canvas"></canvas>
+
+    <nav class="menu">
+        <a href="index.html" class="nasa-title" id="logo-link">
+            <img src="assets/sun_symbol.svg" alt="Sun symbol">
+            <span class="nasa-text-label">SolarScale</span>
+        </a>
+        <a href="sizes.html" class="nav-link">
+            <span class="text-label">Sizes</span>
+        </a>
+        <a href="positions.html" class="nav-link active" id="nav-posizioni">
+            <span class="text-label">Positions</span>
+        </a>
+        <a href="distances.html" class="nav-link">
+            <span class="text-label">Distances</span>
+        </a>
+    </nav>
+
+    <nav class="right-menu">
+        <a href="measurement.html" class="nav-link">
+            <span class="text-label">Measurement Methods</span>
+        </a>
+        <a href="credits.html" class="nav-link" id="crediti-link">
+            <span class="text-label">Credits</span>
+        </a>
+    </nav>
+
+    <div class="scrollWrapper" id="header-scroll">
+        <div id="scroll-sign" class="scroll-sign jump">
+            <p>Scroll to explore</p>
+            <span class="scroll-arrow">→</span>
+        </div>
+    </div>
+
+    <div id="time-controls-container" class="fixed-ui">
+        <div class="time-row">
+            <div class="date-display-left" id="date-part">...</div>
+            <div class="live-wrapper-center">
+                <button class="btn btn-text" id="btn-live">Live</button>
+            </div>
+            <div class="time-display-right" id="time-part">...</div>
+        </div>
+
+        <div class="speed-control">
+            <span id="speed-label">Real time</span>
+            <div class="slider-wrapper">
+                <div class="center-dot"></div>
+                <input type="range" id="speed-slider" min="-1000" max="1000" value="0">
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-icon" id="btn-prev">&#9668;&#9668;</button>
+            <button class="btn btn-icon btn-active" id="btn-play" style="font-size: 14px;">&#10074;&#10074;</button>
+            <button class="btn btn-icon" id="btn-next">&#9658;&#9658;</button>
+        </div>
+    </div>
+
+    <div id="zoom-controls" class="fixed-ui">
+        <button class="btn" id="btn-zoom-in">+</button>
+        <button class="btn" id="btn-zoom-out">&minus;</button>
+    </div>
+    
+    <div class="horizontal-scroll-wrapper" id="scroll-wrapper">
+        <header id="main-header" class="slide header-slide">
+            <div class="titles">
+                <h1 id="main-title">Positions&nbsp;<span class="anim-pos-orbit"></span></h1>
+                <h2 class="title">Live simulation of orbital mechanics over time (JPL data)</h2>
+            </div>
+        </header>
+
+        <div class="slide content-slide" id="universe-slide">
+            <div id="universe">
+                <div id="scene">
+                    <div class="sun-container">
+                        <div class="sun-hud-ring"></div>
+                        <div class="pixel-dot sun-pixel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hidden-intro-container">
+        <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA’s&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency’s&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const scrollWrapperEl = document.getElementById('scroll-wrapper');
+        const timeControlsEl  = document.getElementById('time-controls-container');
+        const zoomControlsEl  = document.getElementById('zoom-controls');
+
+        let winWidth  = window.innerWidth;
+        let winHeight = window.innerHeight;
+
+        // ── CURSOR ───────────────────────────────────────────────────────────
+        const cursorDot     = document.querySelector('[data-cursor-dot]');
+        const cursorOutline = document.querySelector('[data-cursor-outline]');
+        
+        const savedCursorX = sessionStorage.getItem('cursorPosX');
+        const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+        let mouseX = savedCursorX !== null ? parseFloat(savedCursorX) : winWidth / 2;
+        let mouseY = savedCursorY !== null ? parseFloat(savedCursorY) : winHeight / 2;
+        let outlineX = mouseX, outlineY = mouseY;
+        let lastSavedX = mouseX, lastSavedY = mouseY;
+        
+        if (savedCursorX !== null && savedCursorY !== null) {
+            cursorDot.style.transform = `translate3d(${mouseX}px,${mouseY}px,0) translate(-50%,-50%)`;
+            cursorOutline.style.transform = `translate3d(${outlineX}px,${outlineY}px,0) translate(-50%,-50%)`;
+        }
+
+        let lastDotPx = -1, lastDotPy = -1, lastOlPx = -1, lastOlPy = -1;
+
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
+
+        setInterval(() => {
+            if (mouseX !== lastSavedX || mouseY !== lastSavedY) {
+                sessionStorage.setItem('cursorPosX', mouseX);
+                sessionStorage.setItem('cursorPosY', mouseY);
+                lastSavedX = mouseX; lastSavedY = mouseY;
+            }
+        }, 1000);
+
+        window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+        window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+
+        const interactives = document.querySelectorAll('.nav-link, #logo-link, .btn, input, .scrollWrapper, #zoom-controls button');
+        interactives.forEach(el => {
+            el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+            el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
+        });
+
+        // ── MENU HACKER EFFECT ───────────────────────────────────────────────
+        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+        const menuLinks = document.querySelectorAll('.nav-link');
+        
+        function hackerEffect(span, originalText, intervalRef) {
+            let iteration = 0;
+            clearInterval(intervalRef.id);
+            intervalRef.id = setInterval(() => {
+                span.innerText = originalText.split('').map((letter, i) => {
+                    if (i < iteration) return originalText[i];
+                    if (letter === ' ') return ' ';
+                    return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                }).join('');
+                if (iteration >= originalText.length) clearInterval(intervalRef.id);
+                iteration += 1;
+            }, 40);
+        }
+
+        const topLogoLink = document.getElementById('logo-link');
+        let logoSpan, logoOriginal;
+        const logoRef = { id: null };
+
+        function updateMenuWidths() {
+            if (logoSpan) {
+                const curr = logoSpan.innerText;
+                logoSpan.innerText = logoOriginal;
+                logoSpan.style.width = 'auto';
+                logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+                logoSpan.innerText = curr;
+            }
+            menuLinks.forEach(link => {
+                const textSpan = link.querySelector('.text-label');
+                if (textSpan) {
+                    if (!textSpan.hasAttribute('data-original')) textSpan.setAttribute('data-original', textSpan.innerText);
+                    const orig = textSpan.getAttribute('data-original');
+                    const curr = textSpan.innerText;
+                    textSpan.innerText = orig;
+                    textSpan.style.width = 'auto';
+                    textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
+                    textSpan.innerText = curr;
+                }
+            });
+        }
+
+        if (topLogoLink) {
+            logoSpan     = topLogoLink.querySelector('.nasa-text-label');
+            logoOriginal = logoSpan.innerText;
+            document.fonts.ready.then(() => { logoSpan.style.display = 'inline-block'; logoSpan.style.overflow = 'visible'; logoSpan.style.whiteSpace = 'nowrap'; });
+            topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
+            topLogoLink.addEventListener('mouseleave', () => { clearInterval(logoRef.id); logoSpan.innerText = logoOriginal; });
+        }
+
+        menuLinks.forEach(link => {
+            const textSpan = link.querySelector('.text-label');
+            if (!textSpan) return;
+            const originalText = textSpan.innerText;
+            const intervalRef  = { id: null };
+            document.fonts.ready.then(() => { textSpan.style.display = 'inline-block'; textSpan.style.overflow = 'hidden'; textSpan.style.whiteSpace = 'nowrap'; });
+            link.addEventListener('mouseenter', () => hackerEffect(textSpan, originalText, intervalRef));
+            link.addEventListener('mouseleave', () => { clearInterval(intervalRef.id); textSpan.innerText = originalText; });
+        });
+
+        let lastIntroWidth = 0, lastIntroHeight = 0;
+        function syncTitleFontSize() {
+            const hiddenText      = document.getElementById('hidden-dynamic-text');
+            const hiddenContainer = document.getElementById('hidden-intro-container');
+            const mainTitle       = document.getElementById('main-title');
+            if (!hiddenText || !hiddenContainer || !mainTitle) return;
+            const targetHeight = hiddenContainer.clientHeight;
+            const targetWidth  = hiddenContainer.clientWidth;
+            if (targetWidth === lastIntroWidth && targetHeight === lastIntroHeight && hiddenText.style.fontSize) return;
+            let minSize = 10, maxSize = 300, bestFit = minSize;
+            while (minSize <= maxSize) {
+                const midSize = Math.floor((minSize + maxSize) / 2);
+                hiddenText.style.fontSize = midSize + 'px'; void hiddenText.offsetHeight;
+                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { bestFit = midSize; minSize = midSize + 1; }
+                else { maxSize = midSize - 1; }
+            }
+            let fineFit = bestFit;
+            for (let i = 1; i <= 9; i++) {
+                const testSize = bestFit + (i / 10);
+                hiddenText.style.fontSize = testSize + 'px'; void hiddenText.offsetHeight;
+                if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) { fineFit = testSize; }
+                else { break; }
+            }
+            mainTitle.style.fontSize = fineFit + 'px';
+            lastIntroWidth = targetWidth; lastIntroHeight = targetHeight;
+        }
+
+        document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
+
+        // ── STARS ENGINE ─────────────────────────────────────────────────────
+        class UnifiedStarsEngine {
+            constructor(id) {
+                this.canvas = document.getElementById(id);
+                this.ctx    = this.canvas.getContext('2d', { alpha: false });
+                this.dots   = [];
+                this.resize();
+            }
+
+            resize() {
+                this.canvas.width  = winWidth;
+                this.canvas.height = winHeight;
+                this.lB = -winWidth;
+                this.rB =  winWidth * 2;
+                this.dots = [];
+                this._addLayer(1.1, 1.4, 0.1, 1.5, 0.5);
+                this._addLayer(0.4, 0.25, 0.0, 1.0, 0.2);
+                this._addLayer(0.15, 0.001, 0.0, 0.5, 0.1);
+            }
+
+            _addLayer(density, maxS, minS, maxSz, minSz) {
+                const num = Math.floor((winWidth * winHeight / 10000) * density); 
+                for (let i = 0; i < num; i++) {
+                    this.dots.push({
+                        x: Math.random() * (this.rB - this.lB) + this.lB,
+                        y: Math.random() * winHeight,
+                        s: Math.random() * (maxSz - minSz) + minSz,
+                        v: Math.random() * (maxS  - minS)  + minS
+                    });
+                }
+            }
+
+            draw(deltaX, deltaY) {
+                const ctx = this.ctx;
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                const len = this.dots.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    const dot = this.dots[i];
+                    dot.x -= deltaX * dot.v * 0.4;
+                    dot.y -= deltaY * dot.v * 0.4;
+                    if (dot.x < this.lB)                         dot.x = this.rB;
+                    else if (dot.x > this.rB)                    dot.x = this.lB;
+                    if (dot.y < -100)                            dot.y = this.canvas.height + 100;
+                    else if (dot.y > this.canvas.height + 100)   dot.y = -100;
+                    ctx.rect(dot.x | 0, dot.y | 0, dot.s, dot.s);
+                }
+                ctx.fill();
+            }
+
+            redrawStatic() {
+                const ctx = this.ctx;
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                const len = this.dots.length;
+                for (let i = len - 1; i >= 0; i--) {
+                    const dot = this.dots[i];
+                    ctx.rect(dot.x | 0, dot.y | 0, dot.s, dot.s);
+                }
+                ctx.fill();
+            }
+        }
+
+        // ── DOM CACHE UTILS ──────────────────────────────────────────────────
+        function setCss(el, w, h, t) {
+            if (!el._cs) el._cs = { w: '', h: '', t: '' };
+            if (w !== undefined && el._cs.w !== w) { el.style.width = w; el._cs.w = w; }
+            if (h !== undefined && el._cs.h !== h) { el.style.height = h; el._cs.h = h; }
+            if (t !== undefined && el._cs.t !== t) { el.style.transform = t; el._cs.t = t; }
+        }
+
+        // ── SCROLL / SLIDE STATE ──────────────────────────────────────────────
+        let currentState = 0, targetX = 0, currentX = 0, lastX = 0;
+        let isTraveling = false, scrollTimeout;
+        let isEngineActive = false, zoomEnabled = false;
+        let currentAuScale = 10, targetAuScale = 10, lastAuToPxForRender = -1;
+        let scrollOutResistance = 0;
+        const RESISTANCE_THRESHOLD = 1500;
+
+        let wheelEndTimeout;
+        let waitForScrollEnd = false;
+        let uiFadeTimeout; // Variabile per gestire il ritardo dei pannelli UI
+
+        // ── JPL ORBITAL ELEMENTS ──────────────────────────────────────────────
+        const jplData = {
+            mercury: { name: 'Mercury', id: 'mercury', nasa: '199', scale: 0.3825, a0: 0.38709927, a1: 0.00000037, e0: 0.20563593, e1: 0.00001906, i0: 7.00497902, i1: -0.00594749, L0: 252.25032350, L1: 149472.67411175, lp0: 77.45779628, lp1: 0.16047689, N0: 48.33076593, N1: -0.12534081 },
+            venus:   { name: 'Venus',   id: 'venus',   nasa: '299', scale: 0.9489, a0: 0.72333199, a1: 0.00000039, e0: 0.00677323, e1: -0.00004107, i0: 3.39467605, i1: -0.00078890, L0: 181.97973, L1: 58517.81538, lp0: 131.53298, lp1: 0.00128681, N0: 76.68069, N1: -0.27769418 },
+            earth:   { name: 'Earth',   id: 'earth',   nasa: '399', scale: 1.0000, a0: 1.00000261, a1: 0.00000562, e0: 0.01671123, e1: -0.00004392, i0: -0.00001531, i1: -0.01294668, L0: 100.46457166, L1: 35999.37244981, lp0: 102.93768193, lp1: 0.32327364, N0: 0.0, N1: 0.0 },
+            mars:    { name: 'Mars',    id: 'mars',    nasa: '499', scale: 0.5325, a0: 1.52371034, a1: 0.00001847, e0: 0.09339410, e1: 0.00007882, i0: 1.84969142, i1: -0.00813131, L0: -4.55343205, L1: 19140.30268499, lp0: -23.94362959, lp1: 0.44441088, N0: 49.55953891, N1: -0.29257343 },
+            jupiter: { name: 'Jupiter', id: 'jupiter', nasa: '599', scale: 11.2092, a0: 5.20288700, a1: -0.00011607, e0: 0.04838624, e1: -0.00013253, i0: 1.30439695, i1: -0.00183714, L0: 34.39644051, L1: 3034.74612775, lp0: 14.72847983, lp1: 0.21252668, N0: 100.47390909, N1: 0.20469106 },
+            saturn:  { name: 'Saturn',  id: 'saturn',  nasa: '699', scale: 9.4494, a0: 9.53667594, a1: -0.00125060, e0: 0.05386179, e1: -0.00050991, i0: 2.48599187, i1: 0.00193609, L0: 49.95424423, L1: 1222.49362201, lp0: 92.59887831, lp1: -0.41897216, N0: 113.66242448, N1: -0.28867794 },
+            uranus:  { name: 'Uranus',  id: 'uranus',  nasa: '799', scale: 4.0074, a0: 19.18916464, a1: -0.00196176, e0: 0.04725744, e1: -0.00004397, i0: 0.77263783, i1: -0.00242939, L0: 313.23818410, L1: 428.48202785, lp0: 170.95427630, lp1: 0.40805281, N0: 74.01692503, N1: 0.04240589 },
+            neptune: { name: 'Neptune', id: 'neptune', nasa: '899', scale: 3.8827, a0: 30.06992276, a1: 0.00026291, e0: 0.00859048, e1: 0.00005105, i0: 1.77004347, i1: 0.00035372, L0: -55.12002969, L1: 218.45945325, lp0: 44.96476227, lp1: -0.32241464, N0: 131.78422574, N1: -0.00508664 }
+        };
+
+        const planetsArray = Object.values(jplData);
+
+        // ── TIME CONTROLS ─────────────────────────────────────────────────────
+        const datePart    = document.getElementById('date-part');
+        const timePart    = document.getElementById('time-part');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedLabel  = document.getElementById('speed-label');
+        const btnPlay     = document.getElementById('btn-play');
+        const btnPrev     = document.getElementById('btn-prev');
+        const btnNext     = document.getElementById('btn-next');
+        const btnLive     = document.getElementById('btn-live');
+
+        const epochJ2000 = new Date('2000-01-01T12:00:00Z');
+        let currentDate  = new Date();
+        let isPlaying    = true;
+        let isLiveMode   = true;
+        
+        let globalSunContainer, globalSunHud; 
+
+        // ── SLIDE TRANSITIONS E SCROLL LOGIC ──────────────────────────────────
+        function jumpToState(index) {
+            if (index < 0 || index > 1) return;
+            currentState = index;
+            targetX = currentState * winWidth;
+            isTraveling = true;
+            
+            // Pulisce l'eventuale timeout di apparizione per evitare popup indesiderati
+            clearTimeout(uiFadeTimeout);
+
+            setTimeout(() => { isTraveling = false; }, 1000);
+
+            const scrollIndicator = document.getElementById('header-scroll');
+            if (currentState === 1) {
+                scrollIndicator.style.opacity = '0'; scrollIndicator.style.pointerEvents = 'none';
+                isEngineActive = true;
+                setTimeout(() => { zoomEnabled = true; }, 500);
+                
+                // Ritarda l'apparizione dell'interfaccia a DOPO il completamento dell'animazione di scorrimento
+                uiFadeTimeout = setTimeout(() => {
+                    timeControlsEl.classList.add('visible-ui');
+                    zoomControlsEl.classList.add('visible-ui');
+                }, 1000); 
+
+                targetAuScale = 10;
+                needsForceUpdate = true;
+            } else {
+                scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
+                isEngineActive = false; zoomEnabled = false; 
+                
+                // Quando si torna alla schermata 0, svaniscono istantaneamente
+                timeControlsEl.classList.remove('visible-ui');
+                zoomControlsEl.classList.remove('visible-ui');
+            }
+        }
+
+        window.addEventListener('wheel', (e) => {
+            clearTimeout(wheelEndTimeout);
+            wheelEndTimeout = setTimeout(() => { waitForScrollEnd = false; }, 250);
+
+            if (isTraveling || scrollTimeout || waitForScrollEnd) return;
+
+            if (currentState === 0) {
+                const isScrollingDown  = e.deltaY > 0 && Math.abs(e.deltaY) > Math.abs(e.deltaX);
+                const isScrollingRight = e.deltaX > 0 && Math.abs(e.deltaX) > Math.abs(e.deltaY);
+                if (isScrollingDown || isScrollingRight) {
+                    jumpToState(1);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                }
+            } else {
+                if (!zoomEnabled || !isEngineActive ||
+                    e.target.closest('#time-controls-container') ||
+                    e.target.closest('nav') ||
+                    e.target.closest('#zoom-controls')) return;
+
+                if (targetAuScale <= 1.51 && e.deltaY > 0) {
+                    scrollOutResistance += Math.abs(e.deltaY);
+                    if (scrollOutResistance > RESISTANCE_THRESHOLD) {
+                        jumpToState(0);
+                        scrollOutResistance = 0;
+                        scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                        waitForScrollEnd = true; 
+                    }
+                } else {
+                    if (e.deltaY < 0 || targetAuScale > 1.51) scrollOutResistance = 0;
+                    targetAuScale += e.deltaY * -0.02;
+                    targetAuScale = Math.max(1.5, Math.min(targetAuScale, 15));
+                }
+            }
+        }, { passive: true });
+
+        document.getElementById('header-scroll').addEventListener('click', () => jumpToState(1));
+
+        let touchStartX = 0, touchStartY = 0;
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', e => {
+            if (isTraveling || scrollTimeout) return;
+            const dx = touchStartX - e.changedTouches[0].clientX;
+            const dy = touchStartY - e.changedTouches[0].clientY;
+            if (currentState === 0) {
+                if ((dy > 50 && Math.abs(dy) > Math.abs(dx)) || (dx > 50 && Math.abs(dx) > Math.abs(dy))) {
+                    jumpToState(1);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                }
+            } else if (currentState === 1) {
+                if (dx < -250 || dy < -250) {
+                    jumpToState(0);
+                    scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            winWidth = window.innerWidth; winHeight = window.innerHeight;
+            targetX = currentState * winWidth;
+            currentX = targetX; 
+            scrollWrapperEl.style.transform = `translate3d(-${currentX}px,0,0)`;
+            
+            updateMenuWidths(); lastIntroWidth = 0; syncTitleFontSize();
+            if (starEngine) { starEngine.resize(); starEngine.redrawStatic(); }
+            needsForceUpdate = true;
+        });
+
+        const navPosizioni = document.getElementById('nav-posizioni');
+        if (navPosizioni) navPosizioni.addEventListener('click', (e) => { e.preventDefault(); window.location.reload(); });
+
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            if (!isEngineActive) return;
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale + 1.5, 15));
+        });
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            if (!isEngineActive) return;
+            targetAuScale = Math.max(1.5, Math.min(targetAuScale - 1.5, 15));
+        });
+
+        function updateDateUI() {
+            const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
+            const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).toUpperCase();
+            datePart.innerText = dateStr;
+            timePart.innerText = timeStr;
+            if (!isLiveMode) btnLive.classList.add('visible'); else btnLive.classList.remove('visible');
+        }
+        setInterval(updateDateUI, 1000);
+
+        function getSpeed() {
+            const val = parseFloat(speedSlider.value);
+            if (val === 0) return 1;
+            const sign = val < 0 ? -1 : 1;
+            return sign * Math.pow(Math.abs(val) / 1000, 3) * 31557600;
+        }
+
+        function formatSpeed(s) {
+            if (s === 1) return "Real time";
+            const abs = Math.abs(s), pre = s > 0 ? "+" : "-";
+            if (abs < 60)       return `${pre}${abs.toFixed(1)} sec/s`;
+            if (abs < 3600)     return `${pre}${(abs/60).toFixed(1)} min/s`;
+            if (abs < 86400)    return `${pre}${(abs/3600).toFixed(1)} hours/s`;
+            if (abs < 2592000)  return `${pre}${(abs/86400).toFixed(1)} days/s`;
+            if (abs < 31557600) return `${pre}${(abs/2592000).toFixed(1)} months/s`;
+            return `${pre}${(abs/31557600).toFixed(1)} years/s`;
+        }
+
+        speedSlider.addEventListener('input', () => {
+            let val = parseInt(speedSlider.value);
+            if (val > -25 && val < 25) { speedSlider.value = 0; val = 0; }
+            speedLabel.innerText = formatSpeed(getSpeed());
+            if (val === 0) {
+                isLiveMode = true; isPlaying = true;
+                btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
+            } else {
+                isLiveMode = false;
+                if (!isPlaying) { isPlaying = true; btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active"; }
+            }
+        });
+
+        speedSlider.addEventListener('mouseup', () => {
+            if (parseInt(speedSlider.value) > -50 && parseInt(speedSlider.value) < 50) {
+                speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input'));
+            }
+        });
+        speedSlider.addEventListener('touchend', () => {
+            if (parseInt(speedSlider.value) > -50 && parseInt(speedSlider.value) < 50) {
+                speedSlider.value = 0; speedSlider.dispatchEvent(new Event('input'));
+            }
+        });
+
+        function adjustSliderStep(amount) {
+            speedSlider.value = Math.max(-1000, Math.min(1000, parseFloat(speedSlider.value) + amount));
+            speedSlider.dispatchEvent(new Event('input'));
+        }
+        btnPrev.addEventListener('click', () => adjustSliderStep(-50));
+        btnNext.addEventListener('click', () => adjustSliderStep(50));
+
+        btnPlay.addEventListener('click', () => {
+            isPlaying = !isPlaying; isLiveMode = false;
+            btnPlay.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
+            btnPlay.className = isPlaying ? "btn btn-icon btn-active" : "btn btn-icon";
+        });
+
+        btnLive.addEventListener('click', () => {
+            isPlaying = true; isLiveMode = true;
+            btnPlay.innerHTML = "&#10074;&#10074;"; btnPlay.className = "btn btn-icon btn-active";
+            speedSlider.value = 0; speedLabel.innerText = "Real time";
+            currentDate = new Date(); updateDateUI();
+            needsForceUpdate = true;
+        });
+
+        function initializeDOM() {
+            planetsArray.forEach(p => {
+                const orb   = document.createElement('div'); orb.className = `orbit orb-${p.id}`;
+                const model = document.createElement('div'); model.className = `planet-model pl-${p.id}`; 
+                const hud   = document.createElement('div'); hud.className = `hud-ring ${['jupiter','saturn','uranus','neptune'].includes(p.id) ? 'hud-default' : ''}`; hud.setAttribute('data-name', p.name);
+                const pixel = document.createElement('div'); pixel.className = `pixel-dot ${p.id}-pixel`;
+                model.appendChild(hud); model.appendChild(pixel);
+                document.getElementById('scene').appendChild(orb);
+                document.getElementById('scene').appendChild(model);
+                
+                p.orbEl   = orb;
+                p.modelEl = model;
+                p.hudEl   = hud;
+            });
+
+            globalSunContainer = document.querySelector('.sun-container');
+            globalSunHud = document.querySelector('.sun-hud-ring');
+        }
+
+        async function fetchNasaApi() {
+            const startStr = currentDate.toISOString().slice(0, 16).replace('T', ' ');
+            const stopStr  = new Date(currentDate.getTime() + 60000).toISOString().slice(0, 16).replace('T', ' ');
+            await Promise.all(planetsArray.map(async (p) => {
+                const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
+                    `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='@10'&START_TIME='${startStr}'&STOP_TIME='${stopStr}'&STEP_SIZE='1m'&OUT_UNITS='AU-D'&_t=${Date.now()}`
+                )}`;
+                try {
+                    const response = await fetch(url);
+                    const json = await response.json();
+                    const soeData = JSON.parse(json.contents).result.split('$$SOE')[1].split('$$EOE')[0];
+                    const extract = (key) => {
+                        const m = soeData.match(new RegExp(`\\b${key}\\s*=\\s*([\\-\\d\\.E\\+]+)`));
+                        return m ? parseFloat(m[1]) : null;
+                    };
+                    p.api_a = extract('A'); p.api_e = extract('EC'); p.api_i = extract('IN');
+                    p.api_N = extract('OM'); p.api_w = extract('W'); p.api_MA = extract('MA');
+                } catch (_) {}
+            }));
+            needsForceUpdate = true;
+        }
+
+        let lastTime = performance.now();
+        let lastPlanetCalcT = null;
+        let needsForceUpdate = true;
+
+        const PI_180 = 0.017453292519943295;
+        const TWO_PI = 6.283185307179586;
+
+        function animate(time) {
+            const deltaTime = Math.min(time - lastTime, 32);
+            lastTime = time;
+
+            if (Math.abs(mouseX - outlineX) > 0.1 || Math.abs(mouseY - outlineY) > 0.1) {
+                outlineX += (mouseX - outlineX) * 0.2;
+                outlineY += (mouseY - outlineY) * 0.2;
+                const ox = Math.round(outlineX), oy = Math.round(outlineY);
+                if (ox !== lastOlPx || oy !== lastOlPy) {
+                    cursorOutline.style.transform = `translate3d(${ox}px,${oy}px,0) translate(-50%,-50%)`;
+                    lastOlPx = ox; lastOlPy = oy;
+                }
+            }
+            if (mouseX !== lastDotPx || mouseY !== lastDotPy) {
+                cursorDot.style.transform = `translate3d(${Math.round(mouseX)}px,${Math.round(mouseY)}px,0) translate(-50%,-50%)`;
+                lastDotPx = mouseX; lastDotPy = mouseY;
+            }
+
+            currentX += (targetX - currentX) * 0.04;
+            const deltaXSlide = currentX - lastX;
+            if (Math.abs(deltaXSlide) > 0.05) {
+                scrollWrapperEl.style.transform = `translate3d(-${Math.round(currentX)}px,0,0)`;
+                if (starEngine) starEngine.draw(deltaXSlide, 0);
+            }
+            lastX = currentX;
+
+            const auDiff = targetAuScale - currentAuScale;
+            if (Math.abs(auDiff) > 0.001) {
+                currentAuScale += auDiff * 0.08;
+            } else if (Math.abs(auDiff) > 0.00001) {
+                currentAuScale = targetAuScale; 
+            }
+
+            if (!isLiveMode && isPlaying) {
+                const speed = getSpeed();
+                if (speed !== 0) {
+                    currentDate = new Date(currentDate.getTime() + speed * deltaTime);
+                }
+            }
+
+            if (currentState === 1 || isTraveling) {
+                const vmin = Math.min(winWidth, winHeight) / 100;
+                const currentAuToPx = currentAuScale * vmin;
+
+                let zoomChanged = Math.abs(currentAuToPx - lastAuToPxForRender) > 0.05;
+                if (zoomChanged) lastAuToPxForRender = currentAuToPx;
+
+                const T = (currentDate - epochJ2000) / 3155760000000;
+                let timeChanged = false;
+                
+                if (lastPlanetCalcT === null || Math.abs(T - lastPlanetCalcT) > 1e-7) {
+                    timeChanged = true;
+                    lastPlanetCalcT = T;
+                }
+
+                if (timeChanged || zoomChanged || needsForceUpdate) {
+                    needsForceUpdate = false;
+                    
+                    const planetBasePx = currentAuToPx * 0.00008517;
+                    const uiRingPx = Math.round((0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin);
+                    const uiRingStr = uiRingPx + 'px';
+
+                    if (globalSunContainer) {
+                        const sunPxStr = Math.round(planetBasePx * 109.18) + 'px';
+                        setCss(globalSunContainer, sunPxStr, sunPxStr, 'translate(-50%, -50%) translateZ(0)');
+                        if (globalSunHud) setCss(globalSunHud, uiRingStr, uiRingStr);
+                    }
+
+                    for (let i = 0; i < planetsArray.length; i++) {
+                        const p = planetsArray[i];
+                        
+                        if (timeChanged) {
+                            let a, e, i_deg, N, w, M_rad;
+                            if (isLiveMode && p.api_a !== undefined) {
+                                a = p.api_a; e = p.api_e; i_deg = p.api_i; N = p.api_N; w = p.api_w;
+                                M_rad = p.api_MA * PI_180;
+                            } else {
+                                a = p.a0 + p.a1 * T; e = p.e0 + p.e1 * T; i_deg = p.i0 + p.i1 * T;
+                                const L  = p.L0 + p.L1 * T;
+                                const lp = p.lp0 + p.lp1 * T;
+                                N = p.N0 + p.N1 * T; w = lp - N;
+                                M_rad = ((L - lp) % 360) * PI_180;
+                            }
+                            if (M_rad < 0) M_rad += TWO_PI;
+
+                            let E_rad = M_rad, delta = 1;
+                            for (let k = 0; k < 5; k++) {
+                                delta = (E_rad - e * Math.sin(E_rad) - M_rad) / (1 - e * Math.cos(E_rad));
+                                E_rad -= delta;
+                                if (Math.abs(delta) < 1e-4) break; 
+                            }
+                            
+                            const lx = a * (Math.cos(E_rad) - e);
+                            const ly = a * Math.sqrt(1 - e * e) * Math.sin(E_rad);
+                            const N_rad = N * PI_180, i_rad = i_deg * PI_180, w_rad = w * PI_180;
+                            const sin_w = Math.sin(w_rad), cos_w = Math.cos(w_rad);
+                            const sin_N = Math.sin(N_rad), cos_N = Math.cos(N_rad);
+                            const cos_i = Math.cos(i_rad);
+
+                            const x1 = lx * cos_w - ly * sin_w;
+                            const y1 = lx * sin_w + ly * cos_w;
+                            const y2 = y1 * cos_i;
+                            
+                            p.abs_X = x1 * cos_N - y2 * sin_N;
+                            p.abs_Y = x1 * sin_N + y2 * cos_N;
+                            
+                            p.curr_a = a; p.curr_b = a * Math.sqrt(1 - e * e); p.curr_c = a * e;
+                            p.curr_N = N; p.curr_i = i_deg; p.curr_w = w;
+                        }
+
+                        const newX = Math.round(p.abs_X * currentAuToPx);
+                        const newY = Math.round(p.abs_Y * currentAuToPx);
+                        const tStr = `translate3d(${newX}px,${newY}px,0) translate(-50%, -50%)`;
+
+                        const sizePxStr = Math.round(planetBasePx * p.scale) + 'px';
+                        setCss(p.modelEl, sizePxStr, sizePxStr, tStr);
+                        if (p.hudEl) setCss(p.hudEl, uiRingStr, uiRingStr);
+
+                        const wPxStr = Math.round(p.curr_a * 2 * currentAuToPx) + 'px';
+                        const hPxStr = Math.round(p.curr_b * 2 * currentAuToPx) + 'px';
+                        const txPx = Math.round(-p.curr_c * currentAuToPx);
+                        
+                        const orbTStr = `translate(-50%, -50%) rotateZ(${p.curr_N.toFixed(2)}deg) rotateX(${p.curr_i.toFixed(2)}deg) rotateZ(${p.curr_w.toFixed(2)}deg) translateX(${txPx}px)`;
+                        
+                        setCss(p.orbEl, wPxStr, hPxStr, orbTStr);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                starEngine = new UnifiedStarsEngine('stars-canvas');
+                starEngine.redrawStatic();
+                initializeDOM();
+                updateDateUI();
+                needsForceUpdate = true;
+                fetchNasaApi(); 
+                requestAnimationFrame(animate);
+            }, 0);
+        });
+
+        let starEngine;
+
+    });
+    </script>
+</body>
+</html>
