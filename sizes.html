@@ -846,59 +846,89 @@ document.addEventListener('DOMContentLoaded', () => {
     let loadedCount = 0;
     const targetPlanets = ['neptune', 'uranus', 'saturn', 'jupiter'];
 
+    /* ─── CACHE API INTEGRATION: Salva i modelli localmente per velocizzare i ricaricamenti futuri ─── */
+    async function getCachedModelUrl(url) {
+        if (!('caches' in window)) return url; 
+        try {
+            const cacheName = 'solarscale-models-v1';
+            const cache = await caches.open(cacheName);
+            let response = await cache.match(url);
+            
+            if (!response) {
+                response = await fetch(url);
+                if (response.ok) {
+                    await cache.put(url, response.clone());
+                }
+            }
+            const blob = await response.blob();
+            return URL.createObjectURL(blob);
+        } catch (e) {
+            console.warn('Cache API Error, falling back to network', e);
+            return url;
+        }
+    }
+
     function loadPlanet(data, callback) {
-        gltfLoader.load(`assets/${data.id}.glb`, (gltf) => {
-            const model = gltf.scene;
-            const box = new THREE.Box3().setFromObject(model);
-            const size = box.getSize(new THREE.Vector3());
-            const center = box.getCenter(new THREE.Vector3());
+        const modelUrl = `assets/${data.id}.glb`;
+        
+        getCachedModelUrl(modelUrl).then(blobUrl => {
+            gltfLoader.load(blobUrl, (gltf) => {
+                if (blobUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(blobUrl); 
+                }
 
-            model.position.set(-center.x, -center.y, -center.z);
-            if (data.id === 'saturn') { model.rotation.z = 0.46; model.rotation.x = 0.20; }
-            model.updateMatrix();
-            model.matrixAutoUpdate = false; 
+                const model = gltf.scene;
+                const box = new THREE.Box3().setFromObject(model);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
 
-            model.traverse((child) => {
-                if (child.isMesh) {
-                    child.matrixAutoUpdate = false; 
-                    child.updateMatrix();
-                    child.frustumCulled = false;
+                model.position.set(-center.x, -center.y, -center.z);
+                if (data.id === 'saturn') { model.rotation.z = 0.46; model.rotation.x = 0.20; }
+                model.updateMatrix();
+                model.matrixAutoUpdate = false; 
 
-                    if (child.material) {
-                        child.material.side = THREE.FrontSide;
-                        child.castShadow = false; 
-                        child.receiveShadow = false;
-                        
-                        if (targetPlanets.includes(data.id) && child.material.color) {
-                            child.material.color.setScalar(0.5);
-                        }
-                        
-                        if (data.id === 'earth') child.layers.enable(1); 
-                        if (data.id === 'sun') { 
-                            child.material.emissive = new THREE.Color(0xffffff); 
-                            child.material.emissiveIntensity = 1.0; 
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.matrixAutoUpdate = false; 
+                        child.updateMatrix();
+                        child.frustumCulled = false;
+
+                        if (child.material) {
+                            child.material.side = THREE.FrontSide;
+                            child.castShadow = false; 
+                            child.receiveShadow = false;
+                            
+                            if (targetPlanets.includes(data.id) && child.material.color) {
+                                child.material.color.setScalar(0.5);
+                            }
+                            
+                            if (data.id === 'earth') child.layers.enable(1); 
+                            if (data.id === 'sun') { 
+                                child.material.emissive = new THREE.Color(0xffffff); 
+                                child.material.emissiveIntensity = 1.0; 
+                            }
                         }
                     }
-                }
+                });
+
+                const wrapper = new THREE.Group();
+                wrapper.add(model);
+                wrapper.frustumCulled = false; 
+                
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetDiameter = data.scale * 2; 
+                let scaleFactor = targetDiameter / maxDim; 
+                if (data.id === 'saturn') scaleFactor *= 2.33; 
+
+                wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                wrapper.position.set(data.x, data.y, 0);
+
+                scene.add(wrapper);
+                data.mesh = wrapper; 
+                
+                loadedCount++;
+                if (callback) callback();
             });
-
-            const wrapper = new THREE.Group();
-            wrapper.add(model);
-            wrapper.frustumCulled = false; 
-            
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const targetDiameter = data.scale * 2; 
-            let scaleFactor = targetDiameter / maxDim; 
-            if (data.id === 'saturn') scaleFactor *= 2.33; 
-
-            wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
-            wrapper.position.set(data.x, data.y, 0);
-
-            scene.add(wrapper);
-            data.mesh = wrapper; 
-            
-            loadedCount++;
-            if (callback) callback();
         });
     }
 
