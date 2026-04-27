@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>SolarScale - Measurement Methods</title>
+    <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        /* =========================================
+           FONT IMPORT
+           ========================================= */
+        @font-face {
+            font-family: 'Nasa';
+            src: url('assets/nasa.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-book.otf') format('opentype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-medium.otf') format('opentype');
+            font-weight: 500;
+        }
+
+        :root {
+            --color-black: #000000;
+            --color-white: #ffffff;
+            --color-dashed: rgba(255, 255, 255, 0.4);
+            
+            --font-62: clamp(32px, 2.5vw + 26px, 90px);
+            --font-16: clamp(14px, 0.3vw + 11.68px, 22px);
+            --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
+            /* Parallel scalability to the menu: exactly 18px on MacBook (~1440px) */
+            --font-18: clamp(15px, 0.3vw + 13.68px, 24px); 
+        }
+
+        /* ─── BASE SETUP WITH BLOCKED SCROLL (MANAGED VIA JS) ─── */
+        html, body {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            background-color: var(--color-black);
+            color: var(--color-white);
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 400;
+            overflow: hidden; 
+            cursor: none;
+            user-select: none;
+        }
+        
+        h1, h2, h3, p, a, li {
+            color: var(--color-white); margin: 0;
+            font-family: 'Neue Montreal', sans-serif; 
+            z-index: 10; cursor: none;
+        }
+        
+        h1 { 
+            font-size: var(--font-62); 
+            line-height: 1.15; 
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .title { 
+            font-size: var(--font-16);
+            opacity: 0.4; 
+            transition: opacity 0.3s;
+            font-weight: 500;
+        }
+
+        /* ─── MAIN HORIZONTAL CONTAINER ─── */
+        .horizontal-scroll-wrapper {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            width: 200vw; /* Only 2 States: Header and Vertical Content */
+            will-change: transform;
+        }
+
+        /* ─── SLIDE DEFINITION ─── */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 150;
+        }
+
+        .header-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CONTENT SLIDE - ENABLED FOR VERTICAL SCROLL */
+        .content-slide {
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: block;
+            scroll-behavior: smooth;
+            /* PERFECT FADE MASK */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 16vh, black 22vh, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, transparent 16vh, black 22vh, black 100%);
+        }
+
+        /* Hide scrollbar for vertical slide */
+        .content-slide::-webkit-scrollbar { display: none; }
+        .content-slide { scrollbar-width: none; }
+
+        .vertical-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20vh 4vh 12vh 4vh; 
+            display: flex;
+            flex-direction: column;
+            gap: 8vh; 
+        }
+
+        /* ─── FIXED UI ELEMENTS ─── */
+        .scrollWrapper { 
+            position: fixed; 
+            bottom: 4vh; 
+            right: 4vh;
+            cursor: none; 
+            pointer-events: auto; 
+            z-index: 500;
+            transition: opacity 0.2s, transform 0.2s; /* Aggiunto transform per la fluidità */
+        }
+        
+        .scrollWrapper:hover {
+            transform: scale(1.03);
+        }
+        
+        .scrollWrapper:active {
+            transform: scale(0.97);
+        }
+        
+        .scroll-sign { 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            gap: 8px; 
+            opacity: 0.4; 
+            transition: opacity 0.2s; 
+        }
+
+        .scrollWrapper:hover .scroll-sign {
+            opacity: 1;
+        }
+        
+        .scroll-sign p, .scroll-arrow { font-size: var(--font-16); font-weight: 500; }
+        .scroll-arrow { transform: translateY(1px); }
+        
+        @keyframes jumpX { 
+            from { transform: translateX(0); } 
+            to { transform: translateX(6px); } 
+        }
+        .jump { animation: jumpX 1s ease-in-out infinite alternate; }
+
+        .cursor-dot, .cursor-outline {
+            position: fixed; top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 9999999; pointer-events: none;
+            box-sizing: content-box; /* Force content-box to match index.html */
+        }
+        .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .3s, height .3s; }
+        .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .3s, height .3s; }
+        .mouse-down { width: 20px !important; height: 20px !important; }
+        .hover      { width: 30px !important; height: 30px !important; }
+
+        /* =========================================
+           TOP MENU (Da dimensioni.html)
+           ========================================= */
+        .menu {
+            position: fixed;
+            left: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+        }
+
+        .right-menu {
+            position: fixed;
+            right: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+        }
+        
+        .nasa-title {
+            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
+            color: white; line-height: 1; pointer-events: all; cursor: none;
+            margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
+        }
+
+        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
+
+        .nav-link {
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
+        }
+
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link:hover, .nav-link.active { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before,
+        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+
+        @media (max-width: 900px) {
+            .menu { 
+                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            }
+            .right-menu { 
+                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
+                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+            }
+        }
+        /* ========================================= */
+
+        canvas.stars-canvas {
+            position: fixed; left: 0; top: 0;
+            z-index: 0; pointer-events: none;
+        }
+
+        /* ─── TEXT AND VIDEO CONTENT STYLES ─── */
+        .titles { 
+            position: absolute; bottom: 4vh; left: 4vh;
+            display: flex; flex-direction: column; align-items: flex-start; gap: 10px; 
+            text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+        }
+
+        .intro-text p {
+            font-size: clamp(18px, 1.5vw + 10px, 28px);
+            line-height: 1.4; font-weight: 400; opacity: 0.9;
+        }
+
+        .text-block h2 {
+            font-size: clamp(24px, 2vw + 12px, 36px);
+            font-weight: 500; margin-bottom: 25px;
+            display: flex; align-items: center;
+        }
+
+        .text-block p {
+            font-size: var(--font-18); 
+            line-height: 1.6; font-weight: 400; opacity: 0.8; margin-bottom: 30px;
+        }
+
+        .text-block ul {
+            list-style-type: none; padding: 0; margin: 0;
+            display: flex; flex-direction: column; gap: 25px;
+        }
+
+        .text-block li {
+            font-size: var(--font-18); 
+            line-height: 1.6; font-weight: 400; opacity: 0.8;
+            position: relative; padding-left: 20px; border-left: 1px solid var(--color-dashed);
+        }
+
+        .text-block li strong {
+            color: white; font-weight: 500; display: block; margin-bottom: 5px; font-size: 1.05em;
+        }
+
+        .text-block a {
+            color: white;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            cursor: none; /* CORRETTO: rimosso pointer e messo none */
+            pointer-events: auto;
+            word-break: break-all;
+        }
+
+        .text-block a:hover {
+            opacity: 1;
+        }
+
+        .no-border-list li {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        /* ─── RESPONSIVE VIDEO WRAPPER ─── */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Ratio 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 20px 0 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            pointer-events: auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* Physical dimensions for animated glyphs in the hidden box */
+        .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; margin: 0 0.15em; }
+        .anim-dim-circle { display: inline-block; width: 0.35em; height: 0.35em; margin: 0 0.15em; }
+        .anim-dist-circles { display: inline-flex; width: 2.5em; height: 0.5em; margin: 0 0.3em; vertical-align: middle; }
+
+        #hidden-dynamic-text .anim-pos-orbit,
+        #hidden-dynamic-text .anim-dim-circle,
+        #hidden-dynamic-text .anim-dist-circles {
+            animation: none !important;
+        }
+        
+        #hidden-dynamic-text .anim-dist-circles {
+            width: 2.5em !important;
+            margin: 0 0.3em !important;
+        }
+
+        #hidden-intro-container {
+            position: absolute; top: 14vh; left: 4vh; right: 4vh;
+            margin: 0; width: calc(100vw - 8vh); height: 82vh; 
+            opacity: 0; pointer-events: none; z-index: -9999; 
+            visibility: hidden; overflow: hidden;
+        }
+        #hidden-dynamic-text {
+            font-family: 'Neue Montreal', sans-serif; font-weight: 500; 
+            line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor-dot"     data-cursor-dot></div>
+<div class="cursor-outline" data-cursor-outline></div>
+
+<nav class="menu">
+    <a href="index.html" class="nasa-title" id="logo-link">
+        <img src="assets/sun_symbol.svg" alt="Sun symbol">
+        <span class="nasa-text-label">SolarScale</span>
+    </a>
+    <a href="sizes.html" class="nav-link">
+        <span class="text-label">Sizes</span>
+    </a>
+    <a href="positions.html" class="nav-link">
+        <span class="text-label">Positions</span>
+    </a>
+    <a href="distances.html" class="nav-link">
+        <span class="text-label">Distances</span>
+    </a>
+</nav>
+
+<nav class="right-menu">
+    <a href="measurement.html" class="nav-link active" id="nav-misurazioni">
+        <span class="text-label">Measurement Methods</span>
+    </a>
+    <a href="credits.html" class="nav-link" id="crediti-link">
+        <span class="text-label">Credits</span>
+    </a>
+</nav>
+
+<canvas id="stars"  class="stars-canvas"></canvas>
+<canvas id="stars2" class="stars-canvas"></canvas>
+<canvas id="stars3" class="stars-canvas"></canvas>
+
+<div class="scrollWrapper" id="header-scroll">
+    <div id="scroll-sign" class="scroll-sign jump">
+        <p>Scroll to read</p>
+        <span class="scroll-arrow">→</span>
+    </div>
+</div>
+
+<div class="horizontal-scroll-wrapper" id="scroll-wrapper">
+
+    <header id="main-header" class="slide header-slide">
+        <div class="titles">
+            <h1 id="main-title">Measurement Methods</h1>
+            <h2 class="title">Applied Science and Technologies</h2>
+        </div>
+    </header>
+
+    <div class="slide content-slide" id="vertical-content">
+        <div class="vertical-container">
+            
+            <div class="intro-text">
+                <p>Understanding the true proportions of the Solar System requires measurements of absolute precision. The era of relying exclusively on optical observation or visual geometry is long gone. Today, to accurately calculate cosmic scales, NASA relies on the propagation times of electromagnetic waves, gravitational variations, and the immense computing power of supercomputers.</p>
+            </div>
+
+            <div class="text-block">
+                <h2>Measuring Distances: The Stopwatch of Light</h2>
+                <p>The foundation of any spatial map is distance. The most effective modern method is based on the concept of time of flight. Using the immense antennas of the Deep Space Network (DSN), scientists send a radio signal toward a planet or probe. Since we know the speed of light in a vacuum with absolute precision, by measuring the exact time the signal takes to complete the round trip, we can calculate the distance with a minimal margin of error. To achieve this accuracy, the DSN relies on atomic clocks so precise they lose less than a second every billion years. For the Moon, this process is further refined with lunar laser ranging: in this case, radio waves are not used, but rather laser pulses that bounce off mirrors left on the lunar surface, allowing us to monitor its position with millimeter precision.</p>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/NTo5-YsjWlI" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="text-block">
+                <h2>Orbits and Positions: The Doppler Effect and the Telescope</h2>
+                <p>Determining where a planet is today is relatively simple, but understanding exactly where it will be in years requires knowing its speed and angular position in the sky. For speed, radio telescopes exploit the Doppler effect: by analyzing how the frequency of the returning radio signal "compresses" or "stretches" due to the planet's movement, astronomers calculate its orbital speed in real time. For the angular position, a technique called VLBI (Very Long Baseline Interferometry) is used. By linking various antennas scattered across the globe, a virtual telescope the size of the Earth is created, capable of distinguishing minuscule angles. This data is then fed into simulations run by supercomputers that solve the complex N-body problem, which is the calculation of the mutual gravitational influences among all the planets. It is this "digital navigation" that allows us to launch a probe today and have it reach a moving target billions of kilometers away.</p>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/YAnxt1YPWbk" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="text-block">
+                <h2>Size and Mass: Weighing Worlds with Gravity</h2>
+                <p>Once the position is established, the challenge is determining how large a planet is. The classic method relies on angular size and trigonometry, but accuracy increases drastically with stellar occultations: by timing how long a planet obscures the light of a distant star, we calculate its diameter with minimal margins of error. However, the most precise technology of all is laser altimetry mounted on orbiting probes. Instruments like NASA's LOLA fire light pulses that map the surface point by point, providing the exact volume and true shape of the planet, including valleys and mountains.</p>
+                <p>As for mass, our "cosmic scale" is radio science. We do not measure the planet, but the effect of its gravity on spacecraft passing nearby: by analyzing microscopic variations in the frequency of the radio signal (Doppler effect) sent back to Earth, we calculate how much the planet accelerates the vehicle. This data reveals the exact mass of the celestial body. By crossing mass and volume, scientists obtain density, the fundamental parameter for understanding whether a world is rocky and solid like Earth or a gas giant like Saturn.</p>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/pShWcrgPzQs" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="text-block">
+                <h2>In-Depth</h2>
+                <ul class="no-border-list">
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=zR3Igc3Rhfg" target="_blank">To Scale: THE SOLAR SYSTEM</a> - To Scale</strong>
+                        A group of friends goes to the desert to build a true-to-scale model of the solar system. Using a marble to represent the Earth, they visually show us the immense actual distances that separate the planets in the vacuum of space.
+                    </li>
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=libKVRa01L8" target="_blank">Solar System 101 | National Geographic</a> - National Geographic</strong>
+                        A clear and comprehensive overview of our cosmic neighborhood. The video illustrates the formation of the solar system, the structural differences between rocky planets and gas or ice giants, and then ventures out to the Kuiper Belt and the Oort Cloud.
+                    </li>
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=MX3PIkbTQwQ" target="_blank">Our Milky Way Galaxy: How Big is Space?</a> - NASA Solar System</strong>
+                        A visual journey to help us understand the boundless dimensions of the Milky Way. Through the concept of "light-time," it shows the actual times it takes for light to travel from the Sun to the various planets, all the way to our nearest stars.
+                    </li>
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=yaPhKc31zPs" target="_blank">The Basics of the Solar System in 10 Minutes!</a> - BlenderTimer</strong>
+                        A concentration of trivia and fascinating data on the celestial bodies orbiting our star. In just ten minutes, it explores dimensions, temperatures, atmospheric peculiarities, geological records, and the orbital oddities of each planet.
+                    </li>
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=d-z0eQOEzkE" target="_blank">The Birth of the Solar System</a> - SEA</strong>
+                        A deep and detailed documentary on the origins of our planetary system. Starting from the collapse of the primordial nebula, it explains the formation of protoplanets, violent orbital migrations, and the dynamics that made Earth a habitable oasis.
+                    </li>
+                    <li>
+                        <strong>►&nbsp;&nbsp;&nbsp;<a href="https://www.youtube.com/watch?v=4aRr4bYiJFM" target="_blank">Why NASA’s Deep Space Network Is The Most Important Part</a> - Scott Manley</strong>
+                        An analysis of the fundamental infrastructure for cosmic exploration: the Deep Space Network. The video explains how this global network of massive NASA radio telescopes allows us to communicate, navigate, and receive precious images from space probes.
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="text-block">
+                <h2>Sources</h2>
+                <ul class="no-border-list">
+                    <li>NASA. (2017, November 14). <em>Solar System: Facts</em>. NASA Science.<br><a href="https://science.nasa.gov/solar-system/solar-system-facts/" target="_blank">https://science.nasa.gov/solar-system/solar-system-facts/</a></li>
+                    <li>NASA. (2018, January 12). <em>Planet Compare</em>. NASA Solar System Exploration.<br><a href="https://solarsystem.nasa.gov/planet-compare/" target="_blank">https://solarsystem.nasa.gov/planet-compare/</a></li>
+                    <li>NASA. (2023, June 8). <em>Solar System Exploration</em>. NASA Science.<br><a href="https://science.nasa.gov/solar-system/" target="_blank">https://science.nasa.gov/solar-system/</a></li>
+                    <li>NASA Jet Propulsion Laboratory. (2026). <em>APIs</em>. Nasa.gov.<br><a href="https://ssd.jpl.nasa.gov/api.html" target="_blank">https://ssd.jpl.nasa.gov/api.html</a></li>
+                    <li>Wikipedia. (2022). <em>Sistema solare</em>. Wikipedia.org.<br><a href="https://it.wikipedia.org/wiki/Sistema_solare" target="_blank">https://it.wikipedia.org/wiki/Sistema_solare</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div id="hidden-intro-container">
+    <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA’s&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency’s&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ─── 1. HYBRID NAVIGATION ENGINE (X States + Native Y Scroll) ─── */
+    let currentState = 0; // 0 = Header, 1 = Vertical Content
+    let targetX = 0;
+    let currentX = 0;
+    let lastX = 0;
+    
+    // Variables for vertical inertia of stars
+    let targetY = 0;
+    let currentY = 0;
+    let lastY = 0;
+
+    let isTraveling = false;
+    let scrollTimeout;
+
+    // --- VARIABLES FOR RESISTANCE ---
+    let scrollUpResistance = 0; 
+    const RESISTANCE_THRESHOLD = 150; 
+    
+    let lastWheelTime = 0;
+    let gestureStartedAtTop = true;
+
+    const scrollIndicator = document.getElementById('header-scroll');
+    const contentDiv = document.getElementById('vertical-content');
+
+    function jumpToState(index) {
+        if (index < 0 || index > 1) return;
+        
+        currentState = index;
+        targetX = currentState * window.innerWidth;
+        
+        isTraveling = true;
+
+        if (currentState === 1) {
+            scrollIndicator.style.opacity = '0';
+            scrollIndicator.style.pointerEvents = 'none';
+            
+            // 🛑 BLOCCA L'INERZIA DEL TRACKPAD
+            // Nascondiamo l'overflow per impedire lo scroll nativo involontario
+            contentDiv.style.overflowY = 'hidden';
+            contentDiv.scrollTop = 0; // Assicuriamoci che parta esattamente dalla cima
+            
+            setTimeout(() => { 
+                isTraveling = false; 
+                // Riabilita lo scroll nativo solo dopo che l'inerzia è "morta"
+                contentDiv.style.overflowY = 'auto'; 
+            }, 1200);
+            
+        } else {
+            scrollIndicator.style.opacity = '1';
+            scrollIndicator.style.pointerEvents = 'auto';
+            
+            // Quando si torna alla pagina iniziale, blocca la discesa accidentale dell'articolo sotto
+            contentDiv.style.overflowY = 'hidden';
+            
+            setTimeout(() => { isTraveling = false; }, 1200);
+        }
+    }
+
+    // Global mouse wheel listener
+    window.addEventListener('wheel', (e) => {
+        let now = Date.now();
+        // Se è passato abbastanza tempo dall'ultimo scroll (200ms), è un nuovo movimento
+        if (now - lastWheelTime > 200) {
+            gestureStartedAtTop = (contentDiv.scrollTop <= 5);
+            scrollUpResistance = 0;
+        }
+        lastWheelTime = now;
+
+        if (isTraveling || scrollTimeout) return;
+        
+        if (currentState === 0) {
+            if (e.deltaY > 0 || e.deltaX > 0) {
+                jumpToState(1);
+                scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+            }
+        } else if (currentState === 1) {
+            // Se siamo in cima e l'utente prova a scorrere in alto
+            if (contentDiv.scrollTop <= 5 && (e.deltaY < 0 || e.deltaX < 0)) {
+                // Selezioniamo la resistenza SOLO se lo scroll è iniziato dalla cima
+                // Questo blocca il "momentum" se arriviamo in cima da un punto più basso
+                if (gestureStartedAtTop) {
+                    scrollUpResistance += Math.abs(e.deltaY || e.deltaX);
+                    
+                    if (scrollUpResistance > RESISTANCE_THRESHOLD) {
+                        jumpToState(0);
+                        scrollUpResistance = 0; 
+                        scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+                    }
+                }
+            } else {
+                // Se scendiamo o non siamo in cima, resettiamo la resistenza
+                if (e.deltaY > 0 || e.deltaX > 0 || contentDiv.scrollTop > 5) {
+                    scrollUpResistance = 0;
+                }
+            }
+        }
+    });
+
+    scrollIndicator.addEventListener('click', () => jumpToState(1));
+
+    // MENU CLICK TO RELOAD PAGE
+    const navMisurazioni = document.getElementById('nav-misurazioni');
+    if (navMisurazioni) {
+        navMisurazioni.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.reload();
+        });
+    }
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    window.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, {passive: true});
+    
+    window.addEventListener('touchend', e => {
+        if(isTraveling || scrollTimeout) return;
+        let deltaX = touchStartX - e.changedTouches[0].clientX;
+        let deltaY = touchStartY - e.changedTouches[0].clientY;
+        
+        if (currentState === 0) {
+            if((Math.abs(deltaX) > 50 && deltaX > 0) || (Math.abs(deltaY) > 50 && deltaY > 0)) {
+                jumpToState(1);
+                scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+            }
+        } else if (currentState === 1) {
+            if (contentDiv.scrollTop <= 5 && (deltaY < -180 || deltaX < -180)) {
+                jumpToState(0);
+                scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 1200);
+            }
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        targetX = currentState * window.innerWidth;
+    });
+
+
+    /* ─── 2. CURSOR MANAGEMENT AND HACKER MENU ─── */
+    const cursorDot     = document.querySelector('[data-cursor-dot]');
+    const cursorOutline = document.querySelector('[data-cursor-outline]');
+    
+    // Restore saved cursor position
+    const savedCursorX = sessionStorage.getItem('cursorPosX');
+    const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+    if (savedCursorX !== null && savedCursorY !== null) {
+        cursorDot.style.left = savedCursorX + 'px';
+        cursorDot.style.top  = savedCursorY + 'px';
+        cursorOutline.style.left = savedCursorX + 'px';
+        cursorOutline.style.top  = savedCursorY + 'px';
+    }
+    
+    window.addEventListener('mousemove', e => {
+        cursorDot.style.left = e.clientX + 'px';
+        cursorDot.style.top  = e.clientY + 'px';
+        cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:250, fill:'forwards' });
+        
+        // Save current cursor position
+        sessionStorage.setItem('cursorPosX', e.clientX);
+        sessionStorage.setItem('cursorPosY', e.clientY);
+    });
+
+    window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+    window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+    
+    function attachHoverEvents(el) {
+        el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+        el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
+    }
+
+    document.querySelectorAll('.nav-link, #logo-link, .scrollWrapper, .video-container iframe, a').forEach(el => attachHoverEvents(el));
+
+    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+    const menuLinks = document.querySelectorAll('.nav-link');
+    
+    function hackerEffect(span, originalText, intervalRef) {
+        let iteration = 0;
+        clearInterval(intervalRef.id);
+        intervalRef.id = setInterval(() => {
+            span.innerText = originalText.split('').map((letter, i) => {
+                if (i < iteration) return originalText[i];
+                if (letter === ' ') return ' ';
+                return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+            }).join('');
+            if (iteration >= originalText.length) clearInterval(intervalRef.id);
+            iteration += 1;
+        }, 40);
+    }
+
+    const topLogoLink = document.getElementById('logo-link');
+    let logoSpan, logoOriginal;
+    const logoRef = { id: null };
+
+    function updateMenuWidths() {
+        if(logoSpan) {
+            const currentLogoText = logoSpan.innerText;
+            logoSpan.innerText = logoOriginal;
+            logoSpan.style.width = 'auto';
+            logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+            logoSpan.innerText = currentLogoText;
+        }
+
+        menuLinks.forEach(link => {
+            const textSpan = link.querySelector('.text-label');
+            if (textSpan) {
+                if (!textSpan.hasAttribute('data-original')) {
+                    textSpan.setAttribute('data-original', textSpan.innerText);
+                }
+                const orig = textSpan.getAttribute('data-original');
+                const curr = textSpan.innerText;
+                
+                textSpan.innerText = orig;
+                textSpan.style.width = 'auto';
+                textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
+                textSpan.innerText = curr;
+            }
+        });
+    }
+
+    if(topLogoLink) {
+        logoSpan = topLogoLink.querySelector('.nasa-text-label');
+        logoOriginal = logoSpan.innerText;
+        
+        document.fonts.ready.then(() => {
+            logoSpan.style.display = 'inline-block';
+            logoSpan.style.overflow = 'visible'; // BUG FIX
+            logoSpan.style.whiteSpace = 'nowrap';
+        });
+
+        topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
+        topLogoLink.addEventListener('mouseleave', () => {
+            clearInterval(logoRef.id);
+            logoSpan.innerText = logoOriginal;
+        });
+    }
+
+    menuLinks.forEach(link => {
+        const textSpan = link.querySelector('.text-label');
+        if (!textSpan) return;
+
+        const originalText = textSpan.innerText;
+        const intervalRef  = { id: null };
+
+        document.fonts.ready.then(() => {
+            textSpan.style.display = 'inline-block';
+            textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
+            textSpan.style.whiteSpace = 'nowrap';
+        });
+
+        link.addEventListener('mouseenter', () => hackerEffect(textSpan, originalText, intervalRef));
+        link.addEventListener('mouseleave', () => {
+            clearInterval(intervalRef.id);
+            textSpan.innerText = originalText;
+        });
+    });
+
+    /* ─── 3. SYNC TITLE FONT WITH HOMEPAGE ─── */
+    let lastIntroWidth = 0;
+    let lastIntroHeight = 0;
+
+    function syncTitleFontSize() {
+        const hiddenText = document.getElementById('hidden-dynamic-text');
+        const hiddenContainer = document.getElementById('hidden-intro-container');
+        const mainTitle = document.getElementById('main-title');
+
+        if (!hiddenText || !hiddenContainer || !mainTitle) return;
+
+        const targetHeight = hiddenContainer.clientHeight;
+        const targetWidth  = hiddenContainer.clientWidth;
+
+        if (targetWidth === lastIntroWidth && targetHeight === lastIntroHeight && hiddenText.style.fontSize) {
+            return;
+        }
+
+        let minSize = 10;
+        let maxSize = 300; 
+        let bestFit = minSize;
+
+        while (minSize <= maxSize) {
+            let midSize = Math.floor((minSize + maxSize) / 2);
+            hiddenText.style.fontSize = midSize + 'px';
+            void hiddenText.offsetHeight; 
+
+            if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
+                bestFit = midSize;
+                minSize = midSize + 1;
+            } else {
+                maxSize = midSize - 1;
+            }
+        }
+        
+        let fineFit = bestFit;
+        for (let i = 1; i <= 9; i++) {
+            let testSize = bestFit + (i / 10);
+            hiddenText.style.fontSize = testSize + 'px';
+            void hiddenText.offsetHeight; 
+            
+            if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
+                fineFit = testSize;
+            } else {
+                break;
+            }
+        }
+
+        mainTitle.style.fontSize = fineFit + 'px';
+        
+        lastIntroWidth = targetWidth;
+        lastIntroHeight = targetHeight;
+    }
+
+    // EDIT HERE: Execute calculation immediately to avoid FOUC
+    syncTitleFontSize();
+
+    document.fonts.ready.then(() => {
+        updateMenuWidths();
+        syncTitleFontSize();
+    });
+
+    window.addEventListener('resize', () => {
+        updateMenuWidths();
+        lastIntroWidth = 0; 
+        syncTitleFontSize();
+    });
+
+
+    /* ─── 4. DYNAMIC STARS ENGINE ─── */
+    class Stars {
+        constructor(id, density, maxS, minS, maxSz, minSz) {
+            this.canvas = document.getElementById(id);
+            this.ctx = this.canvas.getContext('2d');
+            this.density = density; this.maxS = maxS; this.minS = minS;
+            this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+        }
+        resize() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+            this.lB = -window.innerWidth; this.rB = window.innerWidth * 2;
+            this.num = Math.floor((window.innerWidth * window.innerHeight / 10000) * this.density);
+            this.dots = [];
+            for (let i = 0; i < this.num; i++) this.addDot(Math.random() * (this.rB - this.lB) + this.lB, Math.random() * window.innerHeight);
+        }
+        addDot(x, y) {
+            this.dots.push({ x, y, s: Math.random()*(this.maxSz-this.minSz)+this.minSz, v: Math.random()*(this.maxS-this.minS)+this.minS });
+        }
+        draw(deltaX, deltaY) {
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            while (this.dots.length < this.num) {
+                let startX = Math.random() * this.canvas.width;
+                let startY = Math.random() * this.canvas.height;
+
+                if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX !== 0) {
+                    startX = deltaX > 0 ? this.rB : this.lB;
+                } else if (deltaY !== 0) {
+                    startY = deltaY > 0 ? this.canvas.height + 50 : -50;
+                }
+                this.addDot(startX, startY);
+            }
+            
+            for (let i = this.dots.length - 1; i >= 0; i--) {
+                const dot = this.dots[i];
+                const oldX = dot.x;
+                const oldY = dot.y;
+                
+                dot.x -= deltaX * dot.v * 0.4;
+                dot.y -= deltaY * dot.v * 0.4;
+
+                ctx.beginPath(); 
+                ctx.moveTo(oldX, oldY + dot.s/2); 
+                ctx.lineTo(dot.x, dot.y + dot.s/2);
+                ctx.strokeStyle = 'white'; 
+                ctx.lineWidth = dot.s; 
+                ctx.stroke();
+                
+                if (dot.x < this.lB || dot.x > this.rB || dot.y < -100 || dot.y > this.canvas.height + 100) {
+                    this.dots.splice(i, 1);
+                } else {
+                    ctx.fillStyle = 'white'; 
+                    ctx.fillRect(dot.x, dot.y, dot.s, dot.s); 
+                }
+            }
+        }
+    }
+    
+    const s1 = new Stars('stars',  1.5, 1.4,   0.1,  1.5, 0.5);
+    const s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
+    const s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
+
+    const scrollWrapper = document.getElementById('scroll-wrapper');
+
+    function animateEngine() {
+        requestAnimationFrame(animateEngine);
+        
+        // 1. Calculate Horizontal Inertia (Slide Change)
+        currentX += (targetX - currentX) * 0.04;
+        scrollWrapper.style.transform = `translateX(-${currentX}px)`;
+        let deltaX = (currentX - lastX);
+        lastX = currentX;
+
+        // 2. Calculate Vertical Inertia (Reading Scroll)
+        if (currentState === 1) {
+            targetY = contentDiv.scrollTop;
+        } else {
+            targetY = 0;
+        }
+        currentY += (targetY - currentY) * 0.04;
+        let deltaY = (currentY - lastY);
+        lastY = currentY;
+
+        // Stars are fed with BOTH deltas to avoid skipping
+        s1.draw(deltaX, deltaY); 
+        s2.draw(deltaX, deltaY); 
+        s3.draw(deltaX, deltaY);
+    }
+    
+    animateEngine();
+});
+</script>
+</body>
+</html>
