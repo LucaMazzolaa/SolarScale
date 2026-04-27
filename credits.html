@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolarScale - Credits</title>
+    <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
+    
+    <style>
+        /* =========================================
+           FONT IMPORT AND ROOT VARIABLES
+           ========================================= */
+        @font-face {
+            font-family: 'Nasa';
+            src: url('assets/nasa.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-book.otf') format('opentype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Neue Montreal';
+            src: url('assets/ppneuemontreal-medium.otf') format('opentype');
+            font-weight: 500;
+        }
+
+        :root {
+            /* Fluid size for menu and credits */
+            --font-16: clamp(14px, 0.3vw + 11.68px, 22px); 
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; 
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Neue Montreal', sans-serif;
+            font-weight: 400;
+            background: black;
+            color: white;
+            overflow: hidden; 
+            cursor: none; 
+        }
+
+        /* =========================================
+           CUSTOM CURSOR
+           ========================================= */
+        .cursor-dot, .cursor-outline {
+            position: fixed; 
+            top: 0; 
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%; 
+            z-index: 9999999; 
+            pointer-events: none;
+            box-sizing: content-box; 
+        }
+        .cursor-dot {
+            width: 5px; height: 5px;
+            background: white; 
+            mix-blend-mode: difference;
+            transition: width .3s, height .3s;
+        }
+        .cursor-outline {
+            width: 15px; height: 15px;
+            border: 2px solid white; 
+            mix-blend-mode: difference;
+            transition: width .3s, height .3s;
+        }
+        .mouse-down { width: 20px !important; height: 20px !important; }
+        .hover      { width: 30px !important; height: 30px !important; }
+
+        /* ─── STARS ──────────────────────────────────────────────── */
+        canvas.stars-canvas {
+            position: fixed; left: 0; top: 0;
+            z-index: 0; pointer-events: none;
+        }
+
+        /* =========================================
+           TOP MENU (Da dimensioni.html)
+           ========================================= */
+        .menu {
+            position: fixed;
+            left: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+        }
+
+        .right-menu {
+            position: fixed;
+            right: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+        }
+        
+        .nasa-title {
+            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
+            color: white; line-height: 1; pointer-events: all; cursor: none;
+            margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
+        }
+
+        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
+
+        .nav-link {
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
+        }
+
+        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        /* Altre voci del menu mantengono il comportamento standard */
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link:hover, .nav-link.active { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before,
+        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+
+        @media (max-width: 900px) {
+            .menu { 
+                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
+                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            }
+            .right-menu { 
+                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
+                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+            }
+            .credits-block {
+                position: relative;
+                bottom: auto; left: auto;
+                margin: 4vh;
+            }
+        }
+
+        /* =========================================
+           CREDITS TEXT (Cascade Effect)
+           ========================================= */
+        .credits-block {
+            position: fixed;
+            bottom: 4vh; 
+            left: 4vh;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16);
+            font-weight: 400; 
+            color: white;
+            line-height: 1.5;
+            z-index: 10;
+            pointer-events: none; 
+        }
+
+        /* Elements to animate in a cascade */
+        .cascade-item {
+            opacity: 0; 
+            animation: fadeUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Delay for the second paragraph */
+        .cascade-item:nth-child(2) {
+            animation-delay: 0.2s;
+            margin-top: 1.5em; 
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
+    <canvas id="stars"  class="stars-canvas"></canvas>
+    <canvas id="stars2" class="stars-canvas"></canvas>
+    <canvas id="stars3" class="stars-canvas"></canvas>
+
+    <nav class="menu">
+        <a href="index.html" class="nasa-title" id="logo-link">
+            <img src="assets/sun_symbol.svg" alt="Sun symbol">
+            <span class="nasa-text-label">SolarScale</span>
+        </a>
+        <a href="sizes.html" class="nav-link">
+            <span class="text-label">Sizes</span>
+        </a>
+        <a href="positions.html" class="nav-link">
+            <span class="text-label">Positions</span>
+        </a>
+        <a href="distances.html" class="nav-link">
+            <span class="text-label">Distances</span>
+        </a>
+    </nav>
+
+    <nav class="right-menu">
+        <a href="measurement.html" class="nav-link">
+            <span class="text-label">Measurement Methods</span>
+        </a>
+        <a href="credits.html" class="nav-link active" id="crediti-link">
+            <span class="text-label">Credits</span>
+        </a>
+    </nav>
+
+    <div class="credits-block">
+        <p class="cascade-item">
+            SUPSI DACD<br>
+            Bachelor in Visual Communication<br>
+            A.Y. 2025/26, CV2
+        </p>
+        <p class="cascade-item">
+            Student: Luca Mazzola<br>
+            Module: CV429 Project II M&I<br>
+            Teachers: Andreas Gysin & Giovanni Profeta
+        </p>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // CUSTOM CURSOR LOGIC
+        // -------------------------------------------------------------
+        const cursorDot = document.querySelector('[data-cursor-dot]');
+        const cursorOutline = document.querySelector('[data-cursor-outline]');
+
+        const savedCursorX = sessionStorage.getItem('cursorPosX');
+        const savedCursorY = sessionStorage.getItem('cursorPosY');
+
+        if (savedCursorX !== null && savedCursorY !== null) {
+            cursorDot.style.left = savedCursorX + 'px';
+            cursorDot.style.top  = savedCursorY + 'px';
+            cursorOutline.style.left = savedCursorX + 'px';
+            cursorOutline.style.top  = savedCursorY + 'px';
+        }
+
+        window.addEventListener('mousemove', e => {
+            cursorDot.style.left = e.clientX + 'px';
+            cursorDot.style.top  = e.clientY + 'px';
+            cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 250, fill: 'forwards' });
+            
+            sessionStorage.setItem('cursorPosX', e.clientX);
+            sessionStorage.setItem('cursorPosY', e.clientY);
+        });
+
+        window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
+        window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
+
+        document.querySelectorAll('.nav-link, #logo-link, a').forEach(el => {
+            el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+            el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
+        });
+
+        // -------------------------------------------------------------
+        // DYNAMIC MENU WIDTH RECALCULATION AND HACKER EFFECT
+        // -------------------------------------------------------------
+        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+        const menuLinks = document.querySelectorAll('.nav-link');
+        
+        function hackerEffect(span, originalText, intervalRef) {
+            let iteration = 0;
+            clearInterval(intervalRef.id);
+            intervalRef.id = setInterval(() => {
+                span.innerText = originalText.split('').map((letter, i) => {
+                    if (i < iteration) return originalText[i];
+                    if (letter === ' ') return ' ';
+                    return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                }).join('');
+                if (iteration >= originalText.length) clearInterval(intervalRef.id);
+                iteration += 1;
+            }, 40);
+        }
+
+        const topLogoLink = document.getElementById('logo-link');
+        let logoSpan, logoOriginal;
+        const logoRef = { id: null };
+
+        function updateMenuWidths() {
+            if(logoSpan) {
+                const currentLogoText = logoSpan.innerText;
+                logoSpan.innerText = logoOriginal;
+                logoSpan.style.width = 'auto';
+                logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+                logoSpan.innerText = currentLogoText;
+            }
+
+            menuLinks.forEach(link => {
+                const textSpan = link.querySelector('.text-label');
+                if (textSpan) {
+                    if (!textSpan.hasAttribute('data-original')) {
+                        textSpan.setAttribute('data-original', textSpan.innerText);
+                    }
+                    const orig = textSpan.getAttribute('data-original');
+                    const curr = textSpan.innerText;
+                    
+                    textSpan.innerText = orig;
+                    textSpan.style.width = 'auto';
+                    textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
+                    textSpan.innerText = curr;
+                }
+            });
+        }
+
+        if(topLogoLink) {
+            logoSpan = topLogoLink.querySelector('.nasa-text-label');
+            logoOriginal = logoSpan.innerText;
+            
+            document.fonts.ready.then(() => {
+                logoSpan.style.display = 'inline-block';
+                logoSpan.style.overflow = 'visible'; // BUG FIX
+                logoSpan.style.whiteSpace = 'nowrap';
+            });
+
+            topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
+            topLogoLink.addEventListener('mouseleave', () => {
+                clearInterval(logoRef.id);
+                logoSpan.innerText = logoOriginal;
+            });
+        }
+
+        menuLinks.forEach(link => {
+            const textSpan = link.querySelector('.text-label');
+            if (!textSpan) return;
+
+            const originalText = textSpan.innerText;
+            const intervalRef  = { id: null };
+
+            document.fonts.ready.then(() => {
+                textSpan.style.display = 'inline-block';
+                textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
+                textSpan.style.whiteSpace = 'nowrap';
+            });
+
+            link.addEventListener('mouseenter', () => hackerEffect(textSpan, originalText, intervalRef));
+            link.addEventListener('mouseleave', () => {
+                clearInterval(intervalRef.id);
+                textSpan.innerText = originalText;
+            });
+        });
+
+        document.fonts.ready.then(() => {
+            updateMenuWidths();
+        });
+
+        window.addEventListener('resize', updateMenuWidths);
+
+        // -------------------------------------------------------------
+        // BACKGROUND STARS (identical to dimensioni.html)
+        // -------------------------------------------------------------
+        class Stars {
+            constructor(id, density, maxS, minS, maxSz, minSz) {
+                this.canvas = document.getElementById(id);
+                this.ctx = this.canvas.getContext('2d');
+                this.density = density; this.maxS = maxS; this.minS = minS;
+                this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.lB = -window.innerWidth; this.rB = window.innerWidth * 2;
+                this.num = Math.floor((window.innerWidth * window.innerHeight / 10000) * this.density);
+                this.dots = [];
+                for (let i = 0; i < this.num; i++) this.addDot(Math.random() * (this.rB - this.lB) + this.lB, Math.random() * window.innerHeight);
+            }
+            addDot(x, y) {
+                this.dots.push({ x, y, s: Math.random()*(this.maxSz-this.minSz)+this.minSz, v: Math.random()*(this.maxS-this.minS)+this.minS });
+            }
+            draw(delta) {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                while (this.dots.length < this.num) this.addDot(delta > 0 ? this.rB : this.lB, Math.random() * window.innerHeight);
+                for (let i = this.dots.length - 1; i >= 0; i--) {
+                    const dot = this.dots[i], oldX = dot.x;
+                    dot.x -= delta * dot.v;
+                    ctx.beginPath(); ctx.moveTo(oldX, dot.y + dot.s/2); ctx.lineTo(dot.x, dot.y + dot.s/2);
+                    ctx.strokeStyle = 'white'; ctx.lineWidth = dot.s; ctx.stroke();
+                    if (dot.x < this.lB || dot.x > this.rB) this.dots.splice(i, 1);
+                    else { ctx.fillStyle = 'white'; ctx.fillRect(dot.x, dot.y, dot.s, dot.s); }
+                }
+            }
+        }
+
+        const s1 = new Stars('stars',  1.5, 1.4,   0.1,  1.5, 0.5);
+        const s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
+        const s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
+
+        // On this page there is no camera movement, so delta = 0:
+        // the stars are static, exactly as they appear at rest in dimensioni.html.
+        function animateStars() {
+            requestAnimationFrame(animateStars);
+            s1.draw(0);
+            s2.draw(0);
+            s3.draw(0);
+        }
+        animateStars();
+    </script>
+</body>
+</html>
