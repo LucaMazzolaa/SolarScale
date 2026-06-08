@@ -6,7 +6,7 @@ Progetto 1: La conquista dello spazio
 
 # SolarScale
 Autore: Luca Mazzola \
-[SolarScale](https://lucamazzolaa.github.io/NASA70/)
+[SolarScale](https://lucamazzolaa.github.io/SolarScale/)
 <br><br>
 
 
@@ -42,41 +42,41 @@ L'interfaccia è strutturata secondo il principio della rivelazione progressiva:
 
 ### Mappa del sito (Pagine)
 * **`index.html`** – Home / Intro
-* **`dimensioni.html`** – Confronto scala
-* **`posizioni.html`** – Mappa orbitale
-* **`distanze.html`** – Viaggio lineare
-* **`misurazioni.html`** – Sezione informativa
-* **`crediti.html`** – Colophon
+* **`sizes.html`** – Confronto scala (Sizes)
+* **`positions.html`** – Mappa orbitale (Positions)
+* **`distances.html`** – Viaggio lineare (Distances)
+* **`measurement.html`** – Sezione informativa sui metodi di misurazione
+* **`credits.html`** – Colophon
 
 
 ### Livello 1: menu globale fisso
 Presente costantemente in tutte le pagine per garantire orientamento e coerenza visiva.
-* **Alto-sinistra:** logo, dimensioni, posizioni, distanze.
-* **Alto-destra:** metodi di misurazione, crediti.
+* **Alto-sinistra:** logo (SolarScale), Sizes, Positions, Distances.
+* **Alto-destra:** Measurement Methods, Credits.
 
 
 ### Livello 2: trigger di esplorazione
-La soglia d'ingresso per le simulazioni (esclusi `index.html` e `crediti.html`).
-* **Gesto core:** "Scorri per esplorare / leggere".
+La soglia d'ingresso per le simulazioni (esclusi `index.html` e `credits.html`).
+* **Gesto core:** "Scroll to explore".
 * **Meccanica:** l'azione di scroll (rotellina/trackpad) dissolve l'header introduttivo testuale e sblocca fisicamente la visione e la navigazione del motore visivo sottostante, immergendo l'utente nei dati.
 
 
 ### Livello 3: interazioni secondarie
-Strumenti di controllo specifici che compaiono solo dopo aver superato il trigger di esplorazione iniziale (esclusi `index.html` e `crediti.html`).
+Strumenti di controllo specifici che compaiono solo dopo aver superato il trigger di esplorazione iniziale (esclusi `index.html` e `credits.html`).
 
-**`dimensioni.html`**
+**`sizes.html`**
 * **Centro-basso:** sidebar con icone dei pianeti per il salto rapido.
-* **Lati (centro):** frecce a comparsa con anteprima dati (Nome, Diametro).
+* **Lati (centro):** frecce a comparsa con anteprima dati (Nome, Diametro in km).
 
-**`posizioni.html`**
-* **Centro-basso:** plancia del tempo spaziale (slider velocità, play/pausa/skip, data attuale).
+**`positions.html`**
+* **Centro-basso:** plancia del tempo spaziale (slider velocità, play/pausa/skip, indicatore "Live" e data attuale).
 * **Basso-destra:** controlli fisici di zoom (+ / -).
 
-**`distanze.html`**
-* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido.
+**`distances.html`**
+* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido (rappresentati proporzionalmente sulla linea di navigazione).
 * **Lati (centro):** frecce a comparsa con anteprima dati (distanza da un pianeta all'altro).
 
-**`misurazioni.html`**
+**`measurement.html`**
 * **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
 
 ### Dimostrazione
