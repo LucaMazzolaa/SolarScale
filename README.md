@@ -80,7 +80,7 @@ Strumenti di controllo specifici che compaiono solo dopo aver superato il trigge
 * **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
 
 ### Dimostrazione
-<video src="https://github.com/user-attachments/assets/bcbb3ed4-d773-4657-a18b-299ced5210eb" loop autoplay muted controls style="max-width: 100%;"></video>
+
 <br>
 
 
@@ -93,30 +93,30 @@ Di seguito vengono presentati tre estratti di codice chiave che sono stati fonda
 ### 1. Motore grafico 3D (Three.js e Model-Viewer)
 Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella.
 
-**HTML** (da `distanze.html`):
+**HTML** (da `distances.html`):
 ```html
 <model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
 
-<div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:140px;height:140px;"></div>
+<div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:143px;height:143px;"></div>
 ```
 
-**CSS** (da `distanze.html`):
+**CSS** (da `distances.html`):
 ```css
 model-viewer {
-background-color: transparent; --poster-color: transparent; border-radius: 50%;
-display: block; flex-shrink: 0; z-index: 5; min-width: 0 !important; min-height: 0 !important; outline: none;
+    background-color: transparent; --poster-color: transparent; border-radius: 50%;
+    display: block; flex-shrink: 0; z-index: 5; min-width: 0 !important; min-height: 0 !important; outline: none;
 }
 model-viewer::part(default-progress-bar), model-viewer::part(default-ar-button), model-viewer::part(default-progress-mask) { display: none; }
 
 .three-planet {
-display: block;
-flex-shrink: 0;
-z-index: 5;
-position: relative;
+    display: block;
+    flex-shrink: 0;
+    z-index: 5;
+    position: relative;
 }
 ```
 
-**JavaScript** (da `distanze.html`):
+**JavaScript** (da `distances.html`):
 ```javascript
 const threePlanetsElements = document.querySelectorAll('.three-planet');
 const renderersThree = [];
@@ -168,10 +168,9 @@ if(threePlanetsElements.length > 0) {
             renderer.render(scene, camera);
         });
 
-        renderersThree.push({ renderer, scene, camera, getMesh: () => modelMesh });
+        const renderObj = { renderer, scene, camera, getMesh: () => modelMesh, container, isVisible: false };
+        renderersThree.push(renderObj);
     });
-
-    // [...] Funzione animateThree() omessa per brevità
 }
 ```
 
@@ -179,37 +178,32 @@ if(threePlanetsElements.length > 0) {
 ### 2. Dati scientifici in tempo reale (API NASA JPL)
 Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate. Il sistema implementa anche un array di fallback in caso di fallimento del sync con l'Agenzia Spaziale.
 
-**HTML** (da `distanze.html` e `posizioni.html`):
+**HTML** (da `distances.html` e `positions.html`):
 ```html
-<p class="info" id="info-Jupiter">Giove (Gigante gassoso)<br>Distanza dal Sole: <span id="disSpa5Km">...</span> km</p>
+<div class="info-grid">
+    <span>Distance from the Sun</span><span><span id="disSpa5Km">...</span> km</span>
+</div>
 
 <div class="orbit orb-mercury"></div>
 ```
 
-**CSS** (da `posizioni.html`):
+**CSS** (da `positions.html`):
 ```css
-/* ORBITE: Rappresentazione geometrica in 2D usando CSS Transform Matrix (NASA JPL style) */
+/* ORBITE: Rappresentazione geometrica base */
 .orbit { 
-    position: absolute; 
-    border-style: dashed;
-    border-color: var(--color-dashed); 
-    border-width: 1px; 
-    border-radius: 50%; 
-    left: 50%; top: 50%; 
-    width: calc(var(--semi-a) * 2 * var(--au-to-vmin)); height: calc(var(--semi-b) * 2 * var(--au-to-vmin)); 
-    margin-left: calc(var(--semi-a) * var(--au-to-vmin) * -1); margin-top: calc(var(--semi-b) * var(--au-to-vmin) * -1); 
-    /* La matematica CSS segue esattamente la proiezione ortografica di J2000 */
-    transform: rotateZ(calc(var(--N) * 1deg)) rotateX(calc(var(--i) * 1deg)) rotateZ(calc(var(--w) * 1deg)) translateX(calc(var(--c) * var(--au-to-vmin) * -1)); 
-    transform-style: flat;
+    position: absolute; left: 50%; top: 50%; 
+    border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; 
+    transform-style: flat; will-change: width, height, transform; contain: layout style; 
 }
+/* La matematica CSS segue esattamente la proiezione di J2000 tramite matrix transformations in JS */
 ```
 
-**JavaScript** (Estratto Fetch API da `distanze.html`):
+**JavaScript** (Estratto Fetch API da `distances.html`):
 ```javascript
 async function syncWithNasa() {
     for (let i = 1; i < planetsData.length; i++) {
         const p = planetsData[i];
-        const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
+        const url = `[https://api.allorigins.win/get?url=$](https://api.allorigins.win/get?url=$){encodeURIComponent(
             `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&OUT_UNITS='KM-S'&CENTER='500@10'&START_TIME='now'&STOP_TIME='now+1m'&STEP_SIZE='1m'`
         )}`;
         try {
@@ -225,13 +219,12 @@ async function syncWithNasa() {
             p.baseDis = d / 1000;
             p.inc = ((x*vx + y*vy + z*vz) / d) / 1000; 
 
-            // [...] Aggiornamento interfaccia domDisKm e proporzioni orbitali
+            // [...] Aggiornamento interfaccia domDisKm e barra timeline
         } catch(e) { 
-            console.error("NASA Sync Error per " + p.name, e); 
+            console.error("NASA Sync Error for " + p.name, e); 
             p.inc = [0, 0.0042, -0.0001, 0.0005, 0.0021, 0.0015, -0.0012, 0.0008, -0.0002][i];
         }
     }
-    // [...]
 }
 ```
 
@@ -239,22 +232,22 @@ async function syncWithNasa() {
 ### 3. Rendering 2D e Animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni, gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo rispetto a parametri dinamici o l'ancoraggio speciale al Sole) sono orchestrate con precisione tramite l'easing avanzato di GSAP.
 
-**HTML** (da `distanze.html`):
+**HTML** (da `distances.html`):
 ```html
-<canvas id="stars" class="stars-canvas"></canvas>
+<canvas id="stars"  class="stars-canvas"></canvas>
 <canvas id="stars2" class="stars-canvas"></canvas>
 <canvas id="stars3" class="stars-canvas"></canvas>
 ```
 
-**CSS** (da `distanze.html`):
+**CSS** (da `distances.html`):
 ```css
 canvas.stars-canvas {
-position: fixed; left: 0; top: 0;
-z-index: 0; pointer-events: none; transition: opacity 2s;
+    position: fixed; left: 0; top: 0;
+    z-index: 0; pointer-events: none; transition: opacity 2s;
 }
 ```
 
-**JavaScript** (da `distanze.html`):
+**JavaScript** (da `distances.html`):
 ```javascript
 // Classe per la generazione e animazione particellare (Canvas API)
 class Stars {
