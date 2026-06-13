@@ -22,16 +22,16 @@ Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in
 ## Riferimenti progettuali
 A livello di funzione e di visualizzazione, il progetto si è basato su tre riferimenti principali, scelti in relazione ai tre temi in cui il Sistema solare è stato scomposto, con l’obiettivo di avvicinarsi il più possibile a una rappresentazione chiara e fedele delle proporzioni.<br>
 
-Per il tema delle dimensioni, il riferimento principale è il [video](https://www.youtube.com/watch?v=i93Z7zljQ7I&t=29s) che mette in evidenza in modo immediato e comparativo le reali scale tra i pianeti.
-<img width="1512" height="848" alt="Screenshot 2026-04-10 alle 09 20 55" src="https://github.com/user-attachments/assets/06a67fb2-d185-4371-92ba-9acb89c81ba1" />
+Per il tema delle dimensioni, il riferimento principale è il [video](https://www.youtube.com/watch?v=i93Z7zljQ7I&t=29s) che mette in evidenza in modo immediato e comparativo le reali scale tra i pianeti. La sua efficacia risiede nella capacità di tradurre dati numerici complessi in un confronto visivo diretto.
+<img width="4000" height="2250" alt="01" src="https://github.com/user-attachments/assets/6a735913-a85c-464b-9f9a-5f471c5635df" />
 <br>
 
 Per posizioni e rotazioni, è stato utilizzato come base lo [strumento interattivo](https://ssd.jpl.nasa.gov/tools/orbit_viewer.html) che permette di osservare in modo semplificato i movimenti orbitali in tempo reale e comprendere le relazioni dinamiche tra i corpi celesti.
-<img width="1512" height="720" alt="Screenshot 2026-04-10 alle 09 22 02" src="https://github.com/user-attachments/assets/7aafc356-7595-477e-832f-e0f72e2dbade" />
+<img width="4000" height="2250" alt="02" src="https://github.com/user-attachments/assets/75695d28-22f9-4614-b19b-fad20d5d32ce" />
 <br>
 
 Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html) che rappresenta in modo  efficace la reale vastità degli spazi tra i pianeti, rendendo percepibile ciò che normalmente risulta astratto.
-<img width="1512" height="734" alt="Screenshot 2026-04-10 alle 09 22 52" src="https://github.com/user-attachments/assets/cde59bcd-cf58-4614-9bd0-9613b45e7c19" />
+<img width="4000" height="2250" alt="03" src="https://github.com/user-attachments/assets/a69f325e-5019-4eda-97c6-e9dcc21ba68b" />
 <br><br>
 
 
