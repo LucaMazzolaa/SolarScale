@@ -11,9 +11,9 @@ Autore: Luca Mazzola \
 
 
 ## Introduzione e tema
-Questo progetto esplora il Sistema solare a partire da una criticità evidente: molte delle rappresentazioni diffuse risultano poco accurate nel restituire le reali proporzioni tra dimensioni dei pianeti e distanze li separano nello spazio. La scala del Sistema è infatti così vasta da rendere impossibile una visualizzazione fedele all’interno di un’unica immagine, portando spesso a semplificazioni e alterazioni che ne compromettono la comprensione.<br>
+Questo progetto esplora il Sistema solare a partire da una criticità evidente: molte delle rappresentazioni diffuse risultano poco accurate nel restituire le reali proporzioni tra dimensioni dei pianeti e distanze che li separano nello spazio. La scala del Sistema è infatti così vasta da rendere impossibile una visualizzazione fedele all’interno di un’unica immagine, portando spesso a semplificazioni e alterazioni che ne compromettono la comprensione.<br>
 
-Per affrontare questo limite, il progetto scompone il Sistema solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole. Questa scelta permette di costruire visualizzazioni più chiare, leggibili e coerenti.<br>
+Per affrontare questo limite, il progetto scompone il Sistema solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole.<br>
 
 Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in un’esperienza visiva immediata, rendendo percepibili proporzioni normalmente astratte e restituendo in modo efficace la reale struttura e scala del Sistema solare.
 <br><br>
@@ -36,29 +36,29 @@ Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshw
 
 
 ## Design dell’interfaccia e modalità di interazione
-Il design è concepito per offrire un'esperienza immersiva, minimale e "data-driven". Richiama l'estetica dei terminali scientifici e dei database aerospaziali, utilizzando uno sfondo nero profondo (spazio), testo bianco in font rigorosi (Neue Montreal) e un cursore personalizzato che si adatta agli elementi interattivi.<br>
+Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfaccia si ispira all'immaginario dell'esplorazione spaziale e della ricerca scientifica, utilizzando uno sfondo nero profondo arricchito da un campo di piccole stelle che immerge immediatamente l'utente nell'ambiente cosmico. La tipografia bianca, basata sul font Neue Montreal, garantisce chiarezza e leggibilità, mentre un cursore personalizzato si adatta dinamicamente agli elementi interattivi.<br>
 
-L'interfaccia è strutturata secondo il principio della rivelazione progressiva: l'utente entra in una pagina con un'interfaccia minimale e, man mano che dimostra l'intento di esplorare, il sistema sblocca le visioni e i controlli avanzati.
+L'interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
 
 ### Mappa del sito (Pagine)
-* **`index.html`** – Home / Intro
-* **`sizes.html`** – Confronto scala (Sizes)
-* **`positions.html`** – Mappa orbitale (Positions)
-* **`distances.html`** – Viaggio lineare (Distances)
+* **`index.html`** – Home / Introduzione
+* **`sizes.html`** – Confronto scala pianeti
+* **`positions.html`** – Mappa orbitale con movimenti dei pianeti
+* **`distances.html`** – Distanze tra i pianeti
 * **`measurement.html`** – Sezione informativa sui metodi di misurazione
 * **`credits.html`** – Colophon
 
 
 ### Livello 1: menu globale fisso
 Presente costantemente in tutte le pagine per garantire orientamento e coerenza visiva.
-* **Alto-sinistra:** logo (SolarScale), Sizes, Positions, Distances.
-* **Alto-destra:** Measurement Methods, Credits.
+* **Alto-sinistra:** logo (SolarScale), pagina Sizes, pagina Positions, pagina Distances.
+* **Alto-destra:** pagina Measurement Methods, pagina Credits.
 
 
 ### Livello 2: trigger di esplorazione
 La soglia d'ingresso per le simulazioni (esclusi `index.html` e `credits.html`).
 * **Gesto core:** "Scroll to explore".
-* **Meccanica:** l'azione di scroll (rotellina/trackpad) dissolve l'header introduttivo testuale e sblocca fisicamente la visione e la navigazione del motore visivo sottostante, immergendo l'utente nei dati.
+* **Meccanica:** l'azione di scroll (pulsante/rotellina/trackpad) dissolve l'header introduttivo testuale e sblocca fisicamente la visione e la navigazione del motore visivo sottostante, immergendo l'utente nei dati.
 
 
 ### Livello 3: interazioni secondarie
@@ -198,7 +198,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 /* La matematica CSS segue esattamente la proiezione di J2000 tramite matrix transformations in JS */
 ```
 
-**JavaScript** (Estratto Fetch API da `distances.html`):
+**JavaScript** (da `distances.html`):
 ```javascript
 async function syncWithNasa() {
     for (let i = 1; i < planetsData.length; i++) {
