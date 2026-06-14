@@ -251,7 +251,7 @@ async function syncWithNasa() {
 ```
 
 
-### Rendering 2D e Animazioni (Canvas e GSAP)
+### Rendering 2D e animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni durante la navigazione orizzontale, gli sfondi stellati con effetto parallasse sono disegnati e calcolati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando perfettamente lo schermo rispetto ai parametri dinamici o il ritorno rapido al Sole) sono orchestrate tramite il motore di animazione ScrollToPlugin di GSAP.
 
 **HTML**
