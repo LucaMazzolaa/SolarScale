@@ -39,37 +39,38 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 
 
 ### Menu globale fisso
-Presente costantemente in tutte le pagine per garantire orientamento e coerenza visiva.
-* **Alto-sinistra:** logo (SolarScale), pagina Sizes, pagina Positions, pagina Distances.
-* **Alto-destra:** pagina Measurement Methods, pagina Credits.
+
+Il menu superiore costituisce l’elemento di navigazione principale e rimane costante in tutte le pagine per garantire orientamento e coerenza visiva. A sinistra sono presenti il logo e il nome del progetto SolarScale, seguiti sulla destra dalle sezioni Sizes, Positions e Distances. Sulla parte destra del menu si trovano invece le sezioni Measurement Methods e Credits, completando la struttura e garantendo una chiara organizzazione gerarchica dei contenuti e un accesso diretto alle diverse aree del progetto.
+
+### Logo
+
+Il logo del progetto si ispira a uno dei più antichi simboli associati al Sole, rappresentato da un cerchio con un punto centrale. Utilizzato nel corso della storia in ambito astronomico, astrologico e simbolico, questo segno identifica il Sole come centro e origine di un sistema.
+La scelta di questo simbolo è strettamente legata al contenuto del progetto. Nel Sistema Solare il Sole rappresenta infatti il punto centrale attorno al quale orbitano tutti i pianeti e costituisce il principale riferimento per comprenderne dimensioni, posizioni e distanze. Il marchio sintetizza quindi il concetto di centralità, orientamento e relazione tra i corpi celesti, traducendo in forma grafica il tema stesso dell'esplorazione delle proporzioni del Sistema Solare.
+
+### SolarScale (index.html)
+
+La pagina iniziale si presenta come un’introduzione tipografica al progetto e al tema della rappresentazione delle proporzioni del Sistema Solare. L’interfaccia, volutamente essenziale, funge da punto di ingresso all’esperienza e accompagna l’utente verso l’esplorazione delle sezioni successive. Inoltre, piccole animazioni circolari integrate nel testo richiamano i temi di dimensioni, posizioni e distanze, anticipando visivamente le visualizzazioni che verranno approfondite nelle pagine dedicate.
 
 
-### Livello 2: trigger di esplorazione
-La soglia d'ingresso per le simulazioni (esclusi `index.html` e `credits.html`).
-* **Gesto core:** "Scroll to explore".
-* **Meccanica:** l'azione di scroll (pulsante/rotellina/trackpad) dissolve l'header introduttivo testuale e sblocca fisicamente la visione e la navigazione del motore visivo sottostante, immergendo l'utente nei dati.
+### Sizes (sizes.html)
 
+La sezione Sizes è dedicata al confronto delle dimensioni dei pianeti attraverso una visualizzazione che ne mostra le reali proporzioni. La pagina si apre con un titolo e un breve testo introduttivo che contestualizzano il contenuto. Attraverso il principio "Scroll to explore", l’utente dissolve progressivamente questa introduzione e accede alla visualizzazione interattiva sottostante, navigabile orizzontalmente. La navigazione è supportata da una barra con le icone dei pianeti posizionata nella parte inferiore dello schermo, che consente di raggiungere rapidamente i diversi corpi celesti. Ai lati compaiono inoltre frecce di navigazione che mostrano in anteprima il nome del pianeta e il relativo diametro, facilitando il confronto tra le diverse scale.
 
-### Livello 3: interazioni secondarie
-Strumenti di controllo specifici che compaiono solo dopo aver superato il trigger di esplorazione iniziale (esclusi `index.html` e `credits.html`).
+### Positions (positions.html)
 
-**`sizes.html`**
-* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido.
-* **Lati (centro):** frecce a comparsa con anteprima dati (Nome, Diametro in km).
+La sezione Positions presenta una mappa orbitale interattiva che visualizza le posizioni e i movimenti dei pianeti nel tempo. Anche in questo caso l’accesso alla simulazione avviene attraverso il gesto "Scroll to explore", che trasforma l’introduzione testuale in uno spazio di osservazione dinamico. Nella parte inferiore è presente una plancia di controllo che permette di modificare la velocità della simulazione, mettere in pausa il sistema, avanzare nel tempo e monitorare la data visualizzata. I controlli di zoom, collocati nell'angolo inferiore destro, consentono invece di osservare il Sistema Solare a differenti livelli di dettaglio.
 
-**`positions.html`**
-* **Centro-basso:** plancia del tempo spaziale (slider velocità, play/pausa/skip, indicatore "Live" e data attuale).
-* **Basso-destra:** controlli fisici di zoom (+ / -).
+### Distances (distances.html)
 
-**`distances.html`**
-* **Centro-basso:** sidebar con icone dei pianeti per il salto rapido (rappresentati proporzionalmente sulla linea di navigazione).
-* **Lati (centro):** frecce a comparsa con anteprima dati (distanza da un pianeta all'altro).
+La sezione Distances esplora le reali distanze tra i pianeti e il Sole, mettendo in evidenza la vastità degli spazi interplanetari. Attraverso il gesto "Scroll to explore", l’utente avanza progressivamente all'interno della visualizzazione e scopre le relazioni spaziali tra i diversi corpi celesti. Una barra di navigazione posta nella parte inferiore permette di spostarsi rapidamente tra i pianeti, rappresentati in modo proporzionale lungo il percorso. Le frecce laterali mostrano invece informazioni sintetiche sulle distanze tra un pianeta e l'altro, facilitando la comprensione delle reali scale del sistema.
 
-**`measurement.html`**
-* **Interazione:** layout di pura lettura. Lo scroll guida la navigazione verticale nativa tra i blocchi di testo e i player video, senza la comparsa di ulteriori pannelli di controllo.
+### Measurement Methods (measurement.html)
 
-### Dimostrazione
+La sezione Measurement Methods è concepita come uno spazio informativo dedicato ai metodi utilizzati per misurare dimensioni, posizioni e distanze nel Sistema Solare. A differenza delle altre sezioni, l’interazione segue il principio "Scroll to read" e si basa esclusivamente sulla lettura dei contenuti. Lo scorrimento verticale guida l’utente attraverso testi esplicativi, immagini e materiali video senza l’introduzione di ulteriori strumenti di navigazione o pannelli di controllo.
 
+### Credits (credits.html)
+
+La sezione Credits raccoglie le informazioni relative all’autore del progetto e al contesto di realizzazione.
 <br>
 
 
