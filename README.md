@@ -88,8 +88,8 @@ Il progetto poggia su una solida architettura front-end nativa, sviluppata in **
 
 Di seguito vengono presentati tre estratti di codice chiave tratti dal file **`distances.html`**, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
 
-### 1. Motore grafico 3D (Three.js e Model-Viewer)
-Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella.
+### Motore grafico 3D (Three.js e Model-Viewer)
+Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella. Le prestazioni sono ulteriormente ottimizzate da un `IntersectionObserver` nativo che sospende il ricalcolo dei frame per i modelli 3D non attualmente visibili nel viewport.
 
 **HTML**:
 ```html
@@ -119,81 +119,87 @@ model-viewer::part(default-progress-bar), model-viewer::part(default-ar-button),
 const threePlanetsElements = document.querySelectorAll('.three-planet');
 const renderersThree = [];
 
+// Ottimizzazione tramite Intersection Observer
+let planetObserver = null;
+if (window.IntersectionObserver) {
+    planetObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const r = renderersThree.find(obj => obj.container.id === entry.target.id);
+            if (r) r.isVisible = entry.isIntersecting;
+        });
+    }, { rootMargin: '100% 0px 100% 0px' });
+}
+
 if(threePlanetsElements.length > 0) {
     const loader = new THREE.GLTFLoader();
 
     threePlanetsElements.forEach(container => {
-        const id = container.id;
-        const file = container.getAttribute('data-file');
-        const width = parseInt(container.style.width);
-        const height = parseInt(container.style.height);
-
-        const scene = new THREE.Scene();
-
-        // [...] Setup luci ambientali e direzionali omesso per brevità
-
-        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 5000);
+        // [...] Setup scena, luci, camera e renderer omesso per brevità
         
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        let modelMesh = null;
-
         loader.load(`assets/${file}`, (gltf) => {
             const model = gltf.scene;
-            const box = new THREE.Box3().setFromObject(model);
-            const size = box.getSize(new THREE.Vector3());
-            const center = box.getCenter(new THREE.Vector3());
-
-            model.position.set(-center.x, -center.y, -center.z);
-            const wrapper = new THREE.Group();
-            wrapper.add(model);
-
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scaleFactor = (width * 0.95) / maxDim; 
-            wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-            // [...] Setup rotazione per Saturno e materiali omesso per brevità
-
+            // [...] Adattamento mesh e materiali omesso per brevità
             scene.add(wrapper);
             modelMesh = wrapper;
-
-            const dist = (width / 2) / Math.tan((45 * Math.PI / 180) / 2);
-            camera.position.z = dist * 1.05;
-            
-            renderer.render(scene, camera);
         });
 
         const renderObj = { renderer, scene, camera, getMesh: () => modelMesh, container, isVisible: false };
         renderersThree.push(renderObj);
+        
+        if (planetObserver) planetObserver.observe(container);
     });
+
+    function animateThree() {
+        requestAnimationFrame(animateThree);
+        renderersThree.forEach(r => {
+            // Renderizza solo se l'elemento è effettivamente visibile sullo schermo
+            if (r.isVisible || !planetObserver) {
+                const mesh = r.getMesh();
+                if (mesh) mesh.children[0].rotation.y += 0.001;
+                r.renderer.render(r.scene, r.camera);
+            }
+        });
+    }
+    animateThree();
 }
 ```
 
 
-### 2. Dati scientifici in tempo reale (API NASA JPL)
-Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate. Il sistema implementa anche un array di fallback in caso di fallimento del sync con l'Agenzia Spaziale.
+### Dati scientifici in tempo reale (API NASA JPL)
+Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale. Questi parametri vengono iniettati nel DOM per aggiornare i chilometri di distanza e per calcolare matematicamente la proporzione visiva tra perielio e afelio adattando dinamicamente la larghezza dei blocchi strutturali CSS.
 
 **HTML**:
 ```html
-<div class="info-grid">
-    <span>Distance from the Sun</span><span><span id="disSpa5Km">...</span> km</span>
+<div class="planetdiv" id="div-Mercury">
+    <div class="perihelion"><div></div></div>
+    <div class="planet-cell">
+        <model-viewer id="Mercury" src="./assets/mercury.glb" ...></model-viewer>
+        <div class="info" id="info-Mercury">
+            <div class="info-title"><span style="font-weight:500;">Mercury</span> (Terrestrial planet)</div>
+            <div class="data-brackets">
+                <div class="info-grid">
+                    <span>Distance from the Sun</span><span><span id="disSpa1Km">...</span> km</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="aphelion"><div></div></div>
 </div>
-
-<div class="orbit orb-mercury"></div>
 ```
 
 **CSS**:
 ```css
-/* ORBITE: Rappresentazione geometrica base */
-.orbit { 
-    position: absolute; left: 50%; top: 50%; 
-    border-style: solid; border-color: var(--ui-color); border-width: 0.8px; border-radius: 50%; 
-    transform-style: flat; will-change: width, height, transform; contain: layout style; 
+.perihelion, .aphelion { 
+    flex-shrink: 0; 
+    height: 10px; 
+    background-image: url("data:image/svg+xml,..."); 
+    background-repeat: repeat-x; 
+    background-position: left center;
+    align-self: center; 
 }
-/* La matematica CSS segue esattamente la proiezione di J2000 tramite matrix transformations in JS */
+.perihelion > div, .aphelion > div { 
+    display: block; height: 100%; width: 100%; 
+}
 ```
 
 **JavaScript**:
@@ -201,7 +207,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 async function syncWithNasa() {
     for (let i = 1; i < planetsData.length; i++) {
         const p = planetsData[i];
-        const url = `[https://api.allorigins.win/get?url=$](https://api.allorigins.win/get?url=$){encodeURIComponent(
+        const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
             `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='${p.nasa}'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&OUT_UNITS='KM-S'&CENTER='500@10'&START_TIME='now'&STOP_TIME='now+1m'&STEP_SIZE='1m'`
         )}`;
         try {
@@ -217,9 +223,24 @@ async function syncWithNasa() {
             p.baseDis = d / 1000;
             p.inc = ((x*vx + y*vy + z*vz) / d) / 1000; 
 
-            // [...] Aggiornamento interfaccia domDisKm e barra timeline
+            // Calcolo flessibile della rappresentazione visiva perielio/afelio
+            if (p.periEl && p.aphEl && p.totalFlex > 0) {
+                let progress = (p.baseDis - p.peri) / (p.aph - p.peri);
+                if (progress < 0) progress = 0;
+                if (progress > 1) progress = 1;
+                
+                let periW = p.totalFlex * progress;
+                p.periEl.style.width = periW + "px";
+                p.aphEl.style.width = (p.totalFlex - periW) + "px";
+            }
+            
+            // Aggiornamento posizione navigatore in sidebar
+            if (p.sidebarItemDiv && p.id !== 'Sun') {
+                p.sidebarItemDiv.style.left = (p.baseDis / shrinkerFactor) + "px";
+            }
         } catch(e) { 
             console.error("NASA Sync Error for " + p.name, e); 
+            // Vettori di scorta in caso di indisponibilità del server
             p.inc = [0, 0.0042, -0.0001, 0.0005, 0.0021, 0.0015, -0.0012, 0.0008, -0.0002][i];
         }
     }
@@ -227,8 +248,8 @@ async function syncWithNasa() {
 ```
 
 
-### 3. Rendering 2D e Animazioni (Canvas e GSAP)
-Per mantenere altissime le prestazioni, gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo rispetto a parametri dinamici o l'ancoraggio speciale al Sole) sono orchestrate con precisione tramite l'easing avanzato di GSAP.
+### Rendering 2D e Animazioni (Canvas e GSAP)
+Per mantenere altissime le prestazioni durante la navigazione orizzontale, gli sfondi stellati con effetto parallasse sono disegnati e calcolati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando perfettamente lo schermo rispetto ai parametri dinamici o il ritorno rapido al Sole) sono orchestrate tramite il motore di animazione ScrollToPlugin di GSAP.
 
 **HTML**:
 ```html
@@ -247,14 +268,14 @@ canvas.stars-canvas {
 
 **JavaScript**:
 ```javascript
-// Classe per la generazione e animazione particellare (Canvas API)
+/// Classe di generazione particellare per i layout stellati
 class Stars {
     constructor(id, density, maxS, minS, maxSz, minSz) {
         this.canvas = document.getElementById(id); this.ctx = this.canvas.getContext('2d');
         this.density = density; this.maxS = maxS; this.minS = minS; this.maxSz = maxSz; this.minSz = minSz; this.dots = [];
         this.resize(); window.addEventListener('resize', () => this.resize());
     }
-    // [...] Funzioni resize() e addDot() omesse per brevità
+    // [...] Funzioni logiche resize() e addDot() omesse per brevità
     draw(delta) {
         const ctx = this.ctx; ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         while (this.dots.length < this.num) this.addDot(delta > 0 ? this.rB : this.lB, Math.random() * window.innerHeight);
@@ -268,7 +289,7 @@ class Stars {
     }
 }
 
-// GSAP ScrollToPlugin per transizione e centraggio visivo
+// Navigazione assistita e calcolo viewport con GSAP ScrollToPlugin
 function autoScroll(targetPla) {
     if (!targetPla || !targetPla.img) return;
     isTraveling = true; traveling.classList.add('traveling-active');
