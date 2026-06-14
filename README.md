@@ -40,18 +40,18 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 
 L'interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
 
-### Mappa del sito (Pagine)
-| File | Contenuto |
-| :--- | :--- |
-| **`index.html`** | Home / Introduzione |
-| **`sizes.html`** | Confronto scala pianeti |
-| **`positions.html`** | Mappa orbitale con movimenti dei pianeti |
-| **`distances.html`** | Distanze tra i pianeti |
-| **`measurement.html`** | Sezione informativa sui metodi di misurazione |
-| **`credits.html`** | Colophon |
+### Pagine del sito
+| N. | File | Pagina | Contenuto |
+| :--- | :--- | :--- | :--- |
+| 1 | **`index.html`** | SolarScale | Introduzione tipografica al progetto |
+| 2 | **`sizes.html`** | Sizes | Confronto scala pianeti |
+| 3 | **`positions.html`** | Positions | Mappa orbitale con movimenti dei pianeti |
+| 4 | **`distances.html`** | Distances | Distanze tra i pianeti |
+| 5 | **`measurement.html`** | Measurement methods | Sezione informativa sui metodi di misurazione |
+| 6 | **`credits.html`** | Credits | Colophon |
 
 
-### Livello 1: menu globale fisso
+### Menu globale fisso
 Presente costantemente in tutte le pagine per garantire orientamento e coerenza visiva.
 * **Alto-sinistra:** logo (SolarScale), pagina Sizes, pagina Positions, pagina Distances.
 * **Alto-destra:** pagina Measurement Methods, pagina Credits.
