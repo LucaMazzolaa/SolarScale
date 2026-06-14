@@ -86,19 +86,19 @@ La sezione Credits raccoglie le informazioni relative all’autore del progetto 
 
 Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
 
-Di seguito vengono presentati tre estratti di codice chiave che sono stati fondamentali nello sviluppo del progetto, in quanto determinanti per la costruzione della logica interattiva:<br>
+Di seguito vengono presentati tre estratti di codice chiave tratti dal file `distances.html`, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
 
 ### 1. Motore grafico 3D (Three.js e Model-Viewer)
 Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella.
 
-**HTML** (da `distances.html`):
+**HTML**:
 ```html
 <model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
 
 <div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:143px;height:143px;"></div>
 ```
 
-**CSS** (da `distances.html`):
+**CSS**:
 ```css
 model-viewer {
     background-color: transparent; --poster-color: transparent; border-radius: 50%;
@@ -114,7 +114,7 @@ model-viewer::part(default-progress-bar), model-viewer::part(default-ar-button),
 }
 ```
 
-**JavaScript** (da `distances.html`):
+**JavaScript**:
 ```javascript
 const threePlanetsElements = document.querySelectorAll('.three-planet');
 const renderersThree = [];
@@ -176,7 +176,7 @@ if(threePlanetsElements.length > 0) {
 ### 2. Dati scientifici in tempo reale (API NASA JPL)
 Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale e inietta questi parametri nel DOM o direttamente nelle regole CSS per generare orbite fisicamente accurate. Il sistema implementa anche un array di fallback in caso di fallimento del sync con l'Agenzia Spaziale.
 
-**HTML** (da `distances.html` e `positions.html`):
+**HTML**:
 ```html
 <div class="info-grid">
     <span>Distance from the Sun</span><span><span id="disSpa5Km">...</span> km</span>
@@ -185,7 +185,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 <div class="orbit orb-mercury"></div>
 ```
 
-**CSS** (da `positions.html`):
+**CSS**:
 ```css
 /* ORBITE: Rappresentazione geometrica base */
 .orbit { 
@@ -196,7 +196,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 /* La matematica CSS segue esattamente la proiezione di J2000 tramite matrix transformations in JS */
 ```
 
-**JavaScript** (da `distances.html`):
+**JavaScript**:
 ```javascript
 async function syncWithNasa() {
     for (let i = 1; i < planetsData.length; i++) {
@@ -230,14 +230,14 @@ async function syncWithNasa() {
 ### 3. Rendering 2D e Animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni, gli sfondi stellati con effetto parallasse sono disegnati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando lo schermo rispetto a parametri dinamici o l'ancoraggio speciale al Sole) sono orchestrate con precisione tramite l'easing avanzato di GSAP.
 
-**HTML** (da `distances.html`):
+**HTML**:
 ```html
 <canvas id="stars"  class="stars-canvas"></canvas>
 <canvas id="stars2" class="stars-canvas"></canvas>
 <canvas id="stars3" class="stars-canvas"></canvas>
 ```
 
-**CSS** (da `distances.html`):
+**CSS**:
 ```css
 canvas.stars-canvas {
     position: fixed; left: 0; top: 0;
@@ -245,7 +245,7 @@ canvas.stars-canvas {
 }
 ```
 
-**JavaScript** (da `distances.html`):
+**JavaScript**:
 ```javascript
 // Classe per la generazione e animazione particellare (Canvas API)
 class Stars {
