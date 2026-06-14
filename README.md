@@ -86,7 +86,7 @@ La sezione Credits raccoglie le informazioni relative all’autore del progetto 
 
 Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
 
-Di seguito vengono presentati tre estratti di codice chiave tratti dal file `distances.html`, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
+Di seguito vengono presentati tre estratti di codice chiave tratti dal file `**distances.html**`, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
 
 ### 1. Motore grafico 3D (Three.js e Model-Viewer)
 Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella.
