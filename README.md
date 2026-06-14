@@ -91,14 +91,14 @@ Di seguito vengono presentati tre estratti di codice chiave tratti dal file **`d
 ### Motore grafico 3D (Three.js e Model-Viewer)
 Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella. Le prestazioni sono ulteriormente ottimizzate da un `IntersectionObserver` nativo che sospende il ricalcolo dei frame per i modelli 3D non attualmente visibili nel viewport.
 
-**HTML**:
+**HTML**
 ```html
 <model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
 
 <div id="Jupiter" class="three-planet" data-file="jupiter.glb" data-rot="8" style="width:143px;height:143px;"></div>
 ```
 
-**CSS**:
+**CSS**
 ```css
 model-viewer {
     background-color: transparent; --poster-color: transparent; border-radius: 50%;
@@ -114,7 +114,7 @@ model-viewer::part(default-progress-bar), model-viewer::part(default-ar-button),
 }
 ```
 
-**JavaScript**:
+**JavaScript**
 ```javascript
 const threePlanetsElements = document.querySelectorAll('.three-planet');
 const renderersThree = [];
@@ -168,7 +168,7 @@ if(threePlanetsElements.length > 0) {
 ### Dati scientifici in tempo reale (API NASA JPL)
 Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale. Questi parametri vengono iniettati nel DOM per aggiornare i chilometri di distanza e per calcolare matematicamente la proporzione visiva tra perielio e afelio adattando dinamicamente la larghezza dei blocchi strutturali CSS.
 
-**HTML**:
+**HTML**
 ```html
 <div class="planetdiv" id="div-Mercury">
     <div class="perihelion"><div></div></div>
@@ -187,7 +187,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 </div>
 ```
 
-**CSS**:
+**CSS**
 ```css
 .perihelion, .aphelion { 
     flex-shrink: 0; 
@@ -202,7 +202,7 @@ Il rigore della simulazione è garantito dall'integrazione delle API Horizons de
 }
 ```
 
-**JavaScript**:
+**JavaScript**
 ```javascript
 async function syncWithNasa() {
     for (let i = 1; i < planetsData.length; i++) {
@@ -251,14 +251,14 @@ async function syncWithNasa() {
 ### Rendering 2D e Animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni durante la navigazione orizzontale, gli sfondi stellati con effetto parallasse sono disegnati e calcolati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando perfettamente lo schermo rispetto ai parametri dinamici o il ritorno rapido al Sole) sono orchestrate tramite il motore di animazione ScrollToPlugin di GSAP.
 
-**HTML**:
+**HTML**
 ```html
 <canvas id="stars"  class="stars-canvas"></canvas>
 <canvas id="stars2" class="stars-canvas"></canvas>
 <canvas id="stars3" class="stars-canvas"></canvas>
 ```
 
-**CSS**:
+**CSS**
 ```css
 canvas.stars-canvas {
     position: fixed; left: 0; top: 0;
@@ -266,7 +266,7 @@ canvas.stars-canvas {
 }
 ```
 
-**JavaScript**:
+**JavaScript**
 ```javascript
 /// Classe di generazione particellare per i layout stellati
 class Stars {
