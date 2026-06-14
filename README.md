@@ -41,12 +41,14 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 L'interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
 
 ### Mappa del sito (Pagine)
-* **`index.html`** – Home / Introduzione
-* **`sizes.html`** – Confronto scala pianeti
-* **`positions.html`** – Mappa orbitale con movimenti dei pianeti
-* **`distances.html`** – Distanze tra i pianeti
-* **`measurement.html`** – Sezione informativa sui metodi di misurazione
-* **`credits.html`** – Colophon
+| File | Contenuto |
+| :--- | :--- |
+| **`index.html`** | Home / Introduzione |
+| **`sizes.html`** | Confronto scala pianeti |
+| **`positions.html`** | Mappa orbitale con movimenti dei pianeti |
+| **`distances.html`** | Distanze tra i pianeti |
+| **`measurement.html`** | Sezione informativa sui metodi di misurazione |
+| **`credits.html`** | Colophon |
 
 
 ### Livello 1: menu globale fisso
