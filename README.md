@@ -32,7 +32,7 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 | 3 | **`positions.html`** | Positions | Mappa orbitale con movimenti dei pianeti |
 | 4 | **`distances.html`** | Distances | Distanze tra i pianeti |
 | 5 | **`measurement.html`** | Measurement methods | Sezione informativa sui metodi di misurazione |
-| 6 | **`credits.html`** | Credits | Colophon |
+| 6 | **`credits.html`** | Credits | Informazioni di autore e contesto |
 
 
 ### Menu globale fisso
