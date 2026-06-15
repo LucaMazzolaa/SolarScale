@@ -7,21 +7,18 @@ Progetto 1: La conquista dello spazio
 # SolarScale
 Autore: Luca Mazzola \
 [SolarScale](https://lucamazzolaa.github.io/SolarScale/)
-<br><br>
 
 
 ## Introduzione e tema
 Questo progetto esplora il Sistema solare a partire da una criticità evidente: molte delle rappresentazioni diffuse risultano poco accurate nel restituire le reali proporzioni tra dimensioni dei pianeti e distanze che li separano nello spazio. La scala del Sistema è infatti così vasta da rendere impossibile una visualizzazione fedele all’interno di un’unica immagine, portando spesso a semplificazioni e alterazioni che ne compromettono la comprensione.<br>
 
 Per affrontare questo limite, il progetto scompone il Sistema solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole.Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in un’esperienza visiva immediata, rendendo percepibili proporzioni normalmente astratte e restituendo in modo efficace la reale struttura e scala del Sistema solare.
-<br><br>
 
 
 ## Riferimenti progettuali
 <img width="4000" height="750" alt="immagini" src="https://github.com/user-attachments/assets/055426aa-bca7-48fc-af18-38c913d98b09" />
 
 A livello di funzione e di visualizzazione, il progetto si è basato su tre riferimenti principali, scelti in relazione ai tre temi in cui il Sistema Solare è stato scomposto, con l’obiettivo di avvicinarsi il più possibile a una rappresentazione chiara e fedele delle proporzioni. Per il tema delle dimensioni, il riferimento principale è il [video](https://www.youtube.com/watch?v=i93Z7zljQ7I&t=29s) che mette in evidenza in modo immediato e comparativo le reali scale tra i pianeti. La sua efficacia risiede nella capacità di tradurre dati numerici complessi in un confronto visivo diretto. Per posizioni e rotazioni, è stato utilizzato come base lo [strumento interattivo](https://ssd.jpl.nasa.gov/tools/orbit_viewer.html) che permette di osservare in modo semplificato i movimenti orbitali in tempo reale e comprendere le relazioni dinamiche tra i corpi celesti. Per le distanze dal Sole, il riferimento chiave è la [pagina web](https://joshworth.com/dev/pixelspace/pixelspace_solarsystem.html) che rappresenta in modo efficace la reale vastità degli spazi tra i pianeti, rendendo percepibile ciò che normalmente risulta astratto.
-<br><br>
 
 
 ## Design dell’interfaccia e modalità di interazione
@@ -43,11 +40,13 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 
 Il menu superiore costituisce l’elemento di navigazione principale e rimane costante in tutte le pagine per garantire orientamento e coerenza visiva. A sinistra sono presenti il logo e il nome del progetto SolarScale, seguiti sulla destra dalle sezioni Sizes, Positions e Distances. Sulla parte destra del menu si trovano invece le sezioni Measurement Methods e Credits, completando la struttura e garantendo una chiara organizzazione gerarchica dei contenuti e un accesso diretto alle diverse aree del progetto.
 
+
 ### Logo
 <img width="4000" height="750" alt="logo" src="https://github.com/user-attachments/assets/2d181193-5229-4b65-b59d-a841a38d0a86" />
 
 Il logo del progetto si ispira a uno dei più antichi simboli associati al Sole, rappresentato da un cerchio con un punto centrale. Utilizzato nel corso della storia in ambito astronomico, astrologico e simbolico, questo segno identifica il Sole come centro e origine di un sistema.
 La scelta di questo simbolo è strettamente legata al contenuto del progetto. Nel Sistema Solare il Sole rappresenta infatti il punto centrale attorno al quale orbitano tutti i pianeti e costituisce il principale riferimento per comprenderne dimensioni, posizioni e distanze. Il marchio sintetizza quindi il concetto di centralità, orientamento e relazione tra i corpi celesti, traducendo in forma grafica il tema stesso dell'esplorazione delle proporzioni del Sistema Solare.
+
 
 ### SolarScale (index.html)
 <img width="4000" height="1994" alt="03_1920_1080" src="https://github.com/user-attachments/assets/b4d11310-72dd-49f8-9d62-fd6b777c1a3d" />
@@ -60,26 +59,29 @@ La pagina iniziale si presenta come un’introduzione tipografica al progetto e 
 
 La sezione Sizes è dedicata al confronto delle dimensioni dei pianeti attraverso una visualizzazione che ne mostra le reali proporzioni. La pagina si apre con un titolo e un breve testo introduttivo che contestualizzano il contenuto. Attraverso il principio "Scroll to explore", l’utente dissolve progressivamente questa introduzione e accede alla visualizzazione interattiva sottostante, navigabile orizzontalmente. La navigazione è supportata da una barra con le icone dei pianeti posizionata nella parte inferiore dello schermo, che consente di raggiungere rapidamente i diversi corpi celesti. Ai lati compaiono inoltre frecce di navigazione che mostrano in anteprima il nome del pianeta e il relativo diametro, facilitando il confronto tra le diverse scale.
 
+
 ### Positions (positions.html)
 <img width="4000" height="1994" alt="03_1920_10803" src="https://github.com/user-attachments/assets/12c3f065-a933-4a65-a34d-c6a4e802885e" />
 
 La sezione Positions presenta una mappa orbitale interattiva che visualizza le posizioni e i movimenti dei pianeti nel tempo. Anche in questo caso l’accesso alla simulazione avviene attraverso il gesto "Scroll to explore", che trasforma l’introduzione testuale in uno spazio di osservazione dinamico. Nella parte inferiore è presente una plancia di controllo che permette di modificare la velocità della simulazione, mettere in pausa il sistema, avanzare nel tempo e monitorare la data visualizzata. I controlli di zoom, collocati nell'angolo inferiore destro, consentono invece di osservare il Sistema Solare a differenti livelli di dettaglio.
+
 
 ### Distances (distances.html)
 <img width="4000" height="1994" alt="03_1920_10804" src="https://github.com/user-attachments/assets/2ad7107f-ea9f-4900-a0e4-8d3e00207c7e" />
 
 La sezione Distances esplora le reali distanze tra i pianeti e il Sole, mettendo in evidenza la vastità degli spazi interplanetari. Attraverso il gesto "Scroll to explore", l’utente avanza progressivamente all'interno della visualizzazione e scopre le relazioni spaziali tra i diversi corpi celesti. Una barra di navigazione posta nella parte inferiore permette di spostarsi rapidamente tra i pianeti, rappresentati in modo proporzionale lungo il percorso. Le frecce laterali mostrano invece informazioni sintetiche sulle distanze tra un pianeta e l'altro, facilitando la comprensione delle reali scale del sistema.
 
+
 ### Measurement Methods (measurement.html)
 <img width="4000" height="1994" alt="03_1920_10805" src="https://github.com/user-attachments/assets/d99aac3b-0eb6-43f2-8f95-d681108b7ebf" />
 
 La sezione Measurement Methods è concepita come uno spazio informativo dedicato ai metodi utilizzati per misurare dimensioni, posizioni e distanze nel Sistema Solare. A differenza delle altre sezioni, l’interazione segue il principio "Scroll to read" e si basa esclusivamente sulla lettura dei contenuti. Lo scorrimento verticale guida l’utente attraverso testi esplicativi, immagini e materiali video senza l’introduzione di ulteriori strumenti di navigazione o pannelli di controllo.
 
+
 ### Credits (credits.html)
 <img width="4000" height="1994" alt="03_1920_10806" src="https://github.com/user-attachments/assets/9c6e99a6-ff4f-497d-88f1-3e96fd73f728" />
 
 La sezione Credits raccoglie le informazioni relative all’autore del progetto e al contesto di realizzazione.
-<br>
 
 
 ## Tecnologia usata
@@ -87,6 +89,7 @@ La sezione Credits raccoglie le informazioni relative all’autore del progetto 
 Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
 
 Di seguito vengono presentati tre estratti di codice chiave tratti dal file **`distances.html`**, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
+
 
 ### Motore grafico 3D (Three.js e Model-Viewer)
 Per la rappresentazione visiva dei corpi celesti si è optato per un approccio ibrido. Il web component `<model-viewer>` delega al browser il rendering efficiente dei modelli più leggeri (pianeti terrestri), mentre Three.js gestisce il rendering avanzato dei giganti gassosi e della stella. Le prestazioni sono ulteriormente ottimizzate da un `IntersectionObserver` nativo che sospende il ricalcolo dei frame per i modelli 3D non attualmente visibili nel viewport.
@@ -248,7 +251,7 @@ async function syncWithNasa() {
 ```
 
 
-### Rendering 2D e Animazioni (Canvas e GSAP)
+### Rendering 2D e animazioni (Canvas e GSAP)
 Per mantenere altissime le prestazioni durante la navigazione orizzontale, gli sfondi stellati con effetto parallasse sono disegnati e calcolati interamente tramite le API native HTML5 Canvas. Le transizioni complesse (come il viaggio automatico tra i pianeti centrando perfettamente lo schermo rispetto ai parametri dinamici o il ritorno rapido al Sole) sono orchestrate tramite il motore di animazione ScrollToPlugin di GSAP.
 
 **HTML**
@@ -317,7 +320,6 @@ function autoScroll(targetPla) {
     });
 }
 ```
-<br>
 
 
 ## Target e contesto d’uso
