@@ -10,9 +10,9 @@ Autore: Luca Mazzola \
 
 
 ## Introduzione e tema
-Questo progetto esplora il Sistema solare a partire da una criticità evidente: molte delle rappresentazioni diffuse risultano poco accurate nel restituire le reali proporzioni tra dimensioni dei pianeti e distanze che li separano nello spazio. La scala del Sistema è infatti così vasta da rendere impossibile una visualizzazione fedele all’interno di un’unica immagine, portando spesso a semplificazioni e alterazioni che ne compromettono la comprensione.<br>
+Questo progetto esplora il Sistema Solare a partire da una criticità evidente: molte delle rappresentazioni diffuse risultano poco accurate nel restituire le reali proporzioni tra dimensioni dei pianeti e distanze che li separano nello spazio. La scala del Sistema è infatti così vasta da rendere impossibile una visualizzazione fedele all’interno di un’unica immagine, portando spesso a semplificazioni e alterazioni che ne compromettono la comprensione.<br>
 
-Per affrontare questo limite, il progetto scompone il Sistema solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole. Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in un’esperienza visiva immediata, rendendo percepibili proporzioni normalmente astratte e restituendo in modo efficace la reale struttura e scala del Sistema solare.
+Per affrontare questo limite, il progetto scompone il Sistema Solare in tre elementi principali: dimensioni dei pianeti, posizioni e movimenti nel tempo, e distanze dal Sole. Ne deriva una visualizzazione interattiva capace di tradurre dati scientifici in un’esperienza visiva immediata, rendendo percepibili proporzioni normalmente astratte e restituendo in modo efficace la reale struttura e scala del Sistema Solare.
 
 
 ## Riferimenti progettuali
@@ -22,7 +22,7 @@ A livello di funzione e di visualizzazione, il progetto si è basato su tre rife
 
 
 ## Design dell’interfaccia e modalità di interazione
-Il design è concepito per offrire un’esperienza immersiva e minimale. L’interfaccia si ispira all’immaginario dell'esplorazione spaziale e della ricerca scientifica, utilizzando uno sfondo nero profondo arricchito da un campo di piccole stelle che immerge immediatamente l'utente nell'ambiente cosmico. La tipografia bianca, basata sul font Neue Montreal, garantisce chiarezza e leggibilità, mentre un cursore personalizzato si adatta dinamicamente agli elementi interattivi. L’interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
+Il design è concepito per offrire un’esperienza immersiva e minimale. L’interfaccia si ispira all’immaginario dell’esplorazione spaziale e della ricerca scientifica, utilizzando uno sfondo nero profondo arricchito da un campo di piccole stelle che immerge immediatamente l’utente nell’ambiente cosmico. La tipografia bianca, basata sul font Neue Montreal, garantisce chiarezza e leggibilità, mentre un cursore personalizzato si adatta dinamicamente agli elementi interattivi. L’interfaccia segue il principio della rivelazione progressiva. L’utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
 
 ### Pagine del sito
 | N. | File | Pagina | Contenuto |
@@ -45,7 +45,7 @@ Il menu superiore costituisce l’elemento di navigazione principale e rimane co
 <img width="4000" height="750" alt="logo" src="https://github.com/user-attachments/assets/2d181193-5229-4b65-b59d-a841a38d0a86" />
 
 Il logo del progetto si ispira a uno dei più antichi simboli associati al Sole, rappresentato da un cerchio con un punto centrale. Utilizzato nel corso della storia in ambito astronomico, astrologico e simbolico, questo segno identifica il Sole come centro e origine di un sistema.
-La scelta di questo simbolo è strettamente legata al contenuto del progetto. Nel Sistema Solare il Sole rappresenta infatti il punto centrale attorno al quale orbitano tutti i pianeti e costituisce il principale riferimento per comprenderne dimensioni, posizioni e distanze. Il marchio sintetizza quindi il concetto di centralità, orientamento e relazione tra i corpi celesti, traducendo in forma grafica il tema stesso dell'esplorazione delle proporzioni del Sistema Solare.
+La scelta di questo simbolo è strettamente legata al contenuto del progetto. Nel Sistema Solare il Sole rappresenta infatti il punto centrale attorno al quale orbitano tutti i pianeti e costituisce il principale riferimento per comprenderne dimensioni, posizioni e distanze. Il marchio sintetizza quindi il concetto di centralità, orientamento e relazione tra i corpi celesti, traducendo in forma grafica il tema stesso dell’esplorazione delle proporzioni del Sistema Solare.
 
 
 ### SolarScale (index.html)
@@ -57,36 +57,36 @@ La pagina iniziale si presenta come un’introduzione tipografica al progetto e 
 ### Sizes (sizes.html)
 <img width="4000" height="1994" alt="03_1920_10802" src="https://github.com/user-attachments/assets/0bf639cb-52c9-4ddd-916d-cb007793de50" />
 
-La sezione Sizes è dedicata al confronto delle dimensioni dei pianeti attraverso una visualizzazione che ne mostra le reali proporzioni. La pagina si apre con un titolo e un breve testo introduttivo che contestualizzano il contenuto. Attraverso il principio "Scroll to explore", l’utente dissolve progressivamente questa introduzione e accede alla visualizzazione interattiva sottostante, navigabile orizzontalmente. La navigazione è supportata da una barra con le icone dei pianeti posizionata nella parte inferiore dello schermo, che consente di raggiungere rapidamente i diversi corpi celesti. Ai lati compaiono inoltre frecce di navigazione che mostrano in anteprima il nome del pianeta e il relativo diametro, facilitando il confronto tra le diverse scale.
+La pagina Sizes è dedicata al confronto delle dimensioni dei pianeti attraverso una visualizzazione che ne mostra le reali proporzioni. La pagina si apre con un titolo e un breve testo introduttivo che contestualizzano il contenuto. Attraverso il principio "Scroll to explore", l’utente dissolve progressivamente questa introduzione e accede alla visualizzazione interattiva sottostante, navigabile orizzontalmente. La navigazione è supportata da una barra con le icone dei pianeti posizionata nella parte inferiore dello schermo, che consente di raggiungere rapidamente i diversi corpi celesti. Ai lati compaiono inoltre frecce di navigazione che mostrano in anteprima il nome del pianeta e il relativo diametro, facilitando il confronto tra le diverse scale.
 
 
 ### Positions (positions.html)
 <img width="4000" height="1994" alt="03_1920_10803" src="https://github.com/user-attachments/assets/12c3f065-a933-4a65-a34d-c6a4e802885e" />
 
-La sezione Positions presenta una mappa orbitale interattiva che visualizza le posizioni e i movimenti dei pianeti nel tempo. Anche in questo caso l’accesso alla simulazione avviene attraverso il gesto "Scroll to explore", che trasforma l’introduzione testuale in uno spazio di osservazione dinamico. Nella parte inferiore è presente una plancia di controllo che permette di modificare la velocità della simulazione, mettere in pausa il sistema, avanzare nel tempo e monitorare la data visualizzata. I controlli di zoom, collocati nell'angolo inferiore destro, consentono invece di osservare il Sistema Solare a differenti livelli di dettaglio.
+La pagina Positions presenta una mappa orbitale interattiva che visualizza le posizioni e i movimenti dei pianeti nel tempo. Anche in questo caso l’accesso alla simulazione avviene attraverso il gesto "Scroll to explore", che trasforma l’introduzione testuale in uno spazio di osservazione dinamico. Nella parte inferiore è presente un pannello di controllo che permette di modificare la velocità della simulazione, mettere in pausa il sistema, avanzare nel tempo e monitorare la data visualizzata. I controlli di zoom, collocati nell'angolo inferiore destro, consentono invece di osservare il Sistema Solare a differenti livelli di dettaglio.
 
 
 ### Distances (distances.html)
 <img width="4000" height="1994" alt="03_1920_10804" src="https://github.com/user-attachments/assets/2ad7107f-ea9f-4900-a0e4-8d3e00207c7e" />
 
-La sezione Distances esplora le reali distanze tra i pianeti e il Sole, mettendo in evidenza la vastità degli spazi interplanetari. Attraverso il gesto "Scroll to explore", l’utente avanza progressivamente all'interno della visualizzazione e scopre le relazioni spaziali tra i diversi corpi celesti. Una barra di navigazione posta nella parte inferiore permette di spostarsi rapidamente tra i pianeti, rappresentati in modo proporzionale lungo il percorso. Le frecce laterali mostrano invece informazioni sintetiche sulle distanze tra un pianeta e l'altro, facilitando la comprensione delle reali scale del sistema.
+La pagina Distances esplora le reali distanze tra i pianeti e il Sole, mettendo in evidenza la vastità degli spazi interplanetari. Attraverso il gesto "Scroll to explore", l’utente avanza progressivamente all’interno della visualizzazione e scopre le relazioni spaziali tra i diversi corpi celesti. Una barra di navigazione posta nella parte inferiore permette di spostarsi rapidamente tra i pianeti, rappresentati in modo proporzionale lungo il percorso. Le frecce laterali mostrano invece informazioni sintetiche sulle distanze tra un pianeta e l’altro, facilitando la comprensione delle reali scale del sistema.
 
 
 ### Measurement Methods (measurement.html)
 <img width="4000" height="1994" alt="03_1920_10805" src="https://github.com/user-attachments/assets/d99aac3b-0eb6-43f2-8f95-d681108b7ebf" />
 
-La sezione Measurement Methods è concepita come uno spazio informativo dedicato ai metodi utilizzati per misurare dimensioni, posizioni e distanze nel Sistema Solare. A differenza delle altre sezioni, l’interazione segue il principio "Scroll to read" e si basa esclusivamente sulla lettura dei contenuti. Lo scorrimento verticale guida l’utente attraverso testi esplicativi, immagini e materiali video senza l’introduzione di ulteriori strumenti di navigazione o pannelli di controllo.
+La pagina Measurement Methods è concepita come uno spazio informativo dedicato ai metodi utilizzati per misurare dimensioni, posizioni e distanze nel Sistema Solare. A differenza delle altre sezioni, l’interazione segue il principio "Scroll to read" e si basa esclusivamente sulla lettura dei contenuti. Lo scorrimento verticale guida l’utente attraverso testi esplicativi, immagini e materiali video senza l’introduzione di ulteriori strumenti di navigazione o pannelli di controllo.
 
 
 ### Credits (credits.html)
 <img width="4000" height="1994" alt="03_1920_10806" src="https://github.com/user-attachments/assets/9c6e99a6-ff4f-497d-88f1-3e96fd73f728" />
 
-La sezione Credits raccoglie le informazioni relative all’autore del progetto e al contesto di realizzazione.
+La pagina Credits raccoglie le informazioni relative all’autore del progetto e al contesto di realizzazione.
 
 
 ## Tecnologia usata
 
-Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell'interfaccia, mentre CSS ne gestisce l'estetica attraverso un design system responsivo basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell'applicazione: orchestra il DOM, gestisce gli eventi dell'utente e sincronizza l'interfaccia con i dati e le librerie esterne.<br>
+Il progetto poggia su una solida architettura front-end nativa, sviluppata in **HTML5, CSS3 e JavaScript (ES6)**. HTML definisce la struttura semantica dell’interfaccia, mentre CSS ne gestisce l’estetica attraverso un design system basato su variabili, calcoli fluidi e tipografia personalizzata. JavaScript funge da motore logico dell’applicazione: orchestra il DOM, gestisce gli eventi dell’utente e sincronizza l’interfaccia con i dati e le librerie esterne.<br>
 
 Di seguito vengono presentati tre estratti di codice chiave tratti dal file **`distances.html`**, fondamentali per lo sviluppo del progetto in quanto rappresentano le principali logiche di interazione e visualizzazione. Questo file integra infatti l’intero sistema di navigazione e gestione dei dati della sezione, combinando struttura, comportamento e relazione tra i diversi elementi dell’interfaccia.<br>
 
@@ -169,7 +169,7 @@ if(threePlanetsElements.length > 0) {
 
 
 ### Dati scientifici in tempo reale (API NASA JPL)
-Il rigore della simulazione è garantito dall'integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l'applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale. Questi parametri vengono iniettati nel DOM per aggiornare i chilometri di distanza e per calcolare matematicamente la proporzione visiva tra perielio e afelio adattando dinamicamente la larghezza dei blocchi strutturali CSS.
+Il rigore della simulazione è garantito dall’integrazione delle API Horizons del NASA JPL. Tramite chiamate asincrone, l’applicazione interroga il database per ottenere i vettori di stato esatti in tempo reale. Questi parametri vengono iniettati nel DOM per aggiornare i chilometri di distanza e per calcolare matematicamente la proporzione visiva tra perielio e afelio adattando dinamicamente la larghezza dei blocchi strutturali CSS.
 
 **HTML**
 ```html
@@ -323,6 +323,6 @@ function autoScroll(targetPla) {
 
 
 ## Target e contesto d’uso
-Il progetto è rivolto a un pubblico generalista, in particolare a persone con conoscenze limitate o di base sul Sistema solare e sui pianeti, ma interessate alla scoperta dello spazio, alla divulgazione scientifica e alla comprensione dei dati attraverso la visualizzazione.<br>
+Il progetto è rivolto a un pubblico generalista internazionale, proveniente da diverse aree geografiche, con conoscenze limitate o di base sul Sistema Solare e sui pianeti, ma interessato alla scoperta dello spazio, alla divulgazione scientifica e alla comprensione dei dati attraverso la visualizzazione. L’interfaccia è pensata per essere accessibile a utenti di età eterogenea, indicativamente da adolescenti e studenti fino a un pubblico adulto, senza richiedere competenze scientifiche o tecniche specifiche.<br>
 
-La piattaforma si inserisce in un contesto di uso principalmente educativo e divulgativo, pensato per essere consultato online in modo autonomo. Può essere utilizzata in ambiti scolastici e formativi, oppure come strumento di esplorazione personale per comprendere in modo intuitivo le proporzioni e le dinamiche del Sistema solare attraverso un’esperienza interattiva.
+La piattaforma si inserisce in un contesto di uso principalmente educativo e divulgativo, pensato per essere consultato online in modo autonomo. Può essere utilizzata in ambiti scolastici e formativi, oppure come strumento di esplorazione personale per comprendere in modo intuitivo le proporzioni e le dinamiche del Sistema Solare attraverso un’esperienza interattiva.
