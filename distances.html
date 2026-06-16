@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>SolarScale - Distances</title>
-    <link rel="icon" type="image/svg+xml" href="assets/sun_symbol.svg">
+    <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
@@ -19,19 +19,14 @@
            FONT IMPORT
            ========================================= */
         @font-face {
-            font-family: 'Nasa';
-            src: url('assets/nasa.ttf') format('truetype');
-        }
-
-        @font-face {
             font-family: 'Neue Montreal';
-            src: url('assets/ppneuemontreal-book.otf') format('opentype');
+            src: url('assets/font/ppneuemontreal-book.otf') format('opentype');
             font-weight: 400;
         }
 
         @font-face {
             font-family: 'Neue Montreal';
-            src: url('assets/ppneuemontreal-medium.otf') format('opentype');
+            src: url('assets/font/ppneuemontreal-medium.otf') format('opentype');
             font-weight: 500;
         }
 
@@ -502,7 +497,7 @@
 
 <nav class="menu">
     <a href="index.html" class="nasa-title" id="logo-link">
-        <img src="assets/sun_symbol.svg" alt="Sun symbol">
+        <img src="assets/imgs/logo.svg" alt="Sun symbol">
         <span class="nasa-text-label">SolarScale</span>
     </a>
     <a href="sizes.html" class="nav-link">
@@ -534,39 +529,39 @@
         <canvas id="sidebar-canvas" width="2600" height="10"></canvas>
         <div class="sidebardiv" id="sidebardiv">
             <div class="sidebaritem" style="left:0px"       data-target="Sun">
-                <img class="sidebaricon button" id="nav-Sun"     src="./assets/sunicon.svg"     alt="Sun">
+                <img class="sidebaricon button" id="nav-Sun"     src="./assets/icons/sunicon.svg"     alt="Sun">
                 <p class="itemname">Sun</p>
             </div>
             <div class="sidebaritem" style="left:36.88px"   data-target="Mercury">
-                <img class="sidebaricon button" id="nav-Mercury" src="./assets/mercuryicon.svg" alt="Mercury">
+                <img class="sidebaricon button" id="nav-Mercury" src="./assets/icons/mercuryicon.svg" alt="Mercury">
                 <p class="itemname">Mercury</p>
             </div>
             <div class="sidebaritem" style="left:60.09px"   data-target="Venus">
-                <img class="sidebaricon button" id="nav-Venus"   src="./assets/venusicon.svg"   alt="Venus">
+                <img class="sidebaricon button" id="nav-Venus"   src="./assets/icons/venusicon.svg"   alt="Venus">
                 <p class="itemname">Venus</p>
             </div>
             <div class="sidebaritem" style="left:82.81px"   data-target="Earth">
-                <img class="sidebaricon button" id="nav-Earth"   src="./assets/earthicon.svg"   alt="Earth">
+                <img class="sidebaricon button" id="nav-Earth"   src="./assets/icons/earthicon.svg"   alt="Earth">
                 <p class="itemname">Earth</p>
             </div>
             <div class="sidebaritem" style="left:114.80px"  data-target="Mars">
-                <img class="sidebaricon button" id="nav-Mars"    src="./assets/marsicon.svg"    alt="Mars">
+                <img class="sidebaricon button" id="nav-Mars"    src="./assets/icons/marsicon.svg"    alt="Mars">
                 <p class="itemname">Mars</p>
             </div>
             <div class="sidebaritem" style="left:435.57px"  data-target="Jupiter">
-                <img class="sidebaricon button" id="nav-Jupiter" src="./assets/jupitericon.svg" alt="Jupiter">
+                <img class="sidebaricon button" id="nav-Jupiter" src="./assets/icons/jupitericon.svg" alt="Jupiter">
                 <p class="itemname">Jupiter</p>
             </div>
             <div class="sidebaritem" style="left:789.02px"  data-target="Saturn">
-                <img class="sidebaricon button" id="nav-Saturn"  src="./assets/saturnicon.svg"  alt="Saturn">
+                <img class="sidebaricon button" id="nav-Saturn"  src="./assets/icons/saturnicon.svg"  alt="Saturn">
                 <p class="itemname">Saturn</p>
             </div>
             <div class="sidebaritem" style="left:1618.64px" data-target="Uranus">
-                <img class="sidebaricon button" id="nav-Uranus"  src="./assets/uranusicon.svg"  alt="Uranus">
+                <img class="sidebaricon button" id="nav-Uranus"  src="./assets/icons/uranusicon.svg"  alt="Uranus">
                 <p class="itemname">Uranus</p>
             </div>
             <div class="sidebaritem" style="left:2483.55px" data-target="Neptune">
-                <img class="sidebaricon button" id="nav-Neptune" src="./assets/neptuneicon.svg" alt="Neptune">
+                <img class="sidebaricon button" id="nav-Neptune" src="./assets/icons/neptuneicon.svg" alt="Neptune">
                 <p class="itemname">Neptune</p>
             </div>
         </div>
@@ -631,7 +626,7 @@
     <div class="planetdiv" id="div-Mercury">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <model-viewer id="Mercury" src="./assets/mercury.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:5px;height:5px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
+            <model-viewer id="Mercury" src="./assets/imgs/mercury.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:5px;height:5px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
             <div class="info" id="info-Mercury">
                 <div class="info-title"><span style="font-weight:500;">Mercury</span> (Terrestrial planet)</div>
                 <div class="data-brackets">
@@ -651,7 +646,7 @@
     <div class="planetdiv" id="div-Venus">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <model-viewer id="Venus" src="./assets/venus.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:12px;height:12px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
+            <model-viewer id="Venus" src="./assets/imgs/venus.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:12px;height:12px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
             <div class="info" id="info-Venus">
                 <div class="info-title"><span style="font-weight:500;">Venus</span> (Terrestrial planet)</div>
                 <div class="data-brackets">
@@ -671,7 +666,7 @@
     <div class="planetdiv" id="div-Earth">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <model-viewer id="Earth" src="./assets/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
+            <model-viewer id="Earth" src="./assets/imgs/earth.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:13px;height:13px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
             <div class="info" id="info-Earth">
                 <div class="info-title"><span style="font-weight:500;">Earth</span> (Terrestrial planet)</div>
                 <div class="data-brackets">
@@ -691,7 +686,7 @@
     <div class="planetdiv" id="div-Mars">
         <div class="perihelion"><div></div></div>
         <div class="planet-cell">
-            <model-viewer id="Mars" src="./assets/mars.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:7px;height:7px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
+            <model-viewer id="Mars" src="./assets/imgs/mars.glb" auto-rotate rotation-per-second="3.44deg" disable-zoom interaction-prompt="none" camera-orbit="0deg 75deg 105%" style="width:7px;height:7px;" touch-action="none" shadow-intensity="0" exposure="1.5"></model-viewer>
             <div class="info" id="info-Mars">
                 <div class="info-title"><span style="font-weight:500;">Mars</span> (Terrestrial planet)</div>
                 <div class="data-brackets">
@@ -882,7 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let modelMesh = null;
 
-            loader.load(`assets/${file}`, (gltf) => {
+            loader.load(`assets/imgs/${file}`, (gltf) => {
                 const model = gltf.scene;
                 const box = new THREE.Box3().setFromObject(model);
                 const size = box.getSize(new THREE.Vector3());
