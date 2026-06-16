@@ -31,7 +31,7 @@ Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfa
 | 2 | **`sizes.html`** | Sizes | Confronto scala pianeti |
 | 3 | **`positions.html`** | Positions | Mappa orbitale con movimenti dei pianeti |
 | 4 | **`distances.html`** | Distances | Distanze tra i pianeti |
-| 5 | **`measurement.html`** | Measurement methods | Sezione informativa sui metodi di misurazione |
+| 5 | **`measurement.html`** | Measurement Methods | Sezione informativa sui metodi di misurazione |
 | 6 | **`credits.html`** | Credits | Informazioni di autore e contesto |
 
 
