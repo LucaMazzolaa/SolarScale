@@ -22,7 +22,7 @@ A livello di funzione e di visualizzazione, il progetto si è basato su tre rife
 
 
 ## Design dell’interfaccia e modalità di interazione
-Il design è concepito per offrire un'esperienza immersiva e minimale. L'interfaccia si ispira all'immaginario dell'esplorazione spaziale e della ricerca scientifica, utilizzando uno sfondo nero profondo arricchito da un campo di piccole stelle che immerge immediatamente l'utente nell'ambiente cosmico. La tipografia bianca, basata sul font Neue Montreal, garantisce chiarezza e leggibilità, mentre un cursore personalizzato si adatta dinamicamente agli elementi interattivi. L'interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
+Il design è concepito per offrire un’esperienza immersiva e minimale. L’interfaccia si ispira all’immaginario dell'esplorazione spaziale e della ricerca scientifica, utilizzando uno sfondo nero profondo arricchito da un campo di piccole stelle che immerge immediatamente l'utente nell'ambiente cosmico. La tipografia bianca, basata sul font Neue Montreal, garantisce chiarezza e leggibilità, mentre un cursore personalizzato si adatta dinamicamente agli elementi interattivi. L’interfaccia segue il principio della rivelazione progressiva. L'utente accede inizialmente a uno spazio minimale e, man mano che esplora i contenuti, vengono introdotti nuovi livelli di informazione e strumenti di navigazione, accompagnando la scoperta delle visualizzazioni in modo graduale e intuitivo.
 
 ### Pagine del sito
 | N. | File | Pagina | Contenuto |
