@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SolarScale - Credits</title>
+    <title>SolarScale | Credits</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
     
     <style>
@@ -43,6 +43,11 @@
             color: white;
             overflow: hidden; 
             cursor: none; 
+            user-select: none;
+        }
+
+        a {
+            color: white;
         }
 
         /* =========================================
@@ -80,7 +85,7 @@
         }
 
         /* =========================================
-           TOP MENU (Da dimensioni.html)
+           TOP MENU E HAMBURGER
            ========================================= */
         .menu {
             position: fixed;
@@ -89,6 +94,7 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
 
         .right-menu {
@@ -98,6 +104,36 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
         }
         
         .nasa-title {
@@ -114,13 +150,11 @@
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
 
-        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
         .nasa-text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        /* Altre voci del menu mantengono il comportamento standard */
         .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
@@ -147,18 +181,47 @@
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
         @media (max-width: 900px) {
-            .menu { 
-                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
             }
-            .right-menu { 
-                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
-                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
             }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
+
             .credits-block {
-                position: relative;
-                bottom: auto; left: auto;
-                margin: 4vh;
+                max-width: calc(100vw - 8vh);
             }
         }
 
@@ -204,6 +267,12 @@
 </head>
 <body>
 
+    <script>
+        // BLOCCA IL SALTO DI SCROLL AL CARICAMENTO DELLA PAGINA
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+    </script>
+
     <div class="cursor-dot" data-cursor-dot></div>
     <div class="cursor-outline" data-cursor-outline></div>
 
@@ -235,6 +304,19 @@
             <span class="text-label">Credits</span>
         </a>
     </nav>
+
+    <div class="hamburger" id="hamburger-menu">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <div class="mobile-nav" id="mobile-nav-menu">
+        <a href="sizes.html" class="nav-link"><span class="text-label">Sizes</span></a>
+        <a href="positions.html" class="nav-link"><span class="text-label">Positions</span></a>
+        <a href="distances.html" class="nav-link"><span class="text-label">Distances</span></a>
+        <a href="measurement.html" class="nav-link"><span class="text-label">Measurement Methods</span></a>
+        <a href="credits.html" class="nav-link active"><span class="text-label">Credits</span></a>
+    </div>
 
     <div class="credits-block">
         <p class="cascade-item">
@@ -278,15 +360,37 @@
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
         window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
 
-        document.querySelectorAll('.nav-link, #logo-link, a').forEach(el => {
+        document.querySelectorAll('.nav-link, #logo-link, a, .hamburger').forEach(el => {
             el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
         // -------------------------------------------------------------
+        // LOGICA MENU HAMBURGER E RICARICAMENTO
+        // -------------------------------------------------------------
+        const hamburgerBtn = document.getElementById('hamburger-menu');
+        const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+        if (hamburgerBtn && mobileNavBox) {
+            hamburgerBtn.addEventListener('click', () => {
+                hamburgerBtn.classList.toggle('open');
+                mobileNavBox.classList.toggle('open');
+            });
+        }
+
+        // Seleziona i link "Credits" (desktop e mobile) per forzare il refresh
+        const creditsLinks = document.querySelectorAll('a[href="credits.html"]');
+        creditsLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.reload();
+            });
+        });
+
+        // -------------------------------------------------------------
         // DYNAMIC MENU WIDTH RECALCULATION AND HACKER EFFECT
         // -------------------------------------------------------------
-        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
         
         function hackerEffect(span, originalText, intervalRef) {
@@ -339,7 +443,7 @@
             
             document.fonts.ready.then(() => {
                 logoSpan.style.display = 'inline-block';
-                logoSpan.style.overflow = 'visible'; // BUG FIX
+                logoSpan.style.overflow = 'visible'; 
                 logoSpan.style.whiteSpace = 'nowrap';
             });
 
@@ -359,7 +463,7 @@
 
             document.fonts.ready.then(() => {
                 textSpan.style.display = 'inline-block';
-                textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
+                textSpan.style.overflow = 'hidden'; 
                 textSpan.style.whiteSpace = 'nowrap';
             });
 
@@ -377,7 +481,7 @@
         window.addEventListener('resize', updateMenuWidths);
 
         // -------------------------------------------------------------
-        // BACKGROUND STARS (identical to dimensioni.html)
+        // BACKGROUND STARS (identico alle altre pagine)
         // -------------------------------------------------------------
         class Stars {
             constructor(id, density, maxS, minS, maxSz, minSz) {
@@ -418,8 +522,6 @@
         const s2 = new Stars('stars2', 0.5, 0.25,  0.0,  1.0, 0.2);
         const s3 = new Stars('stars3', 0.2, 0.001, 0.0,  0.5, 0.1);
 
-        // On this page there is no camera movement, so delta = 0:
-        // the stars are static, exactly as they appear at rest in dimensioni.html.
         function animateStars() {
             requestAnimationFrame(animateStars);
             s1.draw(0);
