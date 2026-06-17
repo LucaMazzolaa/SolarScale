@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SolarScale - Distances</title>
+    <title>SolarScale | Distances</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -77,11 +77,12 @@
 
         /* ─── TITLES AND TEXTS ─── */
         h1 { 
-            font-size: var(--font-62); /* Initial fallback size */
+            font-size: var(--font-62); 
             line-height: 1.15; 
             letter-spacing: -0.01em;
-            white-space: nowrap;
+            white-space: nowrap; 
         }
+        
         .title { 
             font-size: var(--font-16);
             opacity: 0.4; 
@@ -113,10 +114,6 @@
 
         /* ─── UPDATED ANIMATIONS ─── */
         
-        /* DISTANCES: The box is reduced to the EXACT maximum footprint of the dots.
-           Max footprint: 0.9em (left side) + 0.9em (right side) + 0.45em (diameter) = 2.25em.
-           This way the dots touch the invisible edge of the div and we can
-           set the CSS margin to the actual desired value of 0.3em. */
         .anim-dist-circles {
             display: inline-flex;
             align-items: center;
@@ -124,8 +121,8 @@
             position: relative;
             vertical-align: middle;
             height: 1em;
-            width: 2.25em; /* Recalibrated width */
-            margin: 0 0.3em; /* Real visual margin */
+            width: 2.25em; 
+            margin: 0 0.3em; 
         }
 
         .anim-dist-circles .c1, 
@@ -211,7 +208,7 @@
             position: fixed; top: 0; left: 0;
             transform: translate(-50%, -50%);
             border-radius: 50%; z-index: 9999999; pointer-events: none;
-            box-sizing: content-box; /* Forces content-box to match index.html */
+            box-sizing: content-box; 
         }
         .cursor-dot { width: 5px; height: 5px; background: white; mix-blend-mode: difference; transition: width .3s, height .3s; }
         .cursor-outline { width: 15px; height: 15px; border: 2px solid white; mix-blend-mode: difference; transition: width .3s, height .3s; }
@@ -219,7 +216,7 @@
         .hover      { width: 30px !important; height: 30px !important; }
 
         /* =========================================
-           TOP MENU
+           TOP MENU E HAMBURGER
            ========================================= */
         .menu {
             position: fixed;
@@ -228,6 +225,7 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
 
         .right-menu {
@@ -237,6 +235,36 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
         }
         
         .nasa-title {
@@ -250,7 +278,7 @@
         .nav-link {
             font-family: 'Neue Montreal', sans-serif; color: white;
             text-decoration: none; transition: opacity 0.2s; cursor: none;
-            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
 
         .nasa-text-label {
@@ -283,6 +311,47 @@
         .nav-link:hover::before, .nav-link.active::before,
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
+        @media (max-width: 900px) {
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
+            }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
+        }
+
         /* ─── STARS CANVAS ─── */
         canvas.stars-canvas {
             position: fixed; left: 0; top: 0;
@@ -304,6 +373,7 @@
             position: absolute; bottom: 4vh; left: 4vh;
             display: flex; flex-direction: column; align-items: flex-start; gap: 10px; 
             text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            max-width: calc(100vw - 280px);
         }
         
         /* ─── SCROLL TO EXPLORE ─── */
@@ -477,17 +547,6 @@
         }
         .sidebaritem:hover .itemname { opacity: 1 !important; }
 
-        @media (max-width: 900px) {
-            .menu { 
-                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
-            }
-            .right-menu { 
-                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
-                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
-            }
-            .itemname { display: none; }
-        }
     </style>
 </head>
 <body>
@@ -519,6 +578,19 @@
         <span class="text-label">Credits</span>
     </a>
 </nav>
+
+<div class="hamburger" id="hamburger-menu">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+</div>
+<div class="mobile-nav" id="mobile-nav-menu">
+    <a href="sizes.html" class="nav-link"><span class="text-label">Sizes</span></a>
+    <a href="positions.html" class="nav-link"><span class="text-label">Positions</span></a>
+    <a href="distances.html" class="nav-link active"><span class="text-label">Distances</span></a>
+    <a href="measurement.html" class="nav-link"><span class="text-label">Measurement Methods</span></a>
+    <a href="credits.html" class="nav-link"><span class="text-label">Credits</span></a>
+</div>
 
 <canvas id="stars"  class="stars-canvas"></canvas>
 <canvas id="stars2" class="stars-canvas"></canvas>
@@ -824,8 +896,18 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
         el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
     }
-    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper, .sidebaritem').forEach(el => attachHoverEvents(el));
+    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper, .sidebaritem, .hamburger').forEach(el => attachHoverEvents(el));
 
+    // Logica Menu Hamburger
+    const hamburgerBtn = document.getElementById('hamburger-menu');
+    const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+    if (hamburgerBtn && mobileNavBox) {
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('open');
+            mobileNavBox.classList.toggle('open');
+        });
+    }
 
     /* ─── THREE.JS INITIALIZATION FOR MAJOR PLANETS ─── */
     const threePlanetsElements = document.querySelectorAll('.three-planet');
@@ -950,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ─── HACKER EFFECT AND MENU ─── */
-    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|:',.<>?/~`";
     const menuLinks = document.querySelectorAll('.nav-link');
     
     function hackerEffect(span, originalText, intervalRef) {
@@ -1042,11 +1124,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const hiddenText = document.getElementById('hidden-dynamic-text');
         const hiddenContainer = document.getElementById('hidden-intro-container');
         const mainTitle = document.getElementById('main-title');
+        const titlesContainer = document.querySelector('.titles');
 
-        if (!hiddenText || !hiddenContainer || !mainTitle) return;
+        if (!hiddenText || !hiddenContainer || !mainTitle || !titlesContainer) return;
 
         const targetHeight = hiddenContainer.clientHeight;
         const targetWidth  = hiddenContainer.clientWidth;
+        const maxTitleWidth = titlesContainer.clientWidth;
 
         if (targetWidth === lastIntroWidth && targetHeight === lastIntroHeight && hiddenText.style.fontSize) {
             return;
@@ -1059,9 +1143,14 @@ document.addEventListener('DOMContentLoaded', () => {
         while (minSize <= maxSize) {
             let midSize = Math.floor((minSize + maxSize) / 2);
             hiddenText.style.fontSize = midSize + 'px';
+            mainTitle.style.fontSize = midSize + 'px';
+            
             void hiddenText.offsetHeight; 
+            void mainTitle.offsetHeight;
 
-            if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
+            if (hiddenText.scrollHeight <= targetHeight && 
+                hiddenText.scrollWidth <= targetWidth && 
+                mainTitle.scrollWidth <= maxTitleWidth) {
                 bestFit = midSize;
                 minSize = midSize + 1;
             } else {
@@ -1073,9 +1162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= 9; i++) {
             let testSize = bestFit + (i / 10);
             hiddenText.style.fontSize = testSize + 'px';
-            void hiddenText.offsetHeight; 
+            mainTitle.style.fontSize = testSize + 'px';
             
-            if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
+            void hiddenText.offsetHeight; 
+            void mainTitle.offsetHeight;
+            
+            if (hiddenText.scrollHeight <= targetHeight && 
+                hiddenText.scrollWidth <= targetWidth && 
+                mainTitle.scrollWidth <= maxTitleWidth) {
                 fineFit = testSize;
             } else {
                 break;
@@ -1083,6 +1177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         mainTitle.style.fontSize = fineFit + 'px';
+        hiddenText.style.fontSize = fineFit + 'px';
         
         lastIntroWidth = targetWidth;
         lastIntroHeight = targetHeight;
@@ -1095,13 +1190,14 @@ document.addEventListener('DOMContentLoaded', () => {
         syncTitleFontSize();
     });
 
-    const navDistanze = document.getElementById('nav-distanze');
-    if (navDistanze) {
-        navDistanze.addEventListener('click', (e) => {
+    // Seleziona sia i link desktop che quelli mobile per forzare il refresh sulla pagina corrente
+    const distanzeLinks = document.querySelectorAll('a[href="distances.html"]');
+    distanzeLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
             e.preventDefault();
             window.location.reload();
         });
-    }
+    });
 
     window.addEventListener('resize', () => {
         updateMenuWidths();
@@ -1350,8 +1446,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    // Rimosso l'anello infinito distruggi-performance: era il colpevole principale del thrashing.
-    // L'aggiornamento viene già chiamato durante le modifiche di layout necessarie.
     requestAnimationFrame(cacheSidebarSegments);
 
     function drawSidebarLine() {
