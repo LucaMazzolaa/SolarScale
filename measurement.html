@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SolarScale - Measurement Methods</title>
+    <title>SolarScale | Measurement Methods</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -35,6 +35,7 @@
             --font-14: clamp(12px, 0.25vw + 10.4px, 18px);
             /* Parallel scalability to the menu: exactly 18px on MacBook (~1440px) */
             --font-18: clamp(15px, 0.3vw + 13.68px, 24px); 
+            --margin-screen: 4vh;
         }
 
         /* ─── BASE SETUP WITH BLOCKED SCROLL (MANAGED VIA JS) ─── */
@@ -60,8 +61,8 @@
             font-size: var(--font-62); 
             line-height: 1.15; 
             letter-spacing: -0.01em;
-            white-space: nowrap;
             font-weight: 500;
+            overflow-wrap: break-word; /* Sicurezza per parole molto lunghe su mobile */
         }
 
         .title { 
@@ -90,9 +91,7 @@
         }
 
         .header-slide {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block; 
         }
 
         /* CONTENT SLIDE - ENABLED FOR VERTICAL SCROLL */
@@ -111,24 +110,31 @@
         .content-slide { scrollbar-width: none; }
 
         .vertical-container {
-            width: 100%;
+            width: calc(100% - 8vh); /* Tiene conto esatto del margine 4vh L e R */
             max-width: 800px;
             margin: 0 auto;
-            padding: 20vh 4vh 12vh 4vh; 
+            padding: 20vh 0 12vh 0; /* Tolti i padding orizzontali dal div per affidarli al width calcolato, garantendo perfetta simmetria su mobile */
             display: flex;
             flex-direction: column;
             gap: 8vh; 
         }
 
-        /* ─── FIXED UI ELEMENTS ─── */
+        /* ─── FIXED UI ELEMENTS E SCROLL TO EXPLORE ─── */
+        .titles { 
+            position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); 
+            display: flex; flex-direction: column; align-items: flex-start; gap: 10px; 
+            text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; 
+            max-width: calc(100vw - 280px); /* A capo in sicurezza */
+        }
+
         .scrollWrapper { 
             position: fixed; 
-            bottom: 4vh; 
-            right: 4vh;
+            bottom: var(--margin-screen); 
+            right: var(--margin-screen);
             cursor: none; 
             pointer-events: auto; 
             z-index: 500;
-            transition: opacity 0.2s, transform 0.2s; /* Aggiunto transform per la fluidità */
+            transition: opacity 0.2s, transform 0.2s; 
         }
         
         .scrollWrapper:hover {
@@ -173,7 +179,7 @@
         .hover      { width: 30px !important; height: 30px !important; }
 
         /* =========================================
-           TOP MENU (Da dimensioni.html)
+           TOP MENU E HAMBURGER
            ========================================= */
         .menu {
             position: fixed;
@@ -182,6 +188,7 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
 
         .right-menu {
@@ -191,6 +198,36 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
         }
         
         .nasa-title {
@@ -207,13 +244,11 @@
             opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
 
-        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
         .nasa-text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        /* Altre voci del menu mantengono il comportamento standard */
         .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
@@ -240,13 +275,48 @@
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
         @media (max-width: 900px) {
-            .menu { 
-                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
             }
-            .right-menu { 
-                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
-                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
+            }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
+
+            #hidden-intro-container {
+                top: auto; left: auto; right: auto; margin: 0;
+                width: 100%; height: 100vh;
             }
         }
         /* ========================================= */
@@ -257,12 +327,6 @@
         }
 
         /* ─── TEXT AND VIDEO CONTENT STYLES ─── */
-        .titles { 
-            position: absolute; bottom: 4vh; left: 4vh;
-            display: flex; flex-direction: column; align-items: flex-start; gap: 10px; 
-            text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-        }
-
         .intro-text p {
             font-size: clamp(18px, 1.5vw + 10px, 28px);
             line-height: 1.4; font-weight: 400; opacity: 0.9;
@@ -300,7 +364,7 @@
             text-underline-offset: 4px;
             opacity: 0.9;
             transition: opacity 0.3s;
-            cursor: none; /* CORRETTO: rimosso pointer e messo none */
+            cursor: none; 
             pointer-events: auto;
             word-break: break-all;
         }
@@ -363,6 +427,12 @@
 </head>
 <body>
 
+<script>
+    // BLOCCA IL SALTO DI SCROLL AL CARICAMENTO DELLA PAGINA
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+</script>
+
 <div class="cursor-dot"     data-cursor-dot></div>
 <div class="cursor-outline" data-cursor-outline></div>
 
@@ -390,6 +460,19 @@
         <span class="text-label">Credits</span>
     </a>
 </nav>
+
+<div class="hamburger" id="hamburger-menu">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+</div>
+<div class="mobile-nav" id="mobile-nav-menu">
+    <a href="sizes.html" class="nav-link"><span class="text-label">Sizes</span></a>
+    <a href="positions.html" class="nav-link"><span class="text-label">Positions</span></a>
+    <a href="distances.html" class="nav-link"><span class="text-label">Distances</span></a>
+    <a href="measurement.html" class="nav-link active"><span class="text-label">Measurement Methods</span></a>
+    <a href="credits.html" class="nav-link"><span class="text-label">Credits</span></a>
+</div>
 
 <canvas id="stars"  class="stars-canvas"></canvas>
 <canvas id="stars2" class="stars-canvas"></canvas>
@@ -491,6 +574,7 @@
 
 <div id="hidden-intro-container">
     <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA’s&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency’s&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -604,6 +688,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Seleziona sia i link desktop che quelli mobile per forzare il refresh sulla pagina corrente
+    const msLinks = document.querySelectorAll('a[href="measurement.html"]');
+    msLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.reload();
+        });
+    });
+
     let touchStartX = 0;
     let touchStartY = 0;
     window.addEventListener('touchstart', e => {
@@ -667,7 +760,18 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
     }
 
-    document.querySelectorAll('.nav-link, #logo-link, .scrollWrapper, .video-container iframe, a').forEach(el => attachHoverEvents(el));
+    document.querySelectorAll('.nav-link, #logo-link, .scrollWrapper, .video-container iframe, a, .hamburger').forEach(el => attachHoverEvents(el));
+
+    // Logica Menu Hamburger
+    const hamburgerBtn = document.getElementById('hamburger-menu');
+    const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+    if (hamburgerBtn && mobileNavBox) {
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('open');
+            mobileNavBox.classList.toggle('open');
+        });
+    }
 
     const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
     const menuLinks = document.querySelectorAll('.nav-link');
@@ -722,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.fonts.ready.then(() => {
             logoSpan.style.display = 'inline-block';
-            logoSpan.style.overflow = 'visible'; // BUG FIX
+            logoSpan.style.overflow = 'visible'; 
             logoSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -742,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.fonts.ready.then(() => {
             textSpan.style.display = 'inline-block';
-            textSpan.style.overflow = 'hidden'; // Rimane hidden per le altre voci
+            textSpan.style.overflow = 'hidden'; 
             textSpan.style.whiteSpace = 'nowrap';
         });
 
@@ -771,13 +875,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let minSize = 10;
-        let maxSize = 300; 
-        let bestFit = minSize;
+        let minSize = 10, maxSize = 300, bestFit = minSize;
 
+        // Calcolo identico a positions.html, svincolato dalla larghezza del mainTitle
         while (minSize <= maxSize) {
             let midSize = Math.floor((minSize + maxSize) / 2);
             hiddenText.style.fontSize = midSize + 'px';
+            
             void hiddenText.offsetHeight; 
 
             if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
@@ -792,6 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 1; i <= 9; i++) {
             let testSize = bestFit + (i / 10);
             hiddenText.style.fontSize = testSize + 'px';
+            
             void hiddenText.offsetHeight; 
             
             if (hiddenText.scrollHeight <= targetHeight && hiddenText.scrollWidth <= targetWidth) {
@@ -802,12 +907,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         mainTitle.style.fontSize = fineFit + 'px';
+        hiddenText.style.fontSize = fineFit + 'px';
         
         lastIntroWidth = targetWidth;
         lastIntroHeight = targetHeight;
     }
 
-    // EDIT HERE: Execute calculation immediately to avoid FOUC
+    // Esegui calcolo subito
     syncTitleFontSize();
 
     document.fonts.ready.then(() => {
