@@ -4,7 +4,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SolarScale - Introduction</title>
+    <title>SolarScale | Introduction</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
     
     <style>
@@ -128,79 +128,76 @@
         }
 
         /* =========================================
-           TOP MENU (Sinistra e Destra)
+           TOP MENU E HAMBURGER
            ========================================= */
         .menu {
             position: fixed;
-            left: 4vh; 
-            top: 4vh; 
-            width: auto;
+            left: 4vh; top: 4vh; width: auto;
             font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); 
-            font-weight: 500;
-            z-index: 999999;
-            display: flex;
-            flex-direction: row; 
-            align-items: center; 
-            gap: 3vw; 
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
 
         .right-menu {
             position: fixed;
-            right: 4vh; 
-            top: 4vh; 
-            width: auto;
+            right: 4vh; top: 4vh; width: auto;
             font-family: 'Neue Montreal', sans-serif;
-            font-size: var(--font-16); 
-            font-weight: 500;
-            z-index: 999999;
-            display: flex;
-            flex-direction: row; 
-            align-items: center; 
-            gap: 3vw; 
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
         }
         
         .nasa-title {
-            font-weight: 700;
-            font-size: clamp(22px, 2vw, 32px); 
-            color: white;
-            line-height: 1; 
-            pointer-events: all;
-            cursor: none;
-            margin-right: 1.5vw;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-            text-decoration: none;
+            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
+            color: white; line-height: 1; pointer-events: all; cursor: none;
+            margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
         }
 
-        .nasa-title img {
-            height: 1em;
-            width: auto;
-            display: block;
-            filter: brightness(0) invert(1);
-        }
+        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
 
         .nav-link {
-            font-family: 'Neue Montreal', sans-serif;
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.3s ease;
-            cursor: none;
-            opacity: 0.4; 
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding: 4px 6px;
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
 
-        /* BUG FIX: Solo il titolo logo SolarScale ha overflow visible per evitare il blocco nero */
         .nasa-text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: visible; pointer-events: none; 
         }
 
-        /* Altre voci del menu mantengono il comportamento standard */
         .text-label {
             display: inline-block; line-height: 1; vertical-align: middle;
             white-space: nowrap; overflow: hidden; pointer-events: none; 
@@ -222,12 +219,49 @@
             transition: opacity 0.2s; 
             transform: translateY(-1px); 
         }
-        
         .nav-link:hover, .nav-link.active { opacity: 1; }
-
         .nav-link:hover::before, .nav-link.active::before,
-        .nav-link:hover::after, .nav-link.active::after {
-            opacity: 1;
+        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+
+        @media (max-width: 900px) {
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
+            }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
         }
 
         /* =========================================
@@ -329,11 +363,8 @@
         }
 
         /* =========================================
-           EFFETTI INTERATTIVI TIPOGRAFICI COMPENSATI
+           EFFETTI INTERATTIVI TIPOGRAFICI
            ========================================= */
-        
-        /* DIMENSIONI: Il cerchio "sborda" di 0.07em quando è al 140%. 
-           Per un margine visivo di 0.3em, serve un margine CSS di 0.37em */
         .anim-dim-circle {
             display: inline-block;
             width: 0.35em;
@@ -343,7 +374,7 @@
             vertical-align: middle;
             position: relative;
             top: -0.05em;
-            margin: 0 0.37em; /* Margine compensato */
+            margin: 0 0.37em;
             animation: pulse-dim 2s ease-in-out infinite;
         }
 
@@ -352,8 +383,6 @@
             50% { transform: scale(1.4); }
         }
 
-        /* POSIZIONI: Il cerchio trasla di 0.15em avvicinandosi al testo.
-           Per un margine visivo di 0.3em, serve un margine CSS di 0.45em (0.3 + 0.15) */
         .anim-pos-orbit {
             display: inline-block;
             width: 0.45em; 
@@ -363,7 +392,7 @@
             vertical-align: middle;
             position: relative;
             top: -0.05em; 
-            margin: 0 0.45em; /* Margine compensato */
+            margin: 0 0.45em;
             animation: orbit-small 1.5s linear infinite;
         }
 
@@ -372,10 +401,6 @@
             to   { transform: rotate(-360deg) translateX(0.15em) rotate(360deg); }
         }
 
-        /* DISTANZE: Il box è ridotto all'ingombro massimo ESATTO dei pallini.
-           Ingombro max: 0.9em (lato sn) + 0.9em (lato dx) + 0.45em (diametro) = 2.25em.
-           In questo modo i pallini toccano il bordo invisibile del div e possiamo
-           impostare il margine CSS al valore reale desiderato di 0.3em. */
         .anim-dist-circles {
             display: inline-flex;
             align-items: center;
@@ -383,8 +408,8 @@
             position: relative;
             vertical-align: middle;
             height: 1em;
-            width: 2.25em; /* Larghezza ricalibrata */
-            margin: 0 0.3em; /* Margine visivo reale */
+            width: 2.25em; 
+            margin: 0 0.3em;
         }
 
         .anim-dist-circles .c1, 
@@ -414,7 +439,7 @@
         }
 
         /* =========================================
-           STILE TESTI E PARAGRAFI (Altre Sezioni)
+           STILE TESTI E PARAGRAFI
            ========================================= */
         .section-title {
             font-family: 'Neue Montreal', sans-serif;
@@ -496,42 +521,6 @@
             color: white;
             border-bottom: 1px solid white;
         }
-
-        /* =========================================
-           RESPONSIVE MOBILE
-           ========================================= */
-        @media (max-width: 900px) {
-            html, body { overflow-y: auto; overflow-x: hidden; }
-            .container { height: auto; min-height: 100vh; display: flex; flex-direction: column; padding: 40px 5vw; overflow: visible; }
-            
-            .menu { 
-                position: relative; top: auto; left: auto; 
-                width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; 
-                align-items: flex-start; margin: 4vh 4vh 15px 4vh;
-            }
-            
-            .right-menu { 
-                position: relative; top: auto; right: auto; 
-                margin: 0 4vh 4vh 4vh;
-                display: flex;
-                width: calc(100% - 8vh);
-                flex-wrap: wrap; gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .content { 
-                position: relative; top: auto; left: auto; right: auto; 
-                margin: 0 4vh;
-                width: calc(100% - 8vh); height: auto; 
-                overflow-y: visible; padding-bottom: 4vh;
-            }
-            
-            .app-container {
-                top: 20vh; 
-                height: 80vh; 
-            }
-        }
     </style>
 </head>
 <body>
@@ -556,7 +545,7 @@
                 <img src="assets/imgs/logo.svg" alt="Sun symbol">
                 <span class="nasa-text-label">SolarScale</span>
             </a>
-            <a href="sizes.html" class="nav-link" id="nav-dimensioni">
+            <a href="sizes.html" class="nav-link">
                 <span class="text-label">Sizes</span>
             </a>
             <a href="positions.html" class="nav-link">
@@ -571,10 +560,23 @@
             <a href="measurement.html" class="nav-link">
                 <span class="text-label">Measurement Methods</span>
             </a>
-            <a href="credits.html" class="nav-link" id="crediti-link">
+            <a href="credits.html" class="nav-link">
                 <span class="text-label">Credits</span>
             </a>
         </nav>
+
+        <div class="hamburger" id="hamburger-menu">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+        <div class="mobile-nav" id="mobile-nav-menu">
+            <a href="sizes.html" class="nav-link"><span class="text-label">Sizes</span></a>
+            <a href="positions.html" class="nav-link"><span class="text-label">Positions</span></a>
+            <a href="distances.html" class="nav-link"><span class="text-label">Distances</span></a>
+            <a href="measurement.html" class="nav-link"><span class="text-label">Measurement Methods</span></a>
+            <a href="credits.html" class="nav-link"><span class="text-label">Credits</span></a>
+        </div>
 
         <div class="content" id="right-content">
             
@@ -587,6 +589,9 @@
     </div>
 
     <script>
+        // -------------------------------------------------------------
+        // CUSTOM CURSOR LOGIC
+        // -------------------------------------------------------------
         const cursorDot = document.querySelector('[data-cursor-dot]');
         const cursorOutline = document.querySelector('[data-cursor-outline]');
 
@@ -612,12 +617,28 @@
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
         window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
 
-        const interactiveElements = document.querySelectorAll('a, .app-container');
+        const interactiveElements = document.querySelectorAll('a, .app-container, .hamburger');
         interactiveElements.forEach(el => {
             el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
+        // -------------------------------------------------------------
+        // LOGICA MENU HAMBURGER
+        // -------------------------------------------------------------
+        const hamburgerBtn = document.getElementById('hamburger-menu');
+        const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+        if (hamburgerBtn && mobileNavBox) {
+            hamburgerBtn.addEventListener('click', () => {
+                hamburgerBtn.classList.toggle('open');
+                mobileNavBox.classList.toggle('open');
+            });
+        }
+
+        // -------------------------------------------------------------
+        // TYPING EFFECT
+        // -------------------------------------------------------------
         let typingTimeouts = []; 
 
         function stopTypingEffect() {
@@ -675,6 +696,9 @@
             });
         }
 
+        // -------------------------------------------------------------
+        // CALCOLO DINAMICO GRANDEZZA TESTO E MENU HACKER EFFECT
+        // -------------------------------------------------------------
         let lastWidth = 0;
         let lastHeight = 0;
 
@@ -728,40 +752,8 @@
             lastHeight = targetHeight;
         }
 
-        function updateMenuWidths() {
-            if(logoSpan) {
-                const currentLogoText = logoSpan.innerText;
-                logoSpan.innerText = logoOriginal;
-                logoSpan.style.width = 'auto';
-                logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
-                logoSpan.innerText = currentLogoText;
-            }
-
-            navLinks.forEach(link => {
-                const textSpan = link.querySelector('.text-label');
-                if (textSpan) {
-                    if (!textSpan.hasAttribute('data-original')) {
-                        textSpan.setAttribute('data-original', textSpan.innerText);
-                    }
-                    const orig = textSpan.getAttribute('data-original');
-                    const curr = textSpan.innerText;
-                    
-                    textSpan.innerText = orig;
-                    textSpan.style.width = 'auto';
-                    textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
-                    textSpan.innerText = curr;
-                }
-            });
-        }
-
-        window.addEventListener('resize', () => {
-            lastWidth = 0;
-            fitIntroText();
-            updateMenuWidths();
-        });
-
-        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
-        const navLinks  = document.querySelectorAll('.nav-link');
+        const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|:',.<>?/~`";
+        const menuLinks  = document.querySelectorAll('.nav-link');
         const sections  = document.querySelectorAll('section');
         const contentBox = document.getElementById('right-content');
 
@@ -779,49 +771,70 @@
             }, 40);
         }
 
-        const logoLink      = document.getElementById('logo-link');
-        const logoSpan      = logoLink.querySelector('.nasa-text-label');
-        const logoOriginal  = logoSpan.innerText;
+        const topLogoLink   = document.getElementById('logo-link');
+        let logoSpan, logoOriginal;
         const logoRef       = { id: null };
 
-        document.fonts.ready.then(() => {
-            logoSpan.style.display    = 'inline-block';
-            logoSpan.style.overflow   = 'visible'; // BUG FIX come dimensioni.html
-            logoSpan.style.whiteSpace = 'nowrap';
-            
-            navLinks.forEach(link => {
+        function updateMenuWidths() {
+            if(logoSpan) {
+                const currentLogoText = logoSpan.innerText;
+                logoSpan.innerText = logoOriginal;
+                logoSpan.style.width = 'auto';
+                logoSpan.style.width = Math.ceil(logoSpan.getBoundingClientRect().width) + 'px';
+                logoSpan.innerText = currentLogoText;
+            }
+
+            menuLinks.forEach(link => {
                 const textSpan = link.querySelector('.text-label');
                 if (textSpan) {
-                    textSpan.style.display    = 'inline-block';
-                    textSpan.style.overflow   = 'hidden';
-                    textSpan.style.whiteSpace = 'nowrap';
+                    if (!textSpan.hasAttribute('data-original')) {
+                        textSpan.setAttribute('data-original', textSpan.innerText);
+                    }
+                    const orig = textSpan.getAttribute('data-original');
+                    const curr = textSpan.innerText;
+                    
+                    textSpan.innerText = orig;
+                    textSpan.style.width = 'auto';
+                    textSpan.style.width = Math.ceil(textSpan.getBoundingClientRect().width) + 'px';
+                    textSpan.innerText = curr;
                 }
             });
-            
-            updateMenuWidths(); 
-        });
+        }
 
-        logoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
-        logoLink.addEventListener('mouseleave', () => {
-            clearInterval(logoRef.id);
-            logoSpan.innerText = logoOriginal;
-        });
+        if(topLogoLink) {
+            logoSpan = topLogoLink.querySelector('.nasa-text-label');
+            logoOriginal = logoSpan.innerText;
+            
+            document.fonts.ready.then(() => {
+                logoSpan.style.display    = 'inline-block';
+                logoSpan.style.overflow   = 'visible'; 
+                logoSpan.style.whiteSpace = 'nowrap';
+            });
+
+            topLogoLink.addEventListener('mouseenter', () => hackerEffect(logoSpan, logoOriginal, logoRef));
+            topLogoLink.addEventListener('mouseleave', () => {
+                clearInterval(logoRef.id);
+                logoSpan.innerText = logoOriginal;
+            });
+
+            topLogoLink.addEventListener('click', navToIntro);
+        }
 
         function navToIntro(e) {
             if (e) e.preventDefault();
             
-            clearInterval(logoRef.id);
-            logoSpan.innerText = logoOriginal;
+            if (logoRef.id) clearInterval(logoRef.id);
+            if (logoSpan) logoSpan.innerText = logoOriginal;
             
-            navLinks.forEach(l => l.classList.remove('active'));
-            logoLink.classList.add('active'); 
+            menuLinks.forEach(l => l.classList.remove('active'));
+            if (topLogoLink) topLogoLink.classList.add('active'); 
             
             contentBox.style.overflowY = 'hidden';
             contentBox.style.paddingBottom = '0';
             sections.forEach(sec => sec.classList.remove('active-section'));
             
             const introSection = document.getElementById('intro');
-            introSection.classList.add('active-section');
+            if (introSection) introSection.classList.add('active-section');
             
             stopTypingEffect();
 
@@ -838,16 +851,25 @@
             });
             
             contentBox.scrollTop = 0;
+            
+            if (hamburgerBtn && mobileNavBox) {
+                hamburgerBtn.classList.remove('open');
+                mobileNavBox.classList.remove('open');
+            }
         }
 
-        logoLink.addEventListener('click', navToIntro);
-
-        navLinks.forEach(link => {
+        menuLinks.forEach(link => {
             const textSpan = link.querySelector('.text-label');
             if (!textSpan) return;
 
             const originalText = textSpan.innerText;
             const intervalRef  = { id: null };
+
+            document.fonts.ready.then(() => {
+                textSpan.style.display = 'inline-block';
+                textSpan.style.overflow = 'hidden'; 
+                textSpan.style.whiteSpace = 'nowrap';
+            });
 
             link.addEventListener('mouseenter', () => hackerEffect(textSpan, originalText, intervalRef));
             link.addEventListener('mouseleave', () => {
@@ -875,9 +897,12 @@
                     targetId = href.substring(1);
                 }
 
-                logoLink.classList.remove('active');
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
+                if (topLogoLink) topLogoLink.classList.remove('active');
+                menuLinks.forEach(l => l.classList.remove('active'));
+                
+                menuLinks.forEach(l => {
+                    if (l.getAttribute('href') === href) l.classList.add('active');
+                });
 
                 const isNoScrollPage = ['intro', 'posizioni', 'dimensioni', 'distanze'].includes(targetId);
 
@@ -889,15 +914,33 @@
 
                 if (targetSection) {
                     targetSection.classList.add('active-section');
-                    if (!isNoScrollPage) {
+                    if (!isNoScrollPage && typeof triggerCascadeAnimation === 'function') {
                         triggerCascadeAnimation(targetSection);
                     }
                 }
 
                 contentBox.scrollTop = 0;
+                
+                if (hamburgerBtn && mobileNavBox) {
+                    hamburgerBtn.classList.remove('open');
+                    mobileNavBox.classList.remove('open');
+                }
             });
         });
 
+        document.fonts.ready.then(() => {
+            updateMenuWidths();
+        });
+
+        window.addEventListener('resize', () => {
+            lastWidth = 0;
+            fitIntroText();
+            updateMenuWidths();
+        });
+
+        // -------------------------------------------------------------
+        // BACKGROUND STARS 
+        // -------------------------------------------------------------
         class Stars {
             constructor(id, density, maxS, minS, maxSz, minSz) {
                 this.canvas = document.getElementById(id);
@@ -945,6 +988,9 @@
         }
         animateStars();
 
+        // -------------------------------------------------------------
+        // GESTIONE PRELOADER
+        // -------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
             const preloader      = document.getElementById('preloader');
             const percentageEl   = document.getElementById('loading-percentage');
@@ -952,7 +998,7 @@
             contentBox.style.overflowY    = 'hidden';
             contentBox.style.paddingBottom = '0';
 
-            logoLink.classList.add('active');
+            if (topLogoLink) topLogoLink.classList.add('active');
 
             setupTypingEffect();
 
