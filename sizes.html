@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SolarScale - Dimensions</title>
+    <title>SolarScale | Sizes</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -66,7 +66,6 @@
             font-size: var(--font-62); 
             line-height: 1.15; 
             letter-spacing: -0.01em;
-            white-space: nowrap;
         }
 
         /* ─── SUBTITLE: Comparison from the smallest... (16px) ─── */
@@ -185,7 +184,7 @@
         .hover      { width: 30px !important; height: 30px !important; }
 
         /* =========================================
-           TOP MENU
+           TOP MENU E HAMBURGER
            ========================================= */
         .menu {
             position: fixed;
@@ -194,6 +193,7 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
 
         .right-menu {
@@ -203,6 +203,36 @@
             font-size: var(--font-16); font-weight: 500;
             z-index: 999999; display: flex; flex-direction: row; 
             align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
         }
         
         .nasa-title {
@@ -216,7 +246,7 @@
         .nav-link {
             font-family: 'Neue Montreal', sans-serif; color: white;
             text-decoration: none; transition: opacity 0.2s; cursor: none;
-            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
         }
 
         .nasa-text-label {
@@ -250,13 +280,48 @@
         .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
         @media (max-width: 900px) {
-            .menu { 
-                position: relative; top: auto; left: auto; width: calc(100% - 8vh); 
-                flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh;
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
             }
-            .right-menu { 
-                position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh;
-                display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start;
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
+            }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
+
+            #hidden-intro-container {
+                top: auto; left: auto; right: auto; margin: 0;
+                width: 100%; height: 100vh;
             }
         }
 
@@ -283,6 +348,7 @@
             display: flex; flex-direction: column; align-items: flex-start; 
             gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
             will-change: transform; 
+            max-width: calc(100vw - 220px);
         }
         
         .scrollWrapper { 
@@ -350,13 +416,6 @@
             width: 100%; word-wrap: break-word;
         }
 
-        @media (max-width: 900px) {
-            #hidden-intro-container {
-                top: auto; left: auto; right: auto; margin: 0;
-                width: 100%; height: 100vh;
-            }
-        }
-
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; margin: 0 0.15em; }
         .anim-dist-circles { display: inline-flex; width: 2.5em; height: 1em; margin: 0 0.3em; }
 
@@ -422,7 +481,7 @@
         .sidebaricon.icon-dim    { filter: brightness(0) invert(1) opacity(0.4); }
         .sidebaritem:hover .itemname { opacity: 1 !important; }
 
-        @media (max-width:600px) { .itemname { display: none; } .time { display: none; } }
+        @media (max-width:600px) { .time { display: none; } }
         @media (hover:none) { #btn-top:hover, #btn-bot:hover, .scrollWrapper:hover, .sidebaricon:hover { transform: none; } }
     </style>
 </head>
@@ -455,6 +514,19 @@
         <span class="text-label">Credits</span>
     </a>
 </nav>
+
+<div class="hamburger" id="hamburger-menu">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+</div>
+<div class="mobile-nav" id="mobile-nav-menu">
+    <a href="sizes.html" class="nav-link active"><span class="text-label">Sizes</span></a>
+    <a href="positions.html" class="nav-link"><span class="text-label">Positions</span></a>
+    <a href="distances.html" class="nav-link"><span class="text-label">Distances</span></a>
+    <a href="measurement.html" class="nav-link"><span class="text-label">Measurement Methods</span></a>
+    <a href="credits.html" class="nav-link"><span class="text-label">Credits</span></a>
+</div>
 
 <canvas id="stars" class="stars-canvas"></canvas>
 
@@ -516,7 +588,7 @@ THREE.Cache.enabled = true;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* ─── 1. VISUAL CURSOR AND ANIMATIONS MANAGEMENT (Hardware Accelerated) ─── */
+    /* ─── 1. VISUAL CURSOR E MENU RESPONSIVE ─── */
     const cursorDot     = document.querySelector('[data-cursor-dot]');
     const cursorOutline = document.querySelector('[data-cursor-outline]');
     
@@ -550,9 +622,20 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
     }
 
-    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper').forEach(el => attachHoverEvents(el));
+    document.querySelectorAll('.nav-link, #logo-link, button, .scrollWrapper, .hamburger').forEach(el => attachHoverEvents(el));
 
-    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
+    // Logica Menu Hamburger
+    const hamburgerBtn = document.getElementById('hamburger-menu');
+    const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+    if (hamburgerBtn && mobileNavBox) {
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('open');
+            mobileNavBox.classList.toggle('open');
+        });
+    }
+
+    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|:',.<>?/~`";
     const menuLinks = document.querySelectorAll('.nav-link');
     
     function hackerEffect(span, originalText, intervalRef) {
@@ -696,13 +779,14 @@ document.addEventListener('DOMContentLoaded', () => {
         syncTitleFontSize(); 
     });
 
-    const navDimensioni = document.getElementById('nav-dimensioni');
-    if (navDimensioni) {
-        navDimensioni.addEventListener('click', (e) => {
+    // Seleziona sia il link desktop che quello mobile per le dimensioni e applica il reload
+    const sizesLinks = document.querySelectorAll('a[href="sizes.html"]');
+    sizesLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
             e.preventDefault(); 
             window.location.reload();    
         });
-    }
+    });
 
     /* ─── 2. DIMENSIONS DATASET ─── */
     const celestialData = [
@@ -757,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── 4. 3D ENGINE AND POSITIONING ─── */
     const canvasContainer = document.getElementById('canvas-container');
-    const scene = new THREE.Scene();
+    const scene = THREE.Cache.enabled ? new THREE.Scene() : new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 40000);
     scene.add(camera); 
 
@@ -841,7 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let loadedCount = 0;
     const targetPlanets = ['neptune', 'uranus', 'saturn', 'jupiter'];
 
-    /* ─── CACHE API INTEGRATION: Salva i modelli localmente per velocizzare i ricaricamenti futuri ─── */
+    /* ─── CACHE API INTEGRATION ─── */
     async function getCachedModelUrl(url) {
         if (!('caches' in window)) return url; 
         try {
@@ -969,7 +1053,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let uiFadeTimeout;
 
-    // Funzione che aggiorna i testi e visibilità in base al fatto se veniamo o no dalla schermata iniziale
     function updateUIImmediate(comingFromHome) {
         if (currentState === -1) {
             headerScrollWrapper.style.opacity = '1';
@@ -983,7 +1066,6 @@ document.addEventListener('DOMContentLoaded', () => {
             headerScrollWrapper.style.opacity = '0';
             headerScrollWrapper.style.pointerEvents = 'none';
 
-            // Aggiorniamo subito i testi dei pulsanti
             if (currentState > 0) {
                 topNam.textContent = celestialData[currentState - 1].name;
                 topDis.textContent = celestialData[currentState - 1].dia;
@@ -993,7 +1075,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 botDis.textContent = celestialData[currentState + 1].dia;
             }
 
-            // Aggiorniamo lo stato delle icone sulla timeline
             celestialData.forEach((p, i) => {
                 p.sidebarIcon.classList.remove('icon-active','icon-half','icon-dim');
                 if (i === currentState) {
@@ -1005,14 +1086,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Trasliamo la timeline nella posizione corretta
             const sidebarWrapper = document.getElementById('sidebarWrapper');
             const stepWidth = 2570 / (celestialData.length - 1);
             const targetLeft = (window.innerWidth / 2) - 25 - (currentState * stepWidth);
             sidebarWrapper.style.transform = `translate3d(${targetLeft}px, 0, 0)`;
 
-            // Se stiamo già viaggiando tra i pianeti, le frecce restano sempre fisse.
-            // Altrimenti, se veniamo dalla schermata intro, le nascondiamo per farle apparire col delay.
             if (!comingFromHome) {
                 sidebarNav.style.opacity = '1';
                 sidebarNav.style.pointerEvents = 'auto';
@@ -1035,7 +1113,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Usato ESCLUSIVAMENTE per il primo caricamento dalla home
     function updateUIDelayed() {
         if (currentState > -1) {
             sidebarNav.style.opacity = '1';
@@ -1090,7 +1167,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             updateUIImmediate(comingFromHome);
 
-            // Ritardiamo l'apparizione solo ed esclusivamente se stiamo entrando dalla Intro
             if (comingFromHome) {
                 uiFadeTimeout = setTimeout(() => {
                     updateUIDelayed();
@@ -1274,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* ─── 8. STARS PARALLAX (Unified Canvas Optimization) ─── */
+    /* ─── 8. STARS PARALLAX ─── */
     const starsCanvas = document.getElementById('stars');
     const starsCtx = starsCanvas.getContext('2d');
 
@@ -1393,7 +1469,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         if (currentState !== -1) targetTitleX = -window.innerWidth; 
         
-        // Applica l'aggiornamento UI sul resize senza attivare i delay (passando false come "comingFromHome")
         if (currentState >= 0) {
             updateUIImmediate(false);
         }
