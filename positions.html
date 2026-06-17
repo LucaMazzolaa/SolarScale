@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>SolarScale - Positions</title>
+    <title>SolarScale | Positions</title>
     <link rel="icon" type="image/svg+xml" href="assets/imgs/logo.svg">
     
     <style>
@@ -44,35 +44,154 @@
 
         canvas.stars-canvas { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; }
 
-        /* MENU */
-        .menu, .right-menu {
-            position: fixed; top: 4vh; width: auto; font-family: 'Neue Montreal', sans-serif; font-size: var(--font-16); font-weight: 500; z-index: 999999; display: flex; flex-direction: row; align-items: center; gap: 3vw; contain: layout paint; transform: translateZ(0); backface-visibility: hidden;
+        /* =========================================
+           TOP MENU E HAMBURGER
+           ========================================= */
+        .menu {
+            position: fixed;
+            left: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
         }
-        .menu { left: 4vh; }
-        .right-menu { right: 4vh; }
-        
-        .nasa-title { font-weight: 700; font-size: clamp(22px, 2vw, 32px); color: white; line-height: 1; pointer-events: all; cursor: none; margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none; }
-        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
-        .nav-link { font-family: 'Neue Montreal', sans-serif; color: white; text-decoration: none; transition: opacity 0.2s; cursor: none; opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto; }
-        .nasa-text-label, .text-label { display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap; pointer-events: none; }
-        .nasa-text-label { overflow: visible; } .text-label { overflow: hidden; }
 
-        .nav-link::before { content: "["; margin-right: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
-        .nav-link::after { content: "]"; margin-left: 3px; font-size: 1.15em; opacity: 1; transition: opacity 0.2s; transform: translateY(-1px); }
+        .right-menu {
+            position: fixed;
+            right: 4vh; top: 4vh; width: auto;
+            font-family: 'Neue Montreal', sans-serif;
+            font-size: var(--font-16); font-weight: 500;
+            z-index: 999999; display: flex; flex-direction: row; 
+            align-items: center; gap: 3vw; 
+            height: clamp(22px, 2vw, 32px); /* Blocca l'altezza legandola a quella del logo */
+        }
+
+        /* Stili Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 14px;
+            position: fixed;
+            right: 4vh;
+            top: 4vh;
+            z-index: 9999999;
+            pointer-events: all;
+        }
+
+        .hamburger .line {
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.open .line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .hamburger.open .line:nth-child(2) { opacity: 0; }
+        .hamburger.open .line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .mobile-nav {
+            display: none;
+        }
+        
+        .nasa-title {
+            font-weight: 700; font-size: clamp(22px, 2vw, 32px); 
+            color: white; line-height: 1; pointer-events: all; cursor: none;
+            margin-right: 1.5vw; display: flex; align-items: center; gap: 0.5em; text-decoration: none;
+        }
+
+        .nasa-title img { height: 1em; width: auto; display: block; filter: brightness(0) invert(1); }
+
+        .nav-link {
+            font-family: 'Neue Montreal', sans-serif; color: white;
+            text-decoration: none; transition: opacity 0.2s; cursor: none;
+            opacity: 0.4; display: flex; align-items: center; position: relative; padding: 4px 6px; pointer-events: auto;
+        }
+
+        .nasa-text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: visible; pointer-events: none; 
+        }
+
+        .text-label {
+            display: inline-block; line-height: 1; vertical-align: middle;
+            white-space: nowrap; overflow: hidden; pointer-events: none; 
+        }
+
+        .nav-link::before { 
+            content: "["; 
+            margin-right: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
+        .nav-link::after { 
+            content: "]"; 
+            margin-left: 3px; 
+            font-size: 1.15em; 
+            opacity: 1; 
+            transition: opacity 0.2s; 
+            transform: translateY(-1px); 
+        }
         .nav-link:hover, .nav-link.active { opacity: 1; }
-        .nav-link:hover::before, .nav-link.active::before, .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
+        .nav-link:hover::before, .nav-link.active::before,
+        .nav-link:hover::after, .nav-link.active::after { opacity: 1; }
 
         @media (max-width: 900px) {
-            .menu { position: relative; top: auto; left: auto; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; margin-bottom: 15px; align-items: flex-start; margin: 4vh 4vh 15px 4vh; }
-            .right-menu { position: relative; top: auto; right: auto; margin: 0 4vh 4vh 4vh; display: flex; width: calc(100% - 8vh); flex-wrap: wrap; gap: 15px; align-items: flex-start; }
+            .menu .nav-link, .right-menu .nav-link {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+                top: calc(4vh + 4px); /* Centratura verticale perfetta all'altezza del logo */
+            }
+
+            .mobile-nav {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100vh;
+                width: max-content;
+                background: black;
+                border-left: 1px solid #555;
+                padding: 12vh 4vh 4vh 2vh; 
+                gap: 20px;
+                z-index: 9999998;
+                transform: translateX(100%);
+                pointer-events: none;
+                transition: transform 0.3s ease;
+                font-family: 'Neue Montreal', sans-serif;
+                font-size: var(--font-16);
+            }
+
+            /* Voci del menu forzate a 500 su mobile, come richiesto */
+            .mobile-nav .nav-link {
+                font-weight: 500;
+            }
+
+            .mobile-nav.open {
+                transform: translateX(0);
+                pointer-events: all;
+            }
+
+            .credits-block {
+                max-width: calc(100vw - 8vh);
+            }
         }
 
+        /* ─── ALTRI STILI PAGINA ──────────────────────────────────────────────── */
         .horizontal-scroll-wrapper { display: flex; flex-direction: row; height: 100vh; width: 200vw; will-change: transform; }
         .slide { width: 100vw; height: 100vh; flex-shrink: 0; position: relative; z-index: 150; }
         .header-slide { display: block; } .content-slide { display: block; position: relative; overflow: visible; }
 
-        .titles { position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; }
-        h1 { font-size: var(--font-62); line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
+        .titles { position: absolute; bottom: var(--margin-screen); left: var(--margin-screen); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: auto; max-width: calc(100vw - 220px); }
+        h1 { font-size: var(--font-62); line-height: 1.15; letter-spacing: -0.01em; }
         .title { font-size: var(--font-16); opacity: 0.4; transition: opacity 0.3s; }
         
         .scrollWrapper { position: fixed; bottom: var(--margin-screen); right: var(--margin-screen); cursor: none; pointer-events: auto; z-index: 500; transition: opacity 0.2s, transform 0.2s; }
@@ -84,8 +203,7 @@
 
         #hidden-intro-container { position: absolute; top: 14vh; left: 4vh; right: 4vh; margin: 0; width: calc(100vw - 8vh); height: 82vh; opacity: 0; pointer-events: none; z-index: -9999; visibility: hidden; overflow: hidden; }
         #hidden-intro-container * { animation-play-state: paused !important; }
-        #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-break: keep-all; overflow-wrap: normal; }
-        @media (max-width: 900px) { #hidden-intro-container { top: auto; left: auto; right: auto; margin: 0; width: 100%; height: 100vh; } }
+        #hidden-dynamic-text { font-family: 'Neue Montreal', sans-serif; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; text-align: left; width: 100%; word-wrap: break-word; }
 
         /* ANIMATIONS */
         .anim-pos-orbit { display: inline-block; width: 0.45em; height: 0.45em; background-color: white; border-radius: 50%; vertical-align: middle; position: relative; top: -0.05em; margin: 0 0.45em; animation: orbit-small 1.5s linear infinite; }
@@ -186,6 +304,19 @@
         </a>
     </nav>
 
+    <div class="hamburger" id="hamburger-menu">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <div class="mobile-nav" id="mobile-nav-menu">
+        <a href="sizes.html" class="nav-link"><span class="text-label">Sizes</span></a>
+        <a href="positions.html" class="nav-link active"><span class="text-label">Positions</span></a>
+        <a href="distances.html" class="nav-link"><span class="text-label">Distances</span></a>
+        <a href="measurement.html" class="nav-link"><span class="text-label">Measurement Methods</span></a>
+        <a href="credits.html" class="nav-link"><span class="text-label">Credits</span></a>
+    </div>
+
     <div class="scrollWrapper" id="header-scroll">
         <div id="scroll-sign" class="scroll-sign jump">
             <p>Scroll to explore</p>
@@ -242,7 +373,7 @@
     </div>
 
     <div id="hidden-intro-container">
-        <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA’s&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency’s&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
+        <div id="hidden-dynamic-text">On&nbsp;the&nbsp;occasion&nbsp;of&nbsp;NASA's&nbsp;70th&nbsp;anniversary,&nbsp;this&nbsp;project is&nbsp;designed&nbsp;to&nbsp;correct&nbsp;the&nbsp;frequently&nbsp;misleading&nbsp;visual representations&nbsp;of&nbsp;our&nbsp;Solar&nbsp;System.&nbsp;Drawing&nbsp;from&nbsp;the agency's&nbsp;immense&nbsp;archive&nbsp;of&nbsp;official&nbsp;scientific&nbsp;data,&nbsp;this interactive&nbsp;platform&nbsp;offers&nbsp;a&nbsp;simplified,&nbsp;clear,&nbsp;and&nbsp;rigorous visualization&nbsp;of&nbsp;true&nbsp;cosmic&nbsp;proportions&nbsp;in&nbsp;an&nbsp;immediate&nbsp;and intuitive&nbsp;way,&nbsp;allowing&nbsp;you&nbsp;to&nbsp;understand&nbsp;the&nbsp;true&nbsp;physical sizes&nbsp;<span class="anim-dim-circle"></span>&nbsp;of&nbsp;the&nbsp;planets,&nbsp;their&nbsp;changing&nbsp;orbital&nbsp;positions&nbsp;<span class="anim-pos-orbit"></span> and&nbsp;the&nbsp;empty&nbsp;distances&nbsp;<span class="anim-dist-circles"><span class="c1"></span><span class="c2"></span></span>&nbsp;that&nbsp;separate&nbsp;them.</div>
     </div>
 
     <script>
@@ -287,13 +418,23 @@
         window.addEventListener('mousedown', () => cursorDot.classList.add('mouse-down'));
         window.addEventListener('mouseup',   () => cursorDot.classList.remove('mouse-down'));
 
-        const interactives = document.querySelectorAll('.nav-link, #logo-link, .btn, input, .scrollWrapper, #zoom-controls button');
+        const interactives = document.querySelectorAll('.nav-link, #logo-link, .btn, input, .scrollWrapper, #zoom-controls button, .hamburger');
         interactives.forEach(el => {
             el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
             el.addEventListener('mouseleave',() => cursorOutline.classList.remove('hover'));
         });
 
-        // ── MENU HACKER EFFECT ───────────────────────────────────────────────
+        // ── MENU HACKER EFFECT & HAMBURGER ───────────────────────────────────
+        const hamburgerBtn = document.getElementById('hamburger-menu');
+        const mobileNavBox = document.getElementById('mobile-nav-menu');
+
+        if (hamburgerBtn && mobileNavBox) {
+            hamburgerBtn.addEventListener('click', () => {
+                hamburgerBtn.classList.toggle('open');
+                mobileNavBox.classList.toggle('open');
+            });
+        }
+
         const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:',.<>?/~`";
         const menuLinks = document.querySelectorAll('.nav-link');
         
@@ -355,6 +496,11 @@
             link.addEventListener('mouseleave', () => { clearInterval(intervalRef.id); textSpan.innerText = originalText; });
         });
 
+        const posLinks = document.querySelectorAll('a[href="positions.html"]');
+        posLinks.forEach(link => {
+            link.addEventListener('click', (e) => { e.preventDefault(); window.location.reload(); });
+        });
+
         let lastIntroWidth = 0, lastIntroHeight = 0;
         function syncTitleFontSize() {
             const hiddenText      = document.getElementById('hidden-dynamic-text');
@@ -382,6 +528,7 @@
             lastIntroWidth = targetWidth; lastIntroHeight = targetHeight;
         }
 
+        syncTitleFontSize();
         document.fonts.ready.then(() => { updateMenuWidths(); syncTitleFontSize(); });
 
         // ── STARS ENGINE ─────────────────────────────────────────────────────
@@ -469,7 +616,7 @@
 
         let wheelEndTimeout;
         let waitForScrollEnd = false;
-        let uiFadeTimeout; // Variabile per gestire il ritardo dei pannelli UI
+        let uiFadeTimeout; 
 
         // ── JPL ORBITAL ELEMENTS ──────────────────────────────────────────────
         const jplData = {
@@ -509,7 +656,6 @@
             targetX = currentState * winWidth;
             isTraveling = true;
             
-            // Pulisce l'eventuale timeout di apparizione per evitare popup indesiderati
             clearTimeout(uiFadeTimeout);
 
             setTimeout(() => { isTraveling = false; }, 1000);
@@ -520,7 +666,6 @@
                 isEngineActive = true;
                 setTimeout(() => { zoomEnabled = true; }, 500);
                 
-                // Ritarda l'apparizione dell'interfaccia a DOPO il completamento dell'animazione di scorrimento
                 uiFadeTimeout = setTimeout(() => {
                     timeControlsEl.classList.add('visible-ui');
                     zoomControlsEl.classList.add('visible-ui');
@@ -531,8 +676,6 @@
             } else {
                 scrollIndicator.style.opacity = '1'; scrollIndicator.style.pointerEvents = 'auto';
                 isEngineActive = false; zoomEnabled = false; 
-                
-                // Quando si torna alla schermata 0, svaniscono istantaneamente
                 timeControlsEl.classList.remove('visible-ui');
                 zoomControlsEl.classList.remove('visible-ui');
             }
@@ -609,9 +752,6 @@
             needsForceUpdate = true;
         });
 
-        const navPosizioni = document.getElementById('nav-posizioni');
-        if (navPosizioni) navPosizioni.addEventListener('click', (e) => { e.preventDefault(); window.location.reload(); });
-
         document.getElementById('btn-zoom-in').addEventListener('click', () => {
             if (!isEngineActive) return;
             targetAuScale = Math.max(1.5, Math.min(targetAuScale + 1.5, 15));
@@ -622,6 +762,9 @@
         });
 
         function updateDateUI() {
+            if (isLiveMode) {
+                currentDate = new Date();
+            }
             const dateStr = currentDate.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
             const timeStr = currentDate.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).toUpperCase();
             datePart.innerText = dateStr;
@@ -798,6 +941,10 @@
 
                 if (timeChanged || zoomChanged || needsForceUpdate) {
                     needsForceUpdate = false;
+                    
+                    if (!isLiveMode) {
+                        updateDateUI();
+                    }
                     
                     const planetBasePx = currentAuToPx * 0.00008517;
                     const uiRingPx = Math.round((0.6 + ((currentAuScale - 1.5) / 13.5) * 1.4) * vmin);
